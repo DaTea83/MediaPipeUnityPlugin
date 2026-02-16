@@ -16,6 +16,7 @@ namespace ProjectionMapping
 	    public bool UseGrabAny;
 	    public bool UseGesture;
 	    public EHandPose GestureType;
+	    public float3 CamDirection;
     }
 
     public struct HandPoseISingleton : IComponentData
@@ -41,8 +42,5 @@ namespace ProjectionMapping
 	    public float3 Origin;
     }
 
-    public struct HandGrabbableIData : IComponentData
-    {
-	    public bool IsGrabbed;
-    }
+    public struct HandGrabbableITag : IComponentData { }
 }

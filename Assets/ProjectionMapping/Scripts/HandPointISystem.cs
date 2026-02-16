@@ -88,7 +88,7 @@ namespace ProjectionMapping
 
 		    // Maybe there's a better way to do this, but keep it as it is for now
 		    // If I decided to use Enum.GetValues(),
-		    // cuz that is a managed type, I had to give up burst compile.
+		    // cuz that is a managed type, means I had to give up burst compile.
 		    // TODO: Need testing to find which is better
 		    
 		    tracking.LeftHand.Wrist2Thumb.Previous = tracking.LeftHand.Wrist2Thumb.Current;

@@ -39,7 +39,7 @@ namespace ProjectionMapping
 					pointOnBody = Mul(localTrans, pickCollector.Hit.Position);
 				}
 
-				GrabRef.Value = new GrabbableData()
+				GrabRef.Value = new GrabbableData
 				{
 					Valid = true,
 					Origin = Origin,

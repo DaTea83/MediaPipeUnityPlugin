@@ -52,7 +52,7 @@ namespace EugeneC.ECS
 	}
 
 	[BurstCompile]
-	public struct MouseCastIJob : IJob
+	public struct CastIJob : IJob
 	{
 		[ReadOnly] public CollisionWorld CollisionWorld;
 		[ReadOnly] public bool IgnoreTriggers;

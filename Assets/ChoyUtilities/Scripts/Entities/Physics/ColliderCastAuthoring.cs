@@ -90,7 +90,7 @@ namespace EugeneC.ECS
 
 					var camRay = cam.ScreenPointToRay(new Vector3(input.Position.x, input.Position.y, 0));
 
-					Dependency = new MouseCastIJob
+					Dependency = new CastIJob
 					{
 						CollisionWorld = physicsWorld.CollisionWorld,
 						IgnoreStatic = grab.IgnoreStatic,
