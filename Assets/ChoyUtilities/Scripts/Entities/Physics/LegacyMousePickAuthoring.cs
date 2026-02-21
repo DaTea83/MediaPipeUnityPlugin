@@ -14,9 +14,7 @@ using static Unity.Physics.Math;
 namespace Unity.Physics.Extensions
 {
 	// A mouse pick collector which stores every hit. Based off the ClosestHitCollector
-#if !UNITY_WEBGL || UNITY_EDITOR
 	[BurstCompile]
-#endif
 	public struct MousePickCollector : ICollector<RaycastHit>
 	{
 		public bool IgnoreTriggers;
@@ -114,10 +112,8 @@ namespace Unity.Physics.Extensions
 			public float3 PointOnBody;
 			public float MouseDepth;
 		}
-
-#if !UNITY_WEBGL || UNITY_EDITOR
+		
 		[BurstCompile]
-#endif
 		struct Pick : IJob
 		{
 			[ReadOnly] public CollisionWorld CollisionWorld;

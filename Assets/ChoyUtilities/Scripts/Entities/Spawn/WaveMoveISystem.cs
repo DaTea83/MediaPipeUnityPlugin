@@ -6,7 +6,6 @@ using Unity.Transforms;
 
 namespace EugeneC.ECS
 {
-#if !UNITY_WEBGL
 	[BurstCompile]
 	[UpdateInGroup(typeof(Eu_PreTransformSystemGroup))]
 	public partial struct WaveMoveISystem : ISystem
@@ -37,5 +36,4 @@ namespace EugeneC.ECS
 			}
 		}
 	}
-#endif
 }

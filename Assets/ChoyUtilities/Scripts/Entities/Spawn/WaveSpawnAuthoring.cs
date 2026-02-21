@@ -54,6 +54,7 @@ namespace EugeneC.ECS
 
 	[BurstCompile]
 	[UpdateInGroup(typeof(Eu_InitializationSystemGroup), OrderFirst = true)]
+	[UpdateAfter(typeof(InitializeRandomISystem))]
 	public partial struct WaveSpawnISystem : ISystem
 	{
 		[BurstCompile]

@@ -7,10 +7,14 @@ namespace EugeneC.Utilities
 {
 	public static partial class HelperCollection
 	{
+		/// <summary>
+		/// Different with normal remainder (x % y), this one will always return positive value 
+		/// </summary>
 		public static float Modulo(float x, float y) => (x % y + y) % y;
 
 		public static int Modulo(int x, int y) => (x % y + y) % y;
 
+		// Reminder is recommended to use RandomAuthoring so u don't need to keep constructs a new Random instance
 		public static float Random01(Entity entity, double et)
 		{
 			var ran = Random.CreateFromIndex((uint)entity.Index + (uint)et << 4 + 1);

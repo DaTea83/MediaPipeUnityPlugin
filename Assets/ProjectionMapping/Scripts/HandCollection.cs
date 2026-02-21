@@ -98,6 +98,19 @@ namespace ProjectionMapping
 			    _ => -1f
 		    };
 	    }
+	    
+	    public static float3 GetPosition(HandData data, HandSettingISingleton setting)
+	    {
+		    return setting.GestureType switch
+		    {
+			    EHandPose.None => float3.zero,
+			    EHandPose.MiddleFinger => data.Wrist2Middle.Position,
+			    EHandPose.PeaceSign => data.Index2Middle.Position,
+			    EHandPose.RockNRoll or EHandPose.OkSign or EHandPose.ThumbsUp => data.Thumb2Index.Position,
+			    EHandPose.HighFive or EHandPose.PhoneSign or EHandPose.ClenchedFist => data.Pinky2Thumb.Position,
+			    _ => float3.zero
+		    };
+	    }
 
 	    public static (bool, HandData) GetHand(this HandTrackingISingleton singleton, EHand hand)
 	    {

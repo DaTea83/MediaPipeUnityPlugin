@@ -7,6 +7,7 @@ using UnityEngine;
 namespace EugeneC.ECS
 {
 	[DisallowMultipleComponent]
+	[RequireComponent(typeof(RandomAuthoring))]
 	public class SphereSpawnAuthoring : MonoBehaviour
 	{
 		public GameObject prefab;
@@ -53,6 +54,7 @@ namespace EugeneC.ECS
 	
 	[BurstCompile]
 	[UpdateInGroup(typeof(Eu_InitializationSystemGroup), OrderFirst = true)]
+	[UpdateAfter(typeof(InitializeRandomISystem))]
 	public partial struct SpawnInSphereISystem : ISystem
 	{
 		[BurstCompile]
@@ -61,13 +63,13 @@ namespace EugeneC.ECS
 			var ecb = new EntityCommandBuffer(state.WorldUpdateAllocator);
 			var em = state.EntityManager;
 
-			foreach (var (sphere, ltw, entity)
-			         in SystemAPI.Query<RefRO<SphereSpawnIData>, RefRO<LocalToWorld>>().WithEntityAccess())
+			foreach (var (sphere, random, ltw, entity)
+			         in SystemAPI.Query<RefRO<SphereSpawnIData>, RefRW<RandomIData>, RefRO<LocalToWorld>>().WithEntityAccess())
 			{
 				using var instances = em.Instantiate(sphere.ValueRO.Prefab, sphere.ValueRO.Amount,
 					state.WorldUpdateAllocator);
 
-				var rng = new Unity.Mathematics.Random((uint)math.max(1, entity.Index + SystemAPI.Time.ElapsedTime));
+				var rng = random.ValueRW.Value;
 
 				for (var i = 0; i < sphere.ValueRO.Amount; i++)
 				{

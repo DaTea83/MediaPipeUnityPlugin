@@ -1,5 +1,4 @@
 using EugeneC.ECS;
-using EugeneC.Utilities;
 using Mediapipe.Unity;
 using Unity.Burst;
 using Unity.Entities;

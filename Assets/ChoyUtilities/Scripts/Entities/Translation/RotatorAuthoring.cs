@@ -38,14 +38,10 @@ namespace EugeneC.ECS
 	}
 
 	[UpdateInGroup(typeof(Eu_PreTransformSystemGroup))]
-#if !UNITY_WEBGL
 	[BurstCompile]
-#endif
 	public partial struct RotatorISystem : ISystem
 	{
-#if !UNITY_WEBGL
 		[BurstCompile]
-#endif
 		public void OnUpdate(ref SystemState state)
 		{
 			var deltaTime = SystemAPI.Time.DeltaTime;
