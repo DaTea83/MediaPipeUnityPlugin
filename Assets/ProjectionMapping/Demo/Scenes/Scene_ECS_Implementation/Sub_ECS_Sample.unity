@@ -259,9 +259,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7653b64ecb1fe34c9ae5e53ff5b2774, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useGrabAny: 1
-  useGesture: 0
-  gestureType: 0
+  useGrabAny: 0
+  useGesture: 1
+  gestureType: 64
 --- !u!4 &1262669431
 Transform:
   m_ObjectHideFlags: 0

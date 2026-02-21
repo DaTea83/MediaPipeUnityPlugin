@@ -49,6 +49,7 @@ namespace ProjectionMapping
 	    public void OnCreate(ref SystemState state)
 	    {
 		    state.RequireForUpdate<HandTrackingISingleton>();
+		    state.RequireForUpdate<HandSettingISingleton>();
 		    state.RequireForUpdate<HandPoseISingleton>();
 	    }
 
@@ -57,6 +58,7 @@ namespace ProjectionMapping
 	    {
 		    var tracking = SystemAPI.GetSingleton<HandTrackingISingleton>();
 		    var pose = SystemAPI.GetSingleton<HandPoseISingleton>();
+		    var settings = SystemAPI.GetSingleton<HandSettingISingleton>();
 		    
 		    var leftPos = new NativeArray<float3>(21, Allocator.Temp);
 		    var rightPos = new NativeArray<float3>(21, Allocator.Temp);
@@ -174,8 +176,8 @@ namespace ProjectionMapping
 		    var (rValid, right) = tracking.GetHand(EHand.Right);
 		    pose.RightCurrentHandPose = rValid ? right.GetPose() : EHandPose.None;
 
-		    pose.LeftOrigin = tracking.LeftHand.Pinky2Thumb.Position;
-		    pose.RightOrigin = tracking.RightHand.Pinky2Thumb.Position;
+		    pose.LeftOrigin = GetPosition(tracking.LeftHand, settings);
+		    pose.RightOrigin = GetPosition(tracking.RightHand, settings);;
 		    SystemAPI.SetSingleton(pose);
 	    }
 
@@ -183,6 +185,19 @@ namespace ProjectionMapping
 	    {
 		    if (id[id1] != id1 || id[id2] != id2) return (-1f, float3.zero);
 		    return (math.distance(pos[id1], pos[id2]), math.lerp(pos[id1], pos[id2], 0.5f));
+	    }
+
+	    private float3 GetPosition(HandData data, HandSettingISingleton setting)
+	    {
+		    return setting.GestureType switch
+		    {
+				EHandPose.None => float3.zero,
+				EHandPose.MiddleFinger => data.Wrist2Middle.Position,
+				EHandPose.PeaceSign => data.Index2Middle.Position,
+				EHandPose.RockNRoll or EHandPose.OkSign or EHandPose.ThumbsUp => data.Thumb2Index.Position,
+				EHandPose.HighFive or EHandPose.PhoneSign or EHandPose.ClenchedFist => data.Pinky2Thumb.Position,
+				_ => float3.zero
+		    };
 	    }
     }
 }
