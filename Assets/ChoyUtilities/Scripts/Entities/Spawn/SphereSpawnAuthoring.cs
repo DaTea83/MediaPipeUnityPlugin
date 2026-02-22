@@ -75,7 +75,7 @@ namespace EugeneC.ECS
 				{
 					var lt = em.GetComponentData<LocalTransform>(instances[i]);
 					var dir = rng.NextFloat3Direction();
-					var dist = sphere.ValueRO.Radius * math.pow(rng.NextFloat(), 1f / 3f);
+					var dist = sphere.ValueRO.Radius * math.pow(rng.NextFloat(), 0.3333f);
 					var newPos = ltw.ValueRO.Position + dir * dist;
 
 					lt.Position = newPos;

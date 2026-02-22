@@ -106,7 +106,16 @@ namespace EugeneC.ECS
 			         in SystemAPI.Query<RefRO<TextGridSpawnIData>, DynamicBuffer<TextGridIBuffer>, RefRO<LocalToWorld>>()
 				         .WithAll<TextGridSpawnIData>().WithEntityAccess())
 			{
-				var startPos = ltw.ValueRO.Position;
+				var rot = ltw.ValueRO.Rotation;
+				
+				// Spawning based on the entity's local rotation
+				var right = math.mul(rot, new float3(1f, 0f, 0f));
+				var forward = math.mul(rot, new float3(0f, 0f, 1f));
+
+				var halfWidth = (spawn.ValueRO.Total.x * spawn.ValueRO.Spacing.x) * 0.5f;
+				var halfHeight = (spawn.ValueRO.Total.y * spawn.ValueRO.Spacing.y) * 0.5f;
+
+				var startPos = ltw.ValueRO.Position - (right * halfWidth) - (forward * halfHeight);
 				var pattern = spawn.ValueRO.Pattern.Value[0];
 
 				var spawnIndex = 0;
@@ -117,22 +126,26 @@ namespace EugeneC.ECS
 						var spawnType = pattern[spawnIndex];
 						var spawnEntity = buffer[spawnType].Prefab;
 						if (spawnEntity == Entity.Null) continue;
-						
+
 						var newEntity = ecb.Instantiate(spawnEntity);
+
+						var pos =
+							startPos +
+							(right * (x * spawn.ValueRO.Spacing.x)) +
+							(forward * (y * spawn.ValueRO.Spacing.y));
+
 						var eLt = LocalTransform.FromPositionRotationScale(
-							new float3
-						{
-							x = startPos.x + x * spawn.ValueRO.Spacing.x,
-							y = startPos.y,
-							z = startPos.z + y * spawn.ValueRO.Spacing.y
-						}, 
-							quaternion.identity, 
+							pos,
+							rot,
 							spawn.ValueRO.Scale);
+
 						ecb.SetComponent(newEntity, eLt);
 					}
 				}
+
 				ecb.RemoveComponent<TextGridSpawnIData>(entity);
 			}
+
 			ecb.Playback(state.EntityManager);
 		}
 	}

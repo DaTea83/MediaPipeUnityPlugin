@@ -56,7 +56,7 @@ namespace EugeneC.ECS
 			foreach (var (grid, ltw, entity) 
 			         in SystemAPI.Query<RefRO<GridSpawnIData>, RefRO<LocalToWorld>>().WithEntityAccess())
 			{
-				var start = ltw.ValueRO.Position - (grid.ValueRO.Size * grid.ValueRO.Spacing / 2);
+				var start = ltw.ValueRO.Position - (grid.ValueRO.Size * grid.ValueRO.Spacing * 0.5f);
 				
 				var total = grid.ValueRO.Size.x * grid.ValueRO.Size.y * grid.ValueRO.Size.z;
 				using var instances = em.Instantiate(grid.ValueRO.Prefab, total, state.WorldUpdateAllocator);

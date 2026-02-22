@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1740711947280598157}
   - component: {fileID: 1672737300083601670}
   m_Layer: 0
-  m_Name: Outside
+  m_Name: Outside_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -41,7 +41,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1118921064605599623}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 4295729970447094460, guid: 3aa1e36a38ae9444c8af143d45e189a1, type: 3}
 --- !u!23 &1740711947280598157
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -107,4 +107,4 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.5, z: 0}

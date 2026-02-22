@@ -33,6 +33,11 @@ namespace EugeneC.Utilities
 			}
 		}
 
+		private void OnDisable()
+		{
+			CameraCancellation();
+		}
+
 		public async Task RunFadeScreen(UtilityCollection.EFadeType fadeType, float duration)
 		{
 			await Awaitable.EndOfFrameAsync(_tokenSource.Token);
