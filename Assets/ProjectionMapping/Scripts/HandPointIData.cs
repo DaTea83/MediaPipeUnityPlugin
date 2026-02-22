@@ -42,5 +42,8 @@ namespace ProjectionMapping
 	    public float3 Origin;
     }
 
-    public struct HandGrabbableITag : IComponentData { }
+    public struct HandGrabbableIData : IComponentData
+    {
+	    public bool IsGrabbed;
+    }
 }

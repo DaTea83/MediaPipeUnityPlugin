@@ -67,6 +67,9 @@ namespace EugeneC.ECS
 			         in SystemAPI.Query<RefRO<WaveSpawnIData>, RefRO<LocalToWorld>>().WithEntityAccess())
 			{
 				if (wave.ValueRO.Prefab == Entity.Null) continue;
+				var halfWidth = wave.ValueRO.Size.x * wave.ValueRO.Spacing.x * 0.5f;
+				var halfHeight = wave.ValueRO.Size.y * wave.ValueRO.Height * 0.5f;
+				var startPos = ltw.ValueRO.Position + new float3(halfWidth, 0, halfHeight);
 
 				var total = wave.ValueRO.Size.x * wave.ValueRO.Size.y;
 				using var instances = em.Instantiate(wave.ValueRO.Prefab, total, state.WorldUpdateAllocator);
@@ -77,7 +80,7 @@ namespace EugeneC.ECS
 					for (var y = 0; y < wave.ValueRO.Size.y; y++, count++)
 					{
 						var lt = em.GetComponentData<LocalTransform>(instances[count]);
-						lt.Position = ltw.ValueRO.Position +
+						lt.Position = startPos +
 						              new float3(x * wave.ValueRO.Spacing.x, 0, y * wave.ValueRO.Spacing.y);
 						em.SetComponentData(instances[count], lt);
 						ecb.AddComponent(instances[count], new WaveMoveIData

@@ -64,7 +64,7 @@ namespace ProjectionMapping
 				}
 
 				if (!SystemAPI.HasComponent<PhysicsMass>(entity)) continue;
-				if (!SystemAPI.HasComponent<HandGrabbableITag>(entity)) continue;
+				if (!SystemAPI.HasComponent<HandGrabbableIData>(entity)) continue;
 				if (SystemAPI.HasComponent<PhysicsMassOverride>(entity)) continue;
 
 				var mass = SystemAPI.GetComponent<PhysicsMass>(entity);

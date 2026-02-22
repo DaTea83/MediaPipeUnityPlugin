@@ -12,7 +12,6 @@ namespace ProjectionMapping
 		private void OnValidate()
 		{
 			_rb = GetComponent<Rigidbody>();
-			_rb.useGravity = false;
 		}
 
 		private class GrabableAuthoringBaker : Baker<GrabableAuthoring>
@@ -20,7 +19,7 @@ namespace ProjectionMapping
 			public override void Bake(GrabableAuthoring authoring)
 			{
 				var e = GetEntity(TransformUsageFlags.Dynamic);
-				AddComponent<HandGrabbableITag>(e);
+				AddComponent<HandGrabbableIData>(e);
 			}
 		}
 	}

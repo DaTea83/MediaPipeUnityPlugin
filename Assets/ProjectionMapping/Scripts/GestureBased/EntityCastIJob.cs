@@ -16,7 +16,7 @@ namespace ProjectionMapping
 		[ReadOnly] public CollisionWorld CollisionWorld;
 		[ReadOnly] public bool IgnoreTriggers;
 		[ReadOnly] public bool IgnoreStatic;
-		[ReadOnly] public ComponentLookup<HandGrabbableITag> GrabLookup;
+		[ReadOnly] public ComponentLookup<HandGrabbableIData> GrabLookup;
 		
 		public NativeReference<GestureData> DataRef;
 		public RaycastInput RayInput;
@@ -32,7 +32,9 @@ namespace ProjectionMapping
 			if (!CollisionWorld.CastRay(RayInput, ref pickCollector)) return;
 			var hitBody = CollisionWorld.Bodies[pickCollector.Hit.RigidBodyIndex];
 			if (!GrabLookup.HasComponent(hitBody.Entity)) return;
-			
+			// Make sure only one hand can access the entity at the same time
+			if (GrabLookup[hitBody.Entity].IsGrabbed) return;
+
 			float3 pointOnBody;
 			{
 				//Convert world transform to local transform

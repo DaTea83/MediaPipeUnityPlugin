@@ -142,10 +142,8 @@ namespace EugeneC.ECS
 						ecb.SetComponent(newEntity, eLt);
 					}
 				}
-
 				ecb.RemoveComponent<TextGridSpawnIData>(entity);
 			}
-
 			ecb.Playback(state.EntityManager);
 		}
 	}

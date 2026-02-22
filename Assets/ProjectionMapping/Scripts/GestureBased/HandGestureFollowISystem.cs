@@ -2,6 +2,7 @@
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -40,6 +41,12 @@ namespace ProjectionMapping
 			if (_interactSystemBase.LeftDataRef.Value.Valid)
 			{
 				var e = _interactSystemBase.LeftDataRef.Value.GrabEntity;
+				var grab = SystemAPI.GetComponent<HandGrabbableIData>(e);
+				if (!grab.IsGrabbed)
+				{
+					grab.IsGrabbed = true;
+					SystemAPI.SetComponent(e, grab);
+				}
 				var lt = SystemAPI.GetComponent<LocalTransform>(e);
 				MoveEntity(pose.LeftOrigin, dir, _interactSystemBase.LeftDataRef.Value.Distance, 
 					 ref lt, dt);
@@ -49,6 +56,12 @@ namespace ProjectionMapping
 			if (_interactSystemBase.RightDataRef.Value.Valid)
 			{
 				var e = _interactSystemBase.RightDataRef.Value.GrabEntity;
+				var grab = SystemAPI.GetComponent<HandGrabbableIData>(e);
+				if (!grab.IsGrabbed)
+				{
+					grab.IsGrabbed = true;
+					SystemAPI.SetComponent(e, grab);
+				}
 				var lt = SystemAPI.GetComponent<LocalTransform>(e);
 				MoveEntity(pose.RightOrigin, dir, _interactSystemBase.RightDataRef.Value.Distance, 
 					 ref lt, dt);

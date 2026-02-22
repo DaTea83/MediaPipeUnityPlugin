@@ -60,7 +60,7 @@ namespace ProjectionMapping
 					IgnoreStatic = cast.IgnoreStatic,
 					IgnoreTriggers = cast.IgnoreTriggers,
 					
-					GrabLookup = SystemAPI.GetComponentLookup<HandGrabbableITag>(true),
+					GrabLookup = SystemAPI.GetComponentLookup<HandGrabbableIData>(true),
 					DataRef = LeftDataRef,
 					RayInput = new RaycastInput
 					{
@@ -76,6 +76,13 @@ namespace ProjectionMapping
 			}
 			else if (pose.LeftCurrentHandPose != settings.GestureType && pose.LeftPreviousHandPose == settings.GestureType)
 			{
+				if (LeftDataRef.Value.GrabEntity != Entity.Null)
+				{
+					var grab = SystemAPI.GetComponent<HandGrabbableIData>(LeftDataRef.Value.GrabEntity);
+					grab.IsGrabbed = false;
+					SystemAPI.SetComponent(LeftDataRef.Value.GrabEntity, grab);
+				}
+				
 				LeftDependency.Complete();
 				LeftDataRef.Value = new GestureData()
 				{
@@ -94,7 +101,7 @@ namespace ProjectionMapping
 					IgnoreStatic = cast.IgnoreStatic,
 					IgnoreTriggers = cast.IgnoreTriggers,
 					
-					GrabLookup = SystemAPI.GetComponentLookup<HandGrabbableITag>(true),
+					GrabLookup = SystemAPI.GetComponentLookup<HandGrabbableIData>(true),
 					DataRef = RightDataRef,
 					RayInput = new RaycastInput
 					{
@@ -110,6 +117,13 @@ namespace ProjectionMapping
 			}
 			else if (pose.RightCurrentHandPose != settings.GestureType && pose.RightPreviousHandPose == settings.GestureType)
 			{
+				if (RightDataRef.Value.GrabEntity != Entity.Null)
+				{
+					var grab = SystemAPI.GetComponent<HandGrabbableIData>(RightDataRef.Value.GrabEntity);
+					grab.IsGrabbed = false;
+					SystemAPI.SetComponent(RightDataRef.Value.GrabEntity, grab);	
+				}
+				
 				RightDependency.Complete();
 				RightDataRef.Value = new GestureData()
 				{
