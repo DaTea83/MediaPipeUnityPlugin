@@ -12,7 +12,7 @@ using UnityEngine;
 namespace EugeneC.ECS
 {
 	[DisallowMultipleComponent]
-	public sealed class ColliderCastAuthoring : MonoBehaviour
+	public sealed class ColliderCastSingletonAuthoring : MonoBehaviour
 	{
 		[SerializeField] private bool ignoreTriggers = true;
 		[SerializeField] private bool ignoreStatic = true;
@@ -28,17 +28,17 @@ namespace EugeneC.ECS
 				deleteTagEntityOnClick = false;
 		}
 
-		public class Baker : Baker<ColliderCastAuthoring>
+		public class Baker : Baker<ColliderCastSingletonAuthoring>
 		{
-			public override void Bake(ColliderCastAuthoring authoring)
+			public override void Bake(ColliderCastSingletonAuthoring singletonAuthoring)
 			{
 				var e = GetEntity(TransformUsageFlags.None);
 				AddComponent(e, new ColliderCastISingleton
 				{
-					IgnoreStatic = authoring.ignoreStatic,
-					IgnoreTriggers = authoring.ignoreTriggers,
-					DeleteEntityOnClick = authoring.deleteAllEntityOnClick,
-					DeleteTagEntityOnClick = authoring.deleteTagEntityOnClick
+					IgnoreStatic = singletonAuthoring.ignoreStatic,
+					IgnoreTriggers = singletonAuthoring.ignoreTriggers,
+					DeleteEntityOnClick = singletonAuthoring.deleteAllEntityOnClick,
+					DeleteTagEntityOnClick = singletonAuthoring.deleteTagEntityOnClick
 				});
 			}
 		}

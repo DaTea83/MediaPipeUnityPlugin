@@ -5,7 +5,7 @@ using UnityEngine;
 namespace EugeneC.ECS
 {
 	[DisallowMultipleComponent]
-	[RequireComponent(typeof(ColliderCastAuthoring))]
+	[RequireComponent(typeof(ColliderCastSingletonAuthoring))]
 	public sealed class MouseInputAuthoring : MonoBehaviour
 	{
 		private class MouseInputAuthoringBaker : Baker<MouseInputAuthoring>

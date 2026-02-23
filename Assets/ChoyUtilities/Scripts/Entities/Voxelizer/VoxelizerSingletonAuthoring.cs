@@ -4,7 +4,7 @@ using UnityEngine;
 namespace EugeneC.ECS
 {
 	[DisallowMultipleComponent]
-	public sealed class VoxelizerAuthoring : MonoBehaviour
+	public sealed class VoxelizerSingletonAuthoring : MonoBehaviour
 	{
 		[SerializeField, Min(0.01f)] private float voxelSize = 0.05f;
 		[SerializeField, Min(0.1f)] private float voxelLife = 0.3f;
@@ -12,19 +12,19 @@ namespace EugeneC.ECS
 		[SerializeField] private float colorSpeed = 0.5f;
 		[SerializeField] private float groundLevel = 0.0f;
 		[SerializeField] private float gravity = 0.2f;
-		public class Baker : Baker<VoxelizerAuthoring>
+		public class Baker : Baker<VoxelizerSingletonAuthoring>
 		{
-			public override void Bake(VoxelizerAuthoring authoring)
+			public override void Bake(VoxelizerSingletonAuthoring singletonAuthoring)
 			{
 				var e = GetEntity(TransformUsageFlags.None);
 				AddComponent(e, new VoxelizerISingleton
 				{
-					VoxelSize = authoring.voxelSize,
-					VoxelLife = authoring.voxelLife,
-					ColorFrequency = authoring.colorFrequency,
-					ColorSpeed = authoring.colorSpeed,
-					GroundLevel = authoring.groundLevel,
-					Gravity = authoring.gravity
+					VoxelSize = singletonAuthoring.voxelSize,
+					VoxelLife = singletonAuthoring.voxelLife,
+					ColorFrequency = singletonAuthoring.colorFrequency,
+					ColorSpeed = singletonAuthoring.colorSpeed,
+					GroundLevel = singletonAuthoring.groundLevel,
+					Gravity = singletonAuthoring.gravity
 				});
 			}
 		}
