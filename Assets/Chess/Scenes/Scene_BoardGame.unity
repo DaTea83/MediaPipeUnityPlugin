@@ -1479,6 +1479,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraTransform: {fileID: 1889470877}
+  <playerPrefab>k__BackingField: {fileID: 3490244906245915763, guid: 8a0fc3b8516822c45a78158e4852bcfa,
+    type: 3}
 --- !u!1 &1990632544
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,6 +10,7 @@ namespace ChessGame
     public class GameController : GenericSingleton<GameController>
     {
         [SerializeField] private Transform cameraTransform;
+        [field: SerializeField] public GameObject playerPrefab { get; private set;}
         
         private World _world;
 	    

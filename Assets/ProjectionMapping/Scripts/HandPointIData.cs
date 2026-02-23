@@ -9,6 +9,7 @@ namespace ProjectionMapping
 	    public byte ID;
 	    public EHand EHand;
 	    public bool IsTracked;
+	    public float3 ScreenPosition;
     }
 
     public struct HandSettingISingleton : IComponentData

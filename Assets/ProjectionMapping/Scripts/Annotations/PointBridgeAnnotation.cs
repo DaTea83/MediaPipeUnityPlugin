@@ -37,7 +37,8 @@ namespace ProjectionMapping
 		    {
 			    ID = id,
 			    EHand = eHand,
-			    IsTracked = isTracked
+			    IsTracked = isTracked,
+			    ScreenPosition = position
 		    });
 	    }
     }

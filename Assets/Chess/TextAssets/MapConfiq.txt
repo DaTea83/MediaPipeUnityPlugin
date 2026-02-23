@@ -7,9 +7,9 @@
 0.gbbc.edwac.eh.0
 0.eddh.w..ic.w..0
 0.w....w...w.w..0
-0wwwwwwwwwwwwwww0
-0wwwwwwwwwwwwwww0
-0wwwwwwwwwwwwwww0
+wwwwwwwwwwwwwwwww
+wwwwwwwwwwwwwwwww
+wwwwwwwwwwwwwwwww
 0...w.w...w...w.0
 0gbbc.w.gbaf.gc.0
 0iadhwwwdaddwac.0
