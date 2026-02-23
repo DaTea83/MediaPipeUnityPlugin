@@ -28,7 +28,7 @@ namespace ProjectionMapping
 		RPinky2Thumb,
 	}
 	
-	public enum EHandPose : byte
+	public enum EHandPose : ushort
 	{
 		None = 0,
 		ClenchedFist = 1 << 0,
@@ -36,9 +36,10 @@ namespace ProjectionMapping
 		MiddleFinger = 1 << 2,
 		PhoneSign = 1 << 3,
 		PeaceSign = 1 << 4,
-		RockNRoll = 1 << 5,
-		OkSign = 1 << 6,
-		HighFive = 1 << 7,
+		GunSign = 1 << 5,
+		RockNRoll = 1 << 6,
+		OkSign = 1 << 7,
+		HighFive = 1 << 8,
 	}
 	
     public static class HandCollection
@@ -101,12 +102,12 @@ namespace ProjectionMapping
 	    
 	    public static float3 GetPosition(HandData data, HandSettingISingleton setting)
 	    {
-		    return setting.GestureType switch
+		    return setting.PickGesture switch
 		    {
 			    EHandPose.None => float3.zero,
 			    EHandPose.MiddleFinger => data.Wrist2Middle.Position,
 			    EHandPose.PeaceSign => data.Index2Middle.Position,
-			    EHandPose.RockNRoll or EHandPose.OkSign or EHandPose.ThumbsUp => data.Thumb2Index.Position,
+			    EHandPose.RockNRoll or EHandPose.OkSign or EHandPose.ThumbsUp or EHandPose.GunSign => data.Thumb2Index.Position,
 			    EHandPose.HighFive or EHandPose.PhoneSign or EHandPose.ClenchedFist => data.Pinky2Thumb.Position,
 			    _ => float3.zero
 		    };
@@ -139,6 +140,7 @@ namespace ProjectionMapping
 			    false when !index && !middle && !ring && !pinky && pinch => EHandPose.OkSign,
 			    true when index && middle && ring && pinky && pinch => EHandPose.ClenchedFist,
 			    false when index && middle && ring && pinky && !pinch => EHandPose.ThumbsUp,
+			    false when !index && middle && ring && pinky && !pinch => EHandPose.GunSign,
 			    false when index && middle && ring && !pinky && !pinch => EHandPose.PhoneSign,
 			    false when !index && middle && ring && !pinky && !pinch => EHandPose.RockNRoll,
 			    true when index && !middle && ring && pinky && pinch => EHandPose.MiddleFinger,

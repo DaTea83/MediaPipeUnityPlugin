@@ -8,12 +8,14 @@ namespace ProjectionMapping
     {
 	    [SerializeField] private bool useGrabAny;
 	    [SerializeField] private bool useGesture;
-	    [SerializeField] private EHandPose gestureType;
+	    [Space]
+	    [SerializeField] private EHandPose pickGesture = EHandPose.OkSign;
+	    [SerializeField] private EHandPose navigateHandPose = EHandPose.GunSign;
 	    
 	    private void OnValidate()
 	    {
 		    if(useGrabAny) useGesture = false;
-		    if(useGesture) useGrabAny = false;
+		    else if(useGesture) useGrabAny = false;
 	    }
 
 	    public class Baker : Baker<HandTrackSingletonAuthoring>
@@ -27,7 +29,8 @@ namespace ProjectionMapping
 			    {
 				    UseGrabAny = authoring.useGrabAny,
 				    UseGesture = authoring.useGesture,
-				    GestureType = authoring.gestureType
+				    PickGesture = authoring.pickGesture,
+				    NavigateGesture = authoring.navigateHandPose
 			    });
 		    }
 	    }

@@ -56,7 +56,16 @@ namespace EugeneC.ECS
 			foreach (var (grid, ltw, entity) 
 			         in SystemAPI.Query<RefRO<GridSpawnIData>, RefRO<LocalToWorld>>().WithEntityAccess())
 			{
-				var start = ltw.ValueRO.Position - (grid.ValueRO.Size * grid.ValueRO.Spacing * 0.5f);
+				var startRot = ltw.ValueRO.Rotation;
+				
+				var right = math.mul(startRot, new float3(1f, 0f, 0f));
+				var up = math.mul(startRot, new float3(0f, 1f, 0f));
+				var forward = math.mul(startRot, new float3(0f, 0f, 1f));
+				
+				var halfWidth = grid.ValueRO.Size.x * grid.ValueRO.Spacing.x * 0.5f;
+				var halfHeight = grid.ValueRO.Size.y * grid.ValueRO.Spacing.y * 0.5f;
+				var halfDepth = grid.ValueRO.Size.z * grid.ValueRO.Spacing.z * 0.5f;
+				var startPos = ltw.ValueRO.Position - (right * halfWidth) - (up * halfHeight) - (forward * halfDepth);
 				
 				var total = grid.ValueRO.Size.x * grid.ValueRO.Size.y * grid.ValueRO.Size.z;
 				using var instances = em.Instantiate(grid.ValueRO.Prefab, total, state.WorldUpdateAllocator);
@@ -69,7 +78,11 @@ namespace EugeneC.ECS
 						for (var z = 0; z < grid.ValueRO.Size.z; z++, count++)
 						{
 							var lt = em.GetComponentData<LocalTransform>(instances[count]);
-							lt.Position = start + new float3(x * grid.ValueRO.Spacing.x, y * grid.ValueRO.Spacing.y, z * grid.ValueRO.Spacing.z);
+							lt.Position = startPos + 
+							              (right * (x * grid.ValueRO.Spacing.x)) +
+							              (up * (y * grid.ValueRO.Spacing.y)) +
+							              (forward * (z * grid.ValueRO.Spacing.z));
+							lt.Rotation = startRot;
 							lt.Scale = grid.ValueRO.Scale;
 							em.SetComponentData(instances[count], lt);
 						}

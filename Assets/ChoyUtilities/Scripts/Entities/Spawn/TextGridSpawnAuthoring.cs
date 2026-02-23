@@ -108,7 +108,6 @@ namespace EugeneC.ECS
 			{
 				var rot = ltw.ValueRO.Rotation;
 				
-				// Spawning based on the entity's local rotation
 				var right = math.mul(rot, new float3(1f, 0f, 0f));
 				var forward = math.mul(rot, new float3(0f, 0f, 1f));
 

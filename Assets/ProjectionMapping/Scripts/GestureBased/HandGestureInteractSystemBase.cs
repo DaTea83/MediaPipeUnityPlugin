@@ -1,6 +1,5 @@
 ﻿using EugeneC.ECS;
 using EugeneC.Utilities;
-using Mediapipe.Unity;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -50,7 +49,7 @@ namespace ProjectionMapping
 			_leftScheduled = false;
 			_rightScheduled = false;
 			
-			if (pose.LeftCurrentHandPose == settings.GestureType && pose.LeftPreviousHandPose != settings.GestureType)
+			if (pose.LeftCurrentHandPose == settings.PickGesture && pose.LeftPreviousHandPose != settings.PickGesture)
 			{
 				var pos = pose.LeftOrigin;
 
@@ -74,8 +73,9 @@ namespace ProjectionMapping
 				LeftDependency = Dependency;
 				_leftScheduled = true;
 			}
-			else if (pose.LeftCurrentHandPose != settings.GestureType && pose.LeftPreviousHandPose == settings.GestureType)
+			else if (pose.LeftCurrentHandPose != settings.PickGesture && pose.LeftPreviousHandPose == settings.PickGesture)
 			{
+				LeftDependency.Complete();
 				if (LeftDataRef.Value.GrabEntity != Entity.Null)
 				{
 					var grab = SystemAPI.GetComponent<HandGrabbableIData>(LeftDataRef.Value.GrabEntity);
@@ -83,7 +83,6 @@ namespace ProjectionMapping
 					SystemAPI.SetComponent(LeftDataRef.Value.GrabEntity, grab);
 				}
 				
-				LeftDependency.Complete();
 				LeftDataRef.Value = new GestureData()
 				{
 					Valid = false
@@ -91,7 +90,7 @@ namespace ProjectionMapping
 				LeftDependency = default;
 			}
 			
-			if (pose.RightCurrentHandPose == settings.GestureType && pose.RightPreviousHandPose != settings.GestureType)
+			if (pose.RightCurrentHandPose == settings.PickGesture && pose.RightPreviousHandPose != settings.PickGesture)
 			{
 				var pos = pose.RightOrigin;
 
@@ -115,8 +114,9 @@ namespace ProjectionMapping
 				RightDependency = Dependency;
 				_rightScheduled = true;
 			}
-			else if (pose.RightCurrentHandPose != settings.GestureType && pose.RightPreviousHandPose == settings.GestureType)
+			else if (pose.RightCurrentHandPose != settings.PickGesture && pose.RightPreviousHandPose == settings.PickGesture)
 			{
+				RightDependency.Complete();
 				if (RightDataRef.Value.GrabEntity != Entity.Null)
 				{
 					var grab = SystemAPI.GetComponent<HandGrabbableIData>(RightDataRef.Value.GrabEntity);
@@ -124,7 +124,6 @@ namespace ProjectionMapping
 					SystemAPI.SetComponent(RightDataRef.Value.GrabEntity, grab);	
 				}
 				
-				RightDependency.Complete();
 				RightDataRef.Value = new GestureData()
 				{
 					Valid = false

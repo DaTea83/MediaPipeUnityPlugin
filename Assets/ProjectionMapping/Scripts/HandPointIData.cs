@@ -15,7 +15,8 @@ namespace ProjectionMapping
     {
 	    public bool UseGrabAny;
 	    public bool UseGesture;
-	    public EHandPose GestureType;
+	    public EHandPose PickGesture;
+	    public EHandPose NavigateGesture;
 	    public float3 CamDirection;
     }
 
