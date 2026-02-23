@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Unity.Mathematics;
-using Unity.Collections;
 using UnityEngine.UI;
 
 #if UNITY_2023_1_OR_NEWER
@@ -23,7 +22,7 @@ namespace EugeneC.Utilities
 			FadeOut = 1,
 		}
 
-		public static async Task FadeScreenAsync(this CancellationToken token, Image fadeImage,
+		public static async Awaitable FadeScreenAsync(this CancellationToken token, Image fadeImage,
 			bool isFadein, float loadDuration, Action onDone = null)
 		{
 			try
@@ -51,7 +50,7 @@ namespace EugeneC.Utilities
 			}
 		}
 
-		public static async Task<bool> FadeScreenAsync(this CancellationToken token, Image fadeImage,
+		public static async Awaitable<bool> FadeScreenAsync(this CancellationToken token, Image fadeImage,
 			EFadeType fadeType,
 			float loadDuration, float dt, Action onDone = null)
 		{
@@ -87,7 +86,7 @@ namespace EugeneC.Utilities
 			}
 		}
 
-		public static async Task<bool> FadeScreenAsync(this CancellationToken token, CanvasGroup cg, EFadeType fadeType,
+		public static async Awaitable<bool> FadeScreenAsync(this CancellationToken token, CanvasGroup cg, EFadeType fadeType,
 			float loadDuration, float dt, Action onDone = null)
 		{
 			try
@@ -125,7 +124,7 @@ namespace EugeneC.Utilities
 
 		#region Change Color Async
 
-		public static async Task<bool> ChangeColorAsync(this CancellationToken token, Image start, Color target,
+		public static async Awaitable<bool> ChangeColorAsync(this CancellationToken token, Image start, Color target,
 			float loadDuration, Action onDone = null)
 		{
 			try
@@ -154,7 +153,7 @@ namespace EugeneC.Utilities
 			}
 		}
 
-		public static async Task<Color> ChangeColorAsync(this CancellationToken token, float4 start, float4 target,
+		public static async Awaitable<Color> ChangeColorAsync(this CancellationToken token, float4 start, float4 target,
 			float loadDuration, Action onDone = null)
 		{
 			try
@@ -176,7 +175,7 @@ namespace EugeneC.Utilities
 			}
 		}
 
-		public static async Task<Color> ChangeColorAsync(this CancellationToken token, Color start, Color target,
+		public static async Awaitable<Color> ChangeColorAsync(this CancellationToken token, Color start, Color target,
 			float loadDuration, Action onDone = null)
 		{
 			try
@@ -202,7 +201,7 @@ namespace EugeneC.Utilities
 			}
 		}
 
-		public static async Task<Color> ChangeColorAsync(this CancellationToken token, Color start, Color target,
+		public static async Awaitable<Color> ChangeColorAsync(this CancellationToken token, Color start, Color target,
 			float loadDuration,
 			float dt, Action onDone = null)
 		{
@@ -233,7 +232,7 @@ namespace EugeneC.Utilities
 
 		#region Move Transform Async
 
-		public static async Task<bool> MoveAsync(this CancellationToken token, GameObject obj, Transform targetPos,
+		public static async Awaitable<bool> MoveAsync(this CancellationToken token, GameObject obj, Transform targetPos,
 			float moveDuration, Action onDone = null)
 		{
 			try
@@ -263,7 +262,7 @@ namespace EugeneC.Utilities
 			}
 		}
 
-		public static async Task<bool> MoveAsync(this CancellationToken token, RectTransform obj, float3 target,
+		public static async Awaitable<bool> MoveAsync(this CancellationToken token, RectTransform obj, float3 target,
 			float duration, Action onDone = null)
 		{
 			try
@@ -289,7 +288,7 @@ namespace EugeneC.Utilities
 			}
 		}
 
-		public static async Task<bool> MoveAsync(this CancellationToken token, GameObject obj, float3 targetPos,
+		public static async Awaitable<bool> MoveAsync(this CancellationToken token, GameObject obj, float3 targetPos,
 			float moveDuration, Action onDone = null)
 		{
 			try
@@ -320,7 +319,7 @@ namespace EugeneC.Utilities
 
 		#endregion
 
-		public static async Task RotateObjectAsync(this CancellationToken token, GameObject obj, Vector3 rotateTo,
+		public static async Awaitable RotateObjectAsync(this CancellationToken token, GameObject obj, Vector3 rotateTo,
 			float rotateDuration, Action onDone = null)
 		{
 			try
@@ -347,7 +346,7 @@ namespace EugeneC.Utilities
 			}
 		}
 
-		public static async Task<bool> RotateObjectAsync(this CancellationToken token, Transform obj, float3 rotateTo,
+		public static async Awaitable<bool> RotateObjectAsync(this CancellationToken token, Transform obj, float3 rotateTo,
 			float rotateDuration, Action onDone = null)
 		{
 			try
@@ -376,7 +375,7 @@ namespace EugeneC.Utilities
 			}
 		}
 
-		public static async Task ScaleObjectAsync(this CancellationToken token, GameObject obj, Vector3 scaleTo,
+		public static async Awaitable ScaleObjectAsync(this CancellationToken token, GameObject obj, Vector3 scaleTo,
 			float scalingDuration, Action onDone = null)
 		{
 			try
@@ -402,7 +401,7 @@ namespace EugeneC.Utilities
 			}
 		}
 
-		public static async Task DialogueAsync(this CancellationToken token, List<string> dialogueList,
+		public static async Awaitable DialogueAsync(this CancellationToken token, List<string> dialogueList,
 			float dialogueDuration,
 			Action<string> displayTo, float timePerChar, Action onDone = null)
 		{
@@ -440,7 +439,7 @@ namespace EugeneC.Utilities
 			}
 		}
 
-		public static async Task RollRightAngleAsync(this CancellationToken token, Transform ob, float rollSpeed,
+		public static async Awaitable RollRightAngleAsync(this CancellationToken token, Transform ob, float rollSpeed,
 			Vector3 dir, float rollCooldown = 0.1f)
 		{
 			try
@@ -460,7 +459,7 @@ namespace EugeneC.Utilities
 			}
 		}
 
-		public static async Task TimeScaleAsync(this CancellationToken token, float targetScale,
+		public static async Awaitable TimeScaleAsync(this CancellationToken token, float targetScale,
 			float loadDuration = 2f, Action onDone = null)
 		{
 			try
