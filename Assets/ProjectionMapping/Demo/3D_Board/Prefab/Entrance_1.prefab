@@ -122,11 +122,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   delay: 3
-  spawnType: 0
-  playerPrefab: {fileID: 3490244906245915763, guid: 8a0fc3b8516822c45a78158e4852bcfa,
-    type: 3}
-  guardPrefab: {fileID: 3490244906245915763, guid: 5269cd2c0e92a6c418d86748f28c0a1a,
-    type: 3}
+  prefab: {fileID: 3490244906245915763, guid: 8a0fc3b8516822c45a78158e4852bcfa, type: 3}
   offset:
     x: 0
     y: 2

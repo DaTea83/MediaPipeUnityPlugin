@@ -5,15 +5,13 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
-namespace ChessGame
+namespace ProjectionMapping
 {
 	[DisallowMultipleComponent]
 	public sealed class SpawnDelayEntityAuthoring : MonoBehaviour
 	{
 		[SerializeField] private float delay = 3f;
-		[SerializeField] private ESpawnType spawnType = ESpawnType.Player;
-		[SerializeField] private GameObject playerPrefab;
-		[SerializeField] private GameObject guardPrefab;
+		[SerializeField] private GameObject prefab;
 		[SerializeField] private float3 offset = new float3(0f, 2f, 0f);
 		
 		private class SpawnPlayerTimerAuthoringBaker : Baker<SpawnDelayEntityAuthoring>
@@ -21,20 +19,7 @@ namespace ChessGame
 			public override void Bake(SpawnDelayEntityAuthoring authoring)
 			{
 				var e = GetEntity(TransformUsageFlags.Dynamic);
-
-				Entity prefab;
-				switch (authoring.spawnType)
-				{
-					case ESpawnType.Player:
-						prefab = GetEntity(authoring.playerPrefab, TransformUsageFlags.Dynamic);
-						break;
-					case ESpawnType.Guards:
-						prefab = GetEntity(authoring.guardPrefab, TransformUsageFlags.Dynamic);
-						break;
-					default:
-						prefab = Entity.Null;
-						return;
-				}
+				var prefab = GetEntity(authoring.prefab, TransformUsageFlags.Dynamic);
 				
 				AddComponent(e, new SpawnDelayEntityIData
 				{

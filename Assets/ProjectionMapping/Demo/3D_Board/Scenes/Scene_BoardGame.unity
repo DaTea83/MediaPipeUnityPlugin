@@ -128,7 +128,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 463438670}
-  - component: {fileID: 463438668}
   - component: {fileID: 463438671}
   m_Layer: 0
   m_Name: Solution
@@ -137,18 +136,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &463438668
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 463438667}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 922516453737f6042a4026098e30c107, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProjectionMapping::ProjectionMapping.TestActivateAllDisplays
 --- !u!4 &463438670
 Transform:
   m_ObjectHideFlags: 0
@@ -879,6 +866,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1232581283}
   - component: {fileID: 1232581282}
+  - component: {fileID: 1232581284}
   m_Layer: 0
   m_Name: Projection Controller
   m_TagString: Untagged
@@ -915,6 +903,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1232581284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1232581281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 922516453737f6042a4026098e30c107, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1390952397
 GameObject:
   m_ObjectHideFlags: 0
@@ -1479,10 +1479,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraTransform: {fileID: 1889470877}
-  <playerPrefab>k__BackingField: {fileID: 3490244906245915763, guid: 8a0fc3b8516822c45a78158e4852bcfa,
-    type: 3}
-  <guardPrefab>k__BackingField: {fileID: 3490244906245915763, guid: 5269cd2c0e92a6c418d86748f28c0a1a,
-    type: 3}
 --- !u!1 &1990632544
 GameObject:
   m_ObjectHideFlags: 0
