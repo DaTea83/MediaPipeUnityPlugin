@@ -10,7 +10,6 @@ using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Mediapipe.Tasks.Components.Containers;
 using Mediapipe.Tasks.Core;
-using Mediapipe.Tasks.Vision.Core;
 using Mediapipe.Tasks.Vision.ObjectDetector;
 using Mediapipe.Unity;
 using Unity.Collections;
@@ -24,19 +23,20 @@ namespace Mediapipe.Tests.Tasks.Vision
 {
 	public class ObjectDetectorTest
 	{
-		private const string _ResourcePath = "Packages/com.github.homuler.mediapipe/PackageResources/MediaPipe";
-		private const string _TestResourcePath = "Packages/com.github.homuler.mediapipe/Tests/Resources";
+		private const string ResourcePath = "Packages/com.github.homuler.mediapipe/PackageResources/MediaPipe";
+		private const string TestResourcePath = "Packages/com.github.homuler.mediapipe/Tests/Resources";
 
-		private const int _CallbackTimeoutMillisec = 1000;
+		private const int CallbackTimeoutMillisec = 1000;
+		private const int Width = 32;
+		private const int Height = 32;
 
-		private static readonly IResourceManager _ResourceManager = new LocalResourceManager();
+		private static readonly IResourceManager ResourceManager = new LocalResourceManager();
 
 		private readonly Lazy<TextAsset> _objectDetectorModel =
-			new Lazy<TextAsset>(() =>
-				AssetDatabase.LoadAssetAtPath<TextAsset>($"{_ResourcePath}/efficientdet_lite0_float16.bytes"));
+			new (() => AssetDatabase.LoadAssetAtPath<TextAsset>($"{ResourcePath}/efficientdet_lite0_float16.bytes"));
 
 		private readonly Lazy<Texture2D> _facePicture =
-			new Lazy<Texture2D>(() => AssetDatabase.LoadAssetAtPath<Texture2D>($"{_TestResourcePath}/lenna.png"));
+			new (() => AssetDatabase.LoadAssetAtPath<Texture2D>($"{TestResourcePath}/lenna.png"));
 
 		#region Create
 
@@ -59,10 +59,8 @@ namespace Mediapipe.Tests.Tasks.Vision
 
 			Assert.DoesNotThrow(() =>
 			{
-				using (var objectDetector = ObjectDetector.CreateFromOptions(options))
-				{
-					objectDetector.Close();
-				}
+				using var objectDetector = ObjectDetector.CreateFromOptions(options);
+				objectDetector.Close();
 			});
 		}
 
@@ -84,17 +82,15 @@ namespace Mediapipe.Tests.Tasks.Vision
 		[UnityTest]
 		public IEnumerator Create_returns_ObjectDetector_when_assetModelPath_is_valid()
 		{
-			yield return _ResourceManager.PrepareAssetAsync("efficientdet_lite0_float16.bytes");
+			yield return ResourceManager.PrepareAssetAsync("efficientdet_lite0_float16.bytes");
 
 			var options = new ObjectDetectorOptions(new BaseOptions(BaseOptions.Delegate.CPU,
 				modelAssetPath: "efficientdet_lite0_float16.bytes"));
 
 			Assert.DoesNotThrow(() =>
 			{
-				using (var objectDetector = ObjectDetector.CreateFromOptions(options))
-				{
-					objectDetector.Close();
-				}
+				using var objectDetector = ObjectDetector.CreateFromOptions(options);
+				objectDetector.Close();
 			});
 		}
 
@@ -110,17 +106,11 @@ namespace Mediapipe.Tests.Tasks.Vision
 				runningMode: RunningMode.IMAGE,
 				scoreThreshold: 0.1f); // specify the score threshold to avoid crash, maybe caused by DetectionsDeduplicateCalculator.
 
-			using (var objectDetector = ObjectDetector.CreateFromOptions(options))
-			{
-				var width = 32;
-				var height = 32;
-				var pixelData = BuildSolidColorData(width, height, UnityEngine.Color.gray);
-				using (var image = new Image(ImageFormat.Types.Format.Srgba, width, height, width * 4, pixelData))
-				{
-					var result = objectDetector.Detect(image, null);
-					Assert.IsNull(result.detections);
-				}
-			}
+			using var objectDetector = ObjectDetector.CreateFromOptions(options);
+			var pixelData = BuildSolidColorData(Width, Height, UnityEngine.Color.gray);
+			using var image = new Image(ImageFormat.Types.Format.Srgba, Width, Height, Width * 4, pixelData);
+			var result = objectDetector.Detect(image, null);
+			Assert.IsNull(result.detections);
 		}
 
 		[Test]
@@ -132,15 +122,11 @@ namespace Mediapipe.Tests.Tasks.Vision
 				runningMode: RunningMode.IMAGE,
 				maxResults: 10);
 
-			using (var objectDetector = ObjectDetector.CreateFromOptions(options))
-			{
-				using (var image = CopyAsImage(_facePicture.Value))
-				{
-					var result = objectDetector.Detect(image, null);
-					Assert.IsTrue(result.detections?.Count > 0);
-					Assert.IsTrue(result.detections?.Count <= 10);
-				}
-			}
+			using var objectDetector = ObjectDetector.CreateFromOptions(options);
+			using var image = CopyAsImage(_facePicture.Value);
+			var result = objectDetector.Detect(image, null);
+			Assert.IsTrue(result.detections?.Count > 0);
+			Assert.IsTrue(result.detections?.Count <= 10);
 		}
 
 		#endregion
@@ -155,18 +141,12 @@ namespace Mediapipe.Tests.Tasks.Vision
 				runningMode: RunningMode.IMAGE,
 				scoreThreshold: 0.1f); // specify the score threshold to avoid crash, maybe caused by DetectionsDeduplicateCalculator.
 
-			using (var objectDetector = ObjectDetector.CreateFromOptions(options))
-			{
-				var width = 32;
-				var height = 32;
-				var pixelData = BuildSolidColorData(width, height, UnityEngine.Color.gray);
-				using (var image = new Image(ImageFormat.Types.Format.Srgba, width, height, width * 4, pixelData))
-				{
-					var result = DetectionResult.Alloc(0);
-					var found = objectDetector.TryDetect(image, null, ref result);
-					Assert.IsFalse(found);
-				}
-			}
+			using var objectDetector = ObjectDetector.CreateFromOptions(options);
+			var pixelData = BuildSolidColorData(Width, Height, UnityEngine.Color.gray);
+			using var image = new Image(ImageFormat.Types.Format.Srgba, Width, Height, Width * 4, pixelData);
+			var result = DetectionResult.Alloc(0);
+			var found = objectDetector.TryDetect(image, null, ref result);
+			Assert.IsFalse(found);
 		}
 
 		[Test]
@@ -177,17 +157,13 @@ namespace Mediapipe.Tests.Tasks.Vision
 				runningMode: RunningMode.IMAGE,
 				maxResults: 10);
 
-			using (var objectDetector = ObjectDetector.CreateFromOptions(options))
-			{
-				using (var image = CopyAsImage(_facePicture.Value))
-				{
-					var result = DetectionResult.Alloc(0);
-					var found = objectDetector.TryDetect(image, null, ref result);
-					Assert.IsTrue(found);
-					Assert.IsTrue(result.detections?.Count > 0);
-					Assert.IsTrue(result.detections?.Count <= 10);
-				}
-			}
+			using var objectDetector = ObjectDetector.CreateFromOptions(options);
+			using var image = CopyAsImage(_facePicture.Value);
+			var result = DetectionResult.Alloc(0);
+			var found = objectDetector.TryDetect(image, null, ref result);
+			Assert.IsTrue(found);
+			Assert.IsTrue(result.detections?.Count > 0);
+			Assert.IsTrue(result.detections?.Count <= 10);
 		}
 
 		#endregion
@@ -202,17 +178,11 @@ namespace Mediapipe.Tests.Tasks.Vision
 				runningMode: RunningMode.VIDEO,
 				scoreThreshold: 0.1f); // specify the score threshold to avoid crash, maybe caused by DetectionsDeduplicateCalculator.
 
-			using (var objectDetector = ObjectDetector.CreateFromOptions(options))
-			{
-				var width = 32;
-				var height = 32;
-				var pixelData = BuildSolidColorData(width, height, UnityEngine.Color.gray);
-				using (var image = new Image(ImageFormat.Types.Format.Srgba, width, height, width * 4, pixelData))
-				{
-					var result = objectDetector.DetectForVideo(image, 1, null);
-					Assert.IsNull(result.detections);
-				}
-			}
+			using var objectDetector = ObjectDetector.CreateFromOptions(options);
+			var pixelData = BuildSolidColorData(Width, Height, UnityEngine.Color.gray);
+			using var image = new Image(ImageFormat.Types.Format.Srgba, Width, Height, Width * 4, pixelData);
+			var result = objectDetector.DetectForVideo(image, 1, null);
+			Assert.IsNull(result.detections);
 		}
 
 		[Test]
@@ -223,15 +193,11 @@ namespace Mediapipe.Tests.Tasks.Vision
 				runningMode: RunningMode.VIDEO,
 				maxResults: 10);
 
-			using (var objectDetector = ObjectDetector.CreateFromOptions(options))
-			{
-				using (var image = CopyAsImage(_facePicture.Value))
-				{
-					var result = objectDetector.DetectForVideo(image, 1, null);
-					Assert.IsTrue(result.detections?.Count > 0);
-					Assert.IsTrue(result.detections?.Count <= 10);
-				}
-			}
+			using var objectDetector = ObjectDetector.CreateFromOptions(options);
+			using var image = CopyAsImage(_facePicture.Value);
+			var result = objectDetector.DetectForVideo(image, 1, null);
+			Assert.IsTrue(result.detections?.Count > 0);
+			Assert.IsTrue(result.detections?.Count <= 10);
 		}
 
 		#endregion
@@ -246,18 +212,12 @@ namespace Mediapipe.Tests.Tasks.Vision
 				runningMode: RunningMode.VIDEO,
 				scoreThreshold: 0.1f); // specify the score threshold to avoid crash, maybe caused by DetectionsDeduplicateCalculator.
 
-			using (var objectDetector = ObjectDetector.CreateFromOptions(options))
-			{
-				var width = 32;
-				var height = 32;
-				var pixelData = BuildSolidColorData(width, height, UnityEngine.Color.gray);
-				using (var image = new Image(ImageFormat.Types.Format.Srgba, width, height, width * 4, pixelData))
-				{
-					var result = DetectionResult.Alloc(0);
-					var found = objectDetector.TryDetectForVideo(image, 1, null, ref result);
-					Assert.IsFalse(found);
-				}
-			}
+			using var objectDetector = ObjectDetector.CreateFromOptions(options);
+			var pixelData = BuildSolidColorData(Width, Height, UnityEngine.Color.gray);
+			using var image = new Image(ImageFormat.Types.Format.Srgba, Width, Height, Width * 4, pixelData);
+			var result = DetectionResult.Alloc(0);
+			var found = objectDetector.TryDetectForVideo(image, 1, null, ref result);
+			Assert.IsFalse(found);
 		}
 
 		[Test]
@@ -268,17 +228,13 @@ namespace Mediapipe.Tests.Tasks.Vision
 				runningMode: RunningMode.VIDEO,
 				maxResults: 10);
 
-			using (var objectDetector = ObjectDetector.CreateFromOptions(options))
-			{
-				using (var image = CopyAsImage(_facePicture.Value))
-				{
-					var result = DetectionResult.Alloc(0);
-					var found = objectDetector.TryDetectForVideo(image, 1, null, ref result);
-					Assert.IsTrue(found);
-					Assert.IsTrue(result.detections?.Count > 0);
-					Assert.IsTrue(result.detections?.Count <= 10);
-				}
-			}
+			using var objectDetector = ObjectDetector.CreateFromOptions(options);
+			using var image = CopyAsImage(_facePicture.Value);
+			var result = DetectionResult.Alloc(0);
+			var found = objectDetector.TryDetectForVideo(image, 1, null, ref result);
+			Assert.IsTrue(found);
+			Assert.IsTrue(result.detections?.Count > 0);
+			Assert.IsTrue(result.detections?.Count <= 10);
 		}
 
 		#endregion
@@ -291,38 +247,32 @@ namespace Mediapipe.Tests.Tasks.Vision
 			var isCallbackInvoked = false;
 			var result = DetectionResult.Alloc(0);
 
-			void callback(DetectionResult detectionResult, Image image, long timestamp)
-			{
-				isCallbackInvoked = true;
-				result = detectionResult;
-			}
-
 			;
 			var options = new ObjectDetectorOptions(new BaseOptions(BaseOptions.Delegate.CPU,
 					modelAssetBuffer: _objectDetectorModel.Value.bytes),
 				runningMode: RunningMode.LIVE_STREAM,
 				scoreThreshold: 0.1f, // specify the score threshold to avoid crash, maybe caused by DetectionsDeduplicateCalculator.
-				resultCallback: callback);
+				resultCallback: Callback);
 
-			using (var objectDetector = ObjectDetector.CreateFromOptions(options))
+			using var objectDetector = ObjectDetector.CreateFromOptions(options);
+			var pixelData = BuildSolidColorData(Width, Height, UnityEngine.Color.gray);
+			using (var image = new Image(ImageFormat.Types.Format.Srgba, Width, Height, Width * 4, pixelData))
 			{
-				var width = 32;
-				var height = 32;
-				var pixelData = BuildSolidColorData(width, height, UnityEngine.Color.gray);
-				using (var image = new Image(ImageFormat.Types.Format.Srgba, width, height, width * 4, pixelData))
-				{
-					objectDetector.DetectAsync(image, 1, null);
-				}
+				objectDetector.DetectAsync(image, 1, null);
+			}
 
-				var stopwatch = new Stopwatch();
-				stopwatch.Start();
-				yield return new WaitUntil(() =>
-				{
-					return isCallbackInvoked || stopwatch.ElapsedMilliseconds > _CallbackTimeoutMillisec;
-				});
+			var stopwatch = new Stopwatch();
+			stopwatch.Start();
+			yield return new WaitUntil(() => isCallbackInvoked || stopwatch.ElapsedMilliseconds > CallbackTimeoutMillisec);
 
-				Assert.IsTrue(isCallbackInvoked);
-				Assert.IsNull(result.detections);
+			Assert.IsTrue(isCallbackInvoked);
+			Assert.IsNull(result.detections);
+			yield break;
+
+			void Callback(DetectionResult detectionResult, Image image, long timestamp)
+			{
+				isCallbackInvoked = true;
+				result = detectionResult;
 			}
 		}
 
@@ -333,18 +283,12 @@ namespace Mediapipe.Tests.Tasks.Vision
 			var isCallbackInvoked = false;
 			var result = DetectionResult.Alloc(0);
 
-			void callback(DetectionResult detectionResult, Image image, long timestamp)
-			{
-				isCallbackInvoked = true;
-				result = detectionResult;
-			}
-
 			;
 			var options = new ObjectDetectorOptions(new BaseOptions(BaseOptions.Delegate.CPU,
 					modelAssetBuffer: _objectDetectorModel.Value.bytes),
 				runningMode: RunningMode.LIVE_STREAM,
 				maxResults: 10,
-				resultCallback: callback);
+				resultCallback: Callback);
 
 			using (var objectDetector = ObjectDetector.CreateFromOptions(options))
 			{
@@ -357,12 +301,20 @@ namespace Mediapipe.Tests.Tasks.Vision
 				stopwatch.Start();
 				yield return new WaitUntil(() =>
 				{
-					return isCallbackInvoked || stopwatch.ElapsedMilliseconds > _CallbackTimeoutMillisec;
+					return isCallbackInvoked || stopwatch.ElapsedMilliseconds > CallbackTimeoutMillisec;
 				});
 
 				Assert.IsTrue(isCallbackInvoked);
 				Assert.IsTrue(result.detections?.Count > 0);
 				Assert.IsTrue(result.detections?.Count <= 10);
+			}
+
+			yield break;
+
+			void Callback(DetectionResult detectionResult, Image image, long timestamp)
+			{
+				isCallbackInvoked = true;
+				result = detectionResult;
 			}
 		}
 

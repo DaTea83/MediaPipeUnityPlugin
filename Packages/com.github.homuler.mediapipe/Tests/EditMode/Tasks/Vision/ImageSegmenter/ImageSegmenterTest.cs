@@ -22,19 +22,19 @@ namespace Mediapipe.Tests.Tasks.Vision
 {
 	public class ImageSegmenterTest
 	{
-		private const string _ResourcePath = "Packages/com.github.homuler.mediapipe/PackageResources/MediaPipe";
-		private const string _TestResourcePath = "Packages/com.github.homuler.mediapipe/Tests/Resources";
+		private const string ResourcePath = "Packages/com.github.homuler.mediapipe/PackageResources/MediaPipe";
+		private const string TestResourcePath = "Packages/com.github.homuler.mediapipe/Tests/Resources";
 
-		private const int _CallbackTimeoutMillisec = 1000;
+		private const int CallbackTimeoutMillisec = 1000;
 
-		private static readonly IResourceManager _ResourceManager = new LocalResourceManager();
+		private static readonly IResourceManager ResourceManager = new LocalResourceManager();
 
 		private readonly Lazy<TextAsset> _hairSegmenterModel =
 			new Lazy<TextAsset>(() =>
-				AssetDatabase.LoadAssetAtPath<TextAsset>($"{_ResourcePath}/hair_segmentation.bytes"));
+				AssetDatabase.LoadAssetAtPath<TextAsset>($"{ResourcePath}/hair_segmentation.bytes"));
 
 		private readonly Lazy<Texture2D> _facePicture =
-			new Lazy<Texture2D>(() => AssetDatabase.LoadAssetAtPath<Texture2D>($"{_TestResourcePath}/lenna.png"));
+			new Lazy<Texture2D>(() => AssetDatabase.LoadAssetAtPath<Texture2D>($"{TestResourcePath}/lenna.png"));
 
 		#region CreateFromOptions
 
@@ -43,7 +43,7 @@ namespace Mediapipe.Tests.Tasks.Vision
 		{
 			var options = new ImageSegmenterOptions(new BaseOptions(BaseOptions.Delegate.CPU));
 
-			_ = Assert.Throws<BadStatusException>(() =>
+			Assert.Throws<BadStatusException>(() =>
 			{
 				using var _ = ImageSegmenter.CreateFromOptions(options);
 			});
@@ -57,10 +57,8 @@ namespace Mediapipe.Tests.Tasks.Vision
 
 			Assert.DoesNotThrow(() =>
 			{
-				using (var imageSegmenter = ImageSegmenter.CreateFromOptions(options))
-				{
-					imageSegmenter.Close();
-				}
+				using var imageSegmenter = ImageSegmenter.CreateFromOptions(options);
+				imageSegmenter.Close();
 			});
 		}
 
@@ -73,7 +71,7 @@ namespace Mediapipe.Tests.Tasks.Vision
 
 			LogAssert.Expect(LogType.Exception, new Regex("KeyNotFoundException"));
 
-			_ = Assert.Throws<BadStatusException>(() =>
+			Assert.Throws<BadStatusException>(() =>
 			{
 				using var _ = ImageSegmenter.CreateFromOptions(options);
 			});
@@ -82,30 +80,27 @@ namespace Mediapipe.Tests.Tasks.Vision
 		[UnityTest]
 		public IEnumerator Create_returns_ImageSegmenter_when_assetModelPath_is_valid()
 		{
-			yield return _ResourceManager.PrepareAssetAsync("hair_segmentation.bytes");
+			yield return ResourceManager.PrepareAssetAsync("hair_segmentation.bytes");
 
 			var options = new ImageSegmenterOptions(new BaseOptions(BaseOptions.Delegate.CPU,
 				modelAssetPath: "hair_segmentation.bytes"));
 
 			Assert.DoesNotThrow(() =>
 			{
-				using (var imageSegmenter = ImageSegmenter.CreateFromOptions(options))
-				{
-					imageSegmenter.Close();
-				}
+				using var imageSegmenter = ImageSegmenter.CreateFromOptions(options);
+				imageSegmenter.Close();
 			});
 		}
 
 		[Test]
-		public void
-			CreateFromOptions_ShouldThrowBadStatusException_When_NeitherOutputSegmentationMasksNorOutputCategoryMaskIsTrue()
+		public void CreateFromOptions_ShouldThrowBadStatusException_When_NeitherOutputSegmentationMasksNorOutputCategoryMaskIsTrue()
 		{
 			var options = new ImageSegmenterOptions(new BaseOptions(BaseOptions.Delegate.CPU,
 					modelAssetBuffer: _hairSegmenterModel.Value.bytes),
 				outputConfidenceMasks: false,
 				outputCategoryMask: false);
 
-			_ = Assert.Throws<BadStatusException>(() =>
+			Assert.Throws<BadStatusException>(() =>
 			{
 				using var _ = ImageSegmenter.CreateFromOptions(options);
 			});
@@ -122,15 +117,11 @@ namespace Mediapipe.Tests.Tasks.Vision
 					modelAssetBuffer: _hairSegmenterModel.Value.bytes),
 				runningMode: RunningMode.IMAGE);
 
-			using (var imageSegmenter = ImageSegmenter.CreateFromOptions(options))
-			{
-				using (var image = CopyAsImage(_facePicture.Value))
-				{
-					var result = imageSegmenter.Segment(image, null);
-					Assert.AreEqual(2, result.confidenceMasks?.Count); // background, hair
-					Assert.Null(result.categoryMask);
-				}
-			}
+			using var imageSegmenter = ImageSegmenter.CreateFromOptions(options);
+			using var image = CopyAsImage(_facePicture.Value);
+			var result = imageSegmenter.Segment(image, null);
+			Assert.AreEqual(2, result.confidenceMasks?.Count); // background, hair
+			Assert.Null(result.categoryMask);
 		}
 
 		[Test]
@@ -141,15 +132,11 @@ namespace Mediapipe.Tests.Tasks.Vision
 				runningMode: RunningMode.IMAGE,
 				outputCategoryMask: true);
 
-			using (var imageSegmenter = ImageSegmenter.CreateFromOptions(options))
-			{
-				using (var image = CopyAsImage(_facePicture.Value))
-				{
-					var result = imageSegmenter.Segment(image, null);
-					Assert.AreEqual(2, result.confidenceMasks?.Count); // background, hair
-					Assert.NotNull(result.categoryMask);
-				}
-			}
+			using var imageSegmenter = ImageSegmenter.CreateFromOptions(options);
+			using var image = CopyAsImage(_facePicture.Value);
+			var result = imageSegmenter.Segment(image, null);
+			Assert.AreEqual(2, result.confidenceMasks?.Count); // background, hair
+			Assert.NotNull(result.categoryMask);
 		}
 
 		[Test]
@@ -161,15 +148,11 @@ namespace Mediapipe.Tests.Tasks.Vision
 				outputConfidenceMasks: false,
 				outputCategoryMask: true);
 
-			using (var imageSegmenter = ImageSegmenter.CreateFromOptions(options))
-			{
-				using (var image = CopyAsImage(_facePicture.Value))
-				{
-					var result = imageSegmenter.Segment(image, null);
-					Assert.Null(result.confidenceMasks);
-					Assert.NotNull(result.categoryMask);
-				}
-			}
+			using var imageSegmenter = ImageSegmenter.CreateFromOptions(options);
+			using var image = CopyAsImage(_facePicture.Value);
+			var result = imageSegmenter.Segment(image, null);
+			Assert.Null(result.confidenceMasks);
+			Assert.NotNull(result.categoryMask);
 		}
 
 		#endregion
@@ -184,15 +167,11 @@ namespace Mediapipe.Tests.Tasks.Vision
 					modelAssetBuffer: _hairSegmenterModel.Value.bytes),
 				runningMode: RunningMode.VIDEO);
 
-			using (var imageSegmenter = ImageSegmenter.CreateFromOptions(options))
-			{
-				using (var image = CopyAsImage(_facePicture.Value))
-				{
-					var result = imageSegmenter.SegmentForVideo(image, 1, null);
-					Assert.AreEqual(2, result.confidenceMasks?.Count); // background, hair
-					Assert.Null(result.categoryMask);
-				}
-			}
+			using var imageSegmenter = ImageSegmenter.CreateFromOptions(options);
+			using var image = CopyAsImage(_facePicture.Value);
+			var result = imageSegmenter.SegmentForVideo(image, 1, null);
+			Assert.AreEqual(2, result.confidenceMasks?.Count); // background, hair
+			Assert.Null(result.categoryMask);
 		}
 
 		[Test]
@@ -203,15 +182,11 @@ namespace Mediapipe.Tests.Tasks.Vision
 				runningMode: RunningMode.VIDEO,
 				outputCategoryMask: true);
 
-			using (var imageSegmenter = ImageSegmenter.CreateFromOptions(options))
-			{
-				using (var image = CopyAsImage(_facePicture.Value))
-				{
-					var result = imageSegmenter.SegmentForVideo(image, 1, null);
-					Assert.AreEqual(2, result.confidenceMasks?.Count); // background, hair
-					Assert.NotNull(result.categoryMask);
-				}
-			}
+			using var imageSegmenter = ImageSegmenter.CreateFromOptions(options);
+			using var image = CopyAsImage(_facePicture.Value);
+			var result = imageSegmenter.SegmentForVideo(image, 1, null);
+			Assert.AreEqual(2, result.confidenceMasks?.Count); // background, hair
+			Assert.NotNull(result.categoryMask);
 		}
 
 		#endregion
@@ -224,35 +199,32 @@ namespace Mediapipe.Tests.Tasks.Vision
 			var isCallbackInvoked = false;
 			var result = ImageSegmenterResult.Alloc(true);
 
-			void callback(ImageSegmenterResult segmentationResult, Image image, long timestamp)
-			{
-				isCallbackInvoked = true;
-				result = segmentationResult;
-			}
-
 			;
 			var options = new ImageSegmenterOptions(new BaseOptions(BaseOptions.Delegate.CPU,
 					modelAssetBuffer: _hairSegmenterModel.Value.bytes),
 				runningMode: RunningMode.LIVE_STREAM,
-				resultCallback: callback);
+				resultCallback: Callback);
 
-			using (var imageSegmenter = ImageSegmenter.CreateFromOptions(options))
+			using var imageSegmenter = ImageSegmenter.CreateFromOptions(options);
+			using (var image = CopyAsImage(_facePicture.Value))
 			{
-				using (var image = CopyAsImage(_facePicture.Value))
-				{
-					imageSegmenter.SegmentAsync(image, 1, null);
-				}
+				imageSegmenter.SegmentAsync(image, 1, null);
+			}
 
-				var stopwatch = new Stopwatch();
-				stopwatch.Start();
-				yield return new WaitUntil(() =>
-				{
-					return isCallbackInvoked || stopwatch.ElapsedMilliseconds > _CallbackTimeoutMillisec;
-				});
+			var stopwatch = new Stopwatch();
+			stopwatch.Start();
+			yield return new WaitUntil(() => isCallbackInvoked || stopwatch.ElapsedMilliseconds > CallbackTimeoutMillisec);
 
-				Assert.IsTrue(isCallbackInvoked);
-				Assert.AreEqual(2, result.confidenceMasks?.Count); // background, hair
-				Assert.Null(result.categoryMask);
+			Assert.IsTrue(isCallbackInvoked);
+			Assert.AreEqual(2, result.confidenceMasks?.Count); // background, hair
+			Assert.Null(result.categoryMask);
+
+			yield break;
+
+			void Callback(ImageSegmenterResult segmentationResult, Image image, long timestamp)
+			{
+				isCallbackInvoked = true;
+				result = segmentationResult;
 			}
 		}
 
@@ -262,18 +234,12 @@ namespace Mediapipe.Tests.Tasks.Vision
 			var isCallbackInvoked = false;
 			var result = ImageSegmenterResult.Alloc(true);
 
-			void callback(ImageSegmenterResult segmentationResult, Image image, long timestamp)
-			{
-				isCallbackInvoked = true;
-				result = segmentationResult;
-			}
-
 			;
 			var options = new ImageSegmenterOptions(new BaseOptions(BaseOptions.Delegate.CPU,
 					modelAssetBuffer: _hairSegmenterModel.Value.bytes),
 				runningMode: RunningMode.LIVE_STREAM,
 				outputCategoryMask: true,
-				resultCallback: callback);
+				resultCallback: Callback);
 
 			using (var imageSegmenter = ImageSegmenter.CreateFromOptions(options))
 			{
@@ -286,12 +252,20 @@ namespace Mediapipe.Tests.Tasks.Vision
 				stopwatch.Start();
 				yield return new WaitUntil(() =>
 				{
-					return isCallbackInvoked || stopwatch.ElapsedMilliseconds > _CallbackTimeoutMillisec;
+					return isCallbackInvoked || stopwatch.ElapsedMilliseconds > CallbackTimeoutMillisec;
 				});
 
 				Assert.IsTrue(isCallbackInvoked);
 				Assert.AreEqual(2, result.confidenceMasks?.Count); // background, hair
 				Assert.NotNull(result.categoryMask);
+			}
+
+			yield break;
+
+			void Callback(ImageSegmenterResult segmentationResult, Image image, long timestamp)
+			{
+				isCallbackInvoked = true;
+				result = segmentationResult;
 			}
 		}
 
@@ -306,10 +280,8 @@ namespace Mediapipe.Tests.Tasks.Vision
 					modelAssetBuffer: _hairSegmenterModel.Value.bytes),
 				runningMode: RunningMode.IMAGE);
 
-			using (var imageSegmenter = ImageSegmenter.CreateFromOptions(options))
-			{
-				Assert.AreEqual(0, imageSegmenter.labels.Count);
-			}
+			using var imageSegmenter = ImageSegmenter.CreateFromOptions(options);
+			Assert.AreEqual(0, imageSegmenter.labels.Count);
 		}
 
 		#endregion

@@ -122,7 +122,7 @@ namespace Mediapipe.Unity.CoordinateSystem.Tests
 			int imageHeight, int width, int height, int x, int y, int z,
 			RotationAngle imageRotation, bool isMirrored, float expectedX, float expectedY, float expectedZ)
 		{
-			var rect = BuildRect(-width / 2, width / 2, -height / 2, height / 2);
+			var rect = BuildRect(-width >> 1, width >> 1, -height >> 1, height >> 1);
 			var result =
 				ImageCoordinate.ImageToPoint(rect, x, y, z, imageWidth, imageHeight, imageRotation, isMirrored);
 			Assert.AreEqual(new Vector3(expectedX, expectedY, expectedZ), result);
@@ -281,7 +281,7 @@ namespace Mediapipe.Unity.CoordinateSystem.Tests
 			int height, float normalizedX, float normalizedY, float normalizedZ,
 			RotationAngle imageRotation, bool isMirrored, float expectedX, float expectedY, float expectedZ)
 		{
-			var rect = BuildRect(-width / 2, width / 2, -height / 2, height / 2);
+			var rect = BuildRect(-width >> 1, width >> 1, -height >> 1, height >> 1);
 			var result = ImageCoordinate.ImageNormalizedToPoint(rect, normalizedX, normalizedY, normalizedZ,
 				imageRotation, isMirrored);
 			Assert.AreEqual(new Vector3(expectedX, expectedY, expectedZ), result);
@@ -405,7 +405,7 @@ namespace Mediapipe.Unity.CoordinateSystem.Tests
 			float normalizedX, float normalizedY, float normalizedZ, float zScale,
 			RotationAngle imageRotation, bool isMirrored, float expectedZ)
 		{
-			var rect = BuildRect(-width / 2, width / 2, -height / 2, height / 2);
+			var rect = BuildRect(-width >> 1, width >> 1, -height >> 1, height >> 1);
 			var result = ImageCoordinate.ImageNormalizedToPoint(rect, normalizedX, normalizedY, normalizedZ, zScale,
 				imageRotation, isMirrored);
 			Assert.AreEqual(expectedZ, result.z);

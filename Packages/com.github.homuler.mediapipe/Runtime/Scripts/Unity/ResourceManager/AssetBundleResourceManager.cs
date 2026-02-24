@@ -14,14 +14,14 @@ namespace Mediapipe.Unity
 	{
 		private static readonly string _TAG = nameof(AssetBundleResourceManager);
 
-		private static string _AssetBundlePath;
-		private static string _CachePathRoot;
+		private static string _assetBundlePath;
+		private static string _cachePathRoot;
 
 		public AssetBundleResourceManager(string assetBundleName, string cachePath = "Cache")
 		{
 			ResourceUtil.EnableCustomResolver();
-			_AssetBundlePath = Path.Combine(Application.streamingAssetsPath, assetBundleName);
-			_CachePathRoot = Path.Combine(Application.persistentDataPath, cachePath);
+			_assetBundlePath = Path.Combine(Application.streamingAssetsPath, assetBundleName);
+			_cachePathRoot = Path.Combine(Application.persistentDataPath, cachePath);
 		}
 
 		private AssetBundleCreateRequest _assetBundleReq;
@@ -29,27 +29,27 @@ namespace Mediapipe.Unity
 
 		public void ClearAllCacheFiles()
 		{
-			if (Directory.Exists(_CachePathRoot))
+			if (Directory.Exists(_cachePathRoot))
 			{
-				Directory.Delete(_CachePathRoot, true);
+				Directory.Delete(_cachePathRoot, true);
 			}
 		}
 
 		public IEnumerator LoadAssetBundleAsync()
 		{
-			if (assetBundle != null)
+			if (assetBundle is not null)
 			{
 				Logger.LogWarning(_TAG, "AssetBundle is already loaded");
 				yield break;
 			}
 
 			// No need to lock because this code can be run in main thread only.
-			_assetBundleReq = AssetBundle.LoadFromFileAsync(_AssetBundlePath);
+			_assetBundleReq = AssetBundle.LoadFromFileAsync(_assetBundlePath);
 			yield return _assetBundleReq;
 
-			if (_assetBundleReq.assetBundle == null)
+			if (_assetBundleReq.assetBundle is null)
 			{
-				throw new IOException($"Failed to load {_AssetBundlePath}");
+				throw new IOException($"Failed to load {_assetBundlePath}");
 			}
 		}
 
@@ -64,33 +64,36 @@ namespace Mediapipe.Unity
 				yield break;
 			}
 
-			if (assetBundle == null)
+			if (assetBundle is null)
 			{
 				yield return LoadAssetBundleAsync();
 			}
-
-			var assetLoadReq = assetBundle.LoadAssetAsync<TextAsset>(name);
-			yield return assetLoadReq;
-
-			if (assetLoadReq.asset == null)
+			else
 			{
-				throw new IOException($"Failed to load {name} from {assetBundle.name}");
-			}
+				var assetLoadReq = assetBundle.LoadAssetAsync<TextAsset>(name);
+				yield return assetLoadReq;
 
-			Logger.LogVerbose(_TAG, $"Writing {name} data to {destFilePath}...");
-			if (!Directory.Exists(_CachePathRoot))
-			{
-				var _ = Directory.CreateDirectory(_CachePathRoot);
-			}
+				if (assetLoadReq.asset == null)
+				{
+					throw new IOException($"Failed to load {name} from {assetBundle.name}");
+				}
 
-			var bytes = (assetLoadReq.asset as TextAsset).bytes;
-			File.WriteAllBytes(destFilePath, bytes);
-			Logger.LogVerbose(_TAG, $"{name} is saved to {destFilePath} (length={bytes.Length})");
+				Logger.LogVerbose(_TAG, $"Writing {name} data to {destFilePath}...");
+				if (!Directory.Exists(_cachePathRoot))
+				{
+					var _ = Directory.CreateDirectory(_cachePathRoot);
+				}
+
+				var bytes = (assetLoadReq.asset as TextAsset)?.bytes;
+				if (bytes == null) yield break;
+				File.WriteAllBytes(destFilePath, bytes);
+				Logger.LogVerbose(_TAG, $"{name} is saved to {destFilePath} (length={bytes.Length})");
+			}
 		}
 
 		private static string GetCachePathFor(string assetName)
 		{
-			return Path.Combine(_CachePathRoot, assetName);
+			return Path.Combine(_cachePathRoot, assetName);
 		}
 	}
 }

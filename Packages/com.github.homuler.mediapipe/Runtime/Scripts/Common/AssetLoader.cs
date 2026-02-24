@@ -10,18 +10,15 @@ namespace Mediapipe.Unity.Sample
 {
 	public static class AssetLoader
 	{
-		private static IResourceManager _ResourceManager;
+		private static IResourceManager _resourceManager;
 
-		public static void Provide(IResourceManager manager) => _ResourceManager = manager;
+		public static void Provide(IResourceManager manager) => _resourceManager = manager;
 
 		public static IEnumerator PrepareAssetAsync(string name, string uniqueKey, bool overwrite = false)
 		{
-			if (_ResourceManager == null)
-			{
-				throw new System.InvalidOperationException("ResourceManager is not provided");
-			}
-
-			return _ResourceManager.PrepareAssetAsync(name, uniqueKey, overwrite);
+			return _resourceManager is null ? 
+				throw new System.InvalidOperationException("ResourceManager is not provided") 
+				: _resourceManager.PrepareAssetAsync(name, uniqueKey, overwrite);
 		}
 
 		public static IEnumerator PrepareAssetAsync(string name, bool overwrite = false) =>

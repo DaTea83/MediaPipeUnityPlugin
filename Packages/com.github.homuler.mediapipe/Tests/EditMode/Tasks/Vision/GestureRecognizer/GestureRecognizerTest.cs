@@ -58,10 +58,8 @@ namespace Mediapipe.Tests.Tasks.Vision
 
 			Assert.DoesNotThrow(() =>
 			{
-				using (var gestureRecognizer = GestureRecognizer.CreateFromOptions(options))
-				{
-					gestureRecognizer.Close();
-				}
+				using var gestureRecognizer = GestureRecognizer.CreateFromOptions(options);
+				gestureRecognizer.Close();
 			});
 		}
 
@@ -91,10 +89,8 @@ namespace Mediapipe.Tests.Tasks.Vision
 
 			Assert.DoesNotThrow(() =>
 			{
-				using (var gestureRecognizer = GestureRecognizer.CreateFromOptions(options))
-				{
-					gestureRecognizer.Close();
-				}
+				using var gestureRecognizer = GestureRecognizer.CreateFromOptions(options);
+				gestureRecognizer.Close();
 			});
 		}
 
@@ -109,17 +105,13 @@ namespace Mediapipe.Tests.Tasks.Vision
 					modelAssetBuffer: _gestureRecognizerModel.Value.bytes),
 				runningMode: RunningMode.IMAGE);
 
-			using (var gestureRecognizer = GestureRecognizer.CreateFromOptions(options))
-			{
-				var width = 32;
-				var height = 32;
-				var pixelData = BuildSolidColorData(width, height, UnityEngine.Color.gray);
-				using (var image = new Image(ImageFormat.Types.Format.Srgba, width, height, width * 4, pixelData))
-				{
-					var result = gestureRecognizer.Recognize(image, null);
-					Assert.IsNull(result.gestures);
-				}
-			}
+			using var gestureRecognizer = GestureRecognizer.CreateFromOptions(options);
+			var width = 32;
+			var height = 32;
+			var pixelData = BuildSolidColorData(width, height, UnityEngine.Color.gray);
+			using var image = new Image(ImageFormat.Types.Format.Srgba, width, height, width * 4, pixelData);
+			var result = gestureRecognizer.Recognize(image, null);
+			Assert.IsNull(result.gestures);
 		}
 
 		[Test]
@@ -411,7 +403,7 @@ namespace Mediapipe.Tests.Tasks.Vision
 
 		private NativeArray<byte> BuildSolidColorData(int width, int height, Color32 color)
 		{
-			var srcBytes = new byte[width * height * 4];
+			var srcBytes = new byte[(width * height) << 2];
 			for (var i = 0; i < srcBytes.Length; i += 4)
 			{
 				srcBytes[i] = color.r;
