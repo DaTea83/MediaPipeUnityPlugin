@@ -2,15 +2,24 @@ using System;
 using EugeneC.Singleton;
 using ProjectionMapping;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace ChessGame
 {
+	public enum ESpawnType : byte
+	{
+		Player,
+		Guards,
+		None = byte.MaxValue
+	}
+	
 	[DisallowMultipleComponent]
     public class GameController : GenericSingleton<GameController>
     {
         [SerializeField] private Transform cameraTransform;
         [field: SerializeField] public GameObject playerPrefab { get; private set;}
+        [field: SerializeField] public GameObject guardPrefab { get; private set;}
         
         private World _world;
 	    
@@ -21,9 +30,18 @@ namespace ChessGame
 		        await Awaitable.EndOfFrameAsync();
 		        _world = World.DefaultGameObjectInjectionWorld;
 		        var system = _world.GetExistingSystemManaged<HandDataEventSystemBase>();
-		        
+		        system.OnScreenDeltaChanged += MoveCamera;
 	        }
 	        catch (Exception e){ Debug.Log(e);}
+        }
+
+        private void MoveCamera(float3 arg1, float3 arg2)
+        {
+	        var delta = math.length(arg1) > math.length(arg2) ? arg1 : arg2;
+	        
+	        var rotation = cameraTransform.eulerAngles;
+	        rotation.y += delta.x;
+	        cameraTransform.eulerAngles = math.lerp(cameraTransform.eulerAngles, rotation, 5f * Time.deltaTime);
         }
     }
 }

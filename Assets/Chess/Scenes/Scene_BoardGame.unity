@@ -314,7 +314,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &532415177
 RectTransform:
   m_ObjectHideFlags: 0
@@ -587,22 +587,22 @@ PrefabInstance:
     - target: {fileID: 5480737853498571237, guid: b4f8229fb395da84db8a36fbb687b99f,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.97376686
       objectReference: {fileID: 0}
     - target: {fileID: 5480737853498571237, guid: b4f8229fb395da84db8a36fbb687b99f,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5480737853498571237, guid: b4f8229fb395da84db8a36fbb687b99f,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0.22754811
       objectReference: {fileID: 0}
     - target: {fileID: 5480737853498571237, guid: b4f8229fb395da84db8a36fbb687b99f,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5480737853498571237, guid: b4f8229fb395da84db8a36fbb687b99f,
         type: 3}
@@ -612,7 +612,7 @@ PrefabInstance:
     - target: {fileID: 5480737853498571237, guid: b4f8229fb395da84db8a36fbb687b99f,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: -26.306
       objectReference: {fileID: 0}
     - target: {fileID: 5480737853498571237, guid: b4f8229fb395da84db8a36fbb687b99f,
         type: 3}
@@ -1480,6 +1480,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraTransform: {fileID: 1889470877}
   <playerPrefab>k__BackingField: {fileID: 3490244906245915763, guid: 8a0fc3b8516822c45a78158e4852bcfa,
+    type: 3}
+  <guardPrefab>k__BackingField: {fileID: 3490244906245915763, guid: 5269cd2c0e92a6c418d86748f28c0a1a,
     type: 3}
 --- !u!1 &1990632544
 GameObject:

@@ -51,7 +51,7 @@ namespace ProjectionMapping
 			
 			if (pose.LeftCurrentHandPose == settings.PickGesture && pose.LeftPreviousHandPose != settings.PickGesture)
 			{
-				var pos = pose.LeftOrigin;
+				var pos = pose.LeftLocalPosition;
 
 				Dependency = new EntityCastIJob
 				{
@@ -92,7 +92,7 @@ namespace ProjectionMapping
 			
 			if (pose.RightCurrentHandPose == settings.PickGesture && pose.RightPreviousHandPose != settings.PickGesture)
 			{
-				var pos = pose.RightOrigin;
+				var pos = pose.RightLocalPosition;
 
 				Dependency = new EntityCastIJob
 				{

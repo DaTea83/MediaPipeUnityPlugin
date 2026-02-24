@@ -48,26 +48,46 @@ namespace ProjectionMapping
 	    {
 		    return target switch
 		    {
-			    ETrackingTarget.LWrist2Thumb => (singleton.LeftHand.Wrist2Thumb.Current, singleton.LeftHand.Wrist2Thumb.Position),
-			    ETrackingTarget.LWrist2Index => (singleton.LeftHand.Wrist2Index.Current, singleton.LeftHand.Wrist2Index.Position),
-			    ETrackingTarget.LWrist2Middle => (singleton.LeftHand.Wrist2Middle.Current, singleton.LeftHand.Wrist2Middle.Position),
-			    ETrackingTarget.LWrist2Ring => (singleton.LeftHand.Wrist2Ring.Current, singleton.LeftHand.Wrist2Ring.Position),
-			    ETrackingTarget.LWrist2Pinky => (singleton.LeftHand.Wrist2Pinky.Current, singleton.LeftHand.Wrist2Pinky.Position),
-			    ETrackingTarget.LThumb2Index => (singleton.LeftHand.Thumb2Index.Current, singleton.LeftHand.Thumb2Index.Position),
-			    ETrackingTarget.LIndex2Middle => (singleton.LeftHand.Index2Middle.Current, singleton.LeftHand.Index2Middle.Position),
-			    ETrackingTarget.LMiddle2Ring => (singleton.LeftHand.Middle2Ring.Current, singleton.LeftHand.Middle2Ring.Position),
-			    ETrackingTarget.LRing2Pinky => (singleton.LeftHand.Ring2Pinky.Current, singleton.LeftHand.Ring2Pinky.Position),
-			    ETrackingTarget.LPinky2Thumb => (singleton.LeftHand.Pinky2Thumb.Current, singleton.LeftHand.Pinky2Thumb.Position),
-			    ETrackingTarget.RWrist2Thumb => (singleton.RightHand.Wrist2Thumb.Current, singleton.RightHand.Wrist2Thumb.Position),
-			    ETrackingTarget.RWrist2Index => (singleton.RightHand.Wrist2Index.Current, singleton.RightHand.Wrist2Index.Position),
-			    ETrackingTarget.RWrist2Middle => (singleton.RightHand.Wrist2Middle.Current, singleton.RightHand.Wrist2Middle.Position),
-			    ETrackingTarget.RWrist2Ring => (singleton.RightHand.Wrist2Ring.Current, singleton.RightHand.Wrist2Ring.Position),
-			    ETrackingTarget.RWrist2Pinky => (singleton.RightHand.Wrist2Pinky.Current, singleton.RightHand.Wrist2Pinky.Position),
-			    ETrackingTarget.RThumb2Index => (singleton.RightHand.Thumb2Index.Current, singleton.RightHand.Thumb2Index.Position),
-			    ETrackingTarget.RIndex2Middle => (singleton.RightHand.Index2Middle.Current, singleton.RightHand.Index2Middle.Position),
-			    ETrackingTarget.RMiddle2Ring => (singleton.RightHand.Middle2Ring.Current, singleton.RightHand.Middle2Ring.Position),
-			    ETrackingTarget.RRing2Pinky => (singleton.RightHand.Ring2Pinky.Current, singleton.RightHand.Ring2Pinky.Position),
-			    ETrackingTarget.RPinky2Thumb => (singleton.RightHand.Pinky2Thumb.Current, singleton.RightHand.Pinky2Thumb.Position),
+			    ETrackingTarget.LWrist2Thumb => (singleton.LeftHand.Wrist2Thumb.CurrentInput,
+				    singleton.LeftHand.Wrist2Thumb.LocalPosition),
+			    ETrackingTarget.LWrist2Index => (singleton.LeftHand.Wrist2Index.CurrentInput,
+				    singleton.LeftHand.Wrist2Index.LocalPosition),
+			    ETrackingTarget.LWrist2Middle => (singleton.LeftHand.Wrist2Middle.CurrentInput,
+				    singleton.LeftHand.Wrist2Middle.LocalPosition),
+			    ETrackingTarget.LWrist2Ring => (singleton.LeftHand.Wrist2Ring.CurrentInput,
+				    singleton.LeftHand.Wrist2Ring.LocalPosition),
+			    ETrackingTarget.LWrist2Pinky => (singleton.LeftHand.Wrist2Pinky.CurrentInput,
+				    singleton.LeftHand.Wrist2Pinky.LocalPosition),
+			    ETrackingTarget.LThumb2Index => (singleton.LeftHand.Thumb2Index.CurrentInput,
+				    singleton.LeftHand.Thumb2Index.LocalPosition),
+			    ETrackingTarget.LIndex2Middle => (singleton.LeftHand.Index2Middle.CurrentInput,
+				    singleton.LeftHand.Index2Middle.LocalPosition),
+			    ETrackingTarget.LMiddle2Ring => (singleton.LeftHand.Middle2Ring.CurrentInput,
+				    singleton.LeftHand.Middle2Ring.LocalPosition),
+			    ETrackingTarget.LRing2Pinky => (singleton.LeftHand.Ring2Pinky.CurrentInput,
+				    singleton.LeftHand.Ring2Pinky.LocalPosition),
+			    ETrackingTarget.LPinky2Thumb => (singleton.LeftHand.Pinky2Thumb.CurrentInput,
+				    singleton.LeftHand.Pinky2Thumb.LocalPosition),
+			    ETrackingTarget.RWrist2Thumb => (singleton.RightHand.Wrist2Thumb.CurrentInput,
+				    singleton.RightHand.Wrist2Thumb.LocalPosition),
+			    ETrackingTarget.RWrist2Index => (singleton.RightHand.Wrist2Index.CurrentInput,
+				    singleton.RightHand.Wrist2Index.LocalPosition),
+			    ETrackingTarget.RWrist2Middle => (singleton.RightHand.Wrist2Middle.CurrentInput,
+				    singleton.RightHand.Wrist2Middle.LocalPosition),
+			    ETrackingTarget.RWrist2Ring => (singleton.RightHand.Wrist2Ring.CurrentInput,
+				    singleton.RightHand.Wrist2Ring.LocalPosition),
+			    ETrackingTarget.RWrist2Pinky => (singleton.RightHand.Wrist2Pinky.CurrentInput,
+				    singleton.RightHand.Wrist2Pinky.LocalPosition),
+			    ETrackingTarget.RThumb2Index => (singleton.RightHand.Thumb2Index.CurrentInput,
+				    singleton.RightHand.Thumb2Index.LocalPosition),
+			    ETrackingTarget.RIndex2Middle => (singleton.RightHand.Index2Middle.CurrentInput,
+				    singleton.RightHand.Index2Middle.LocalPosition),
+			    ETrackingTarget.RMiddle2Ring => (singleton.RightHand.Middle2Ring.CurrentInput,
+				    singleton.RightHand.Middle2Ring.LocalPosition),
+			    ETrackingTarget.RRing2Pinky => (singleton.RightHand.Ring2Pinky.CurrentInput,
+				    singleton.RightHand.Ring2Pinky.LocalPosition),
+			    ETrackingTarget.RPinky2Thumb => (singleton.RightHand.Pinky2Thumb.CurrentInput,
+				    singleton.RightHand.Pinky2Thumb.LocalPosition),
 			    _ => (-1f, float3.zero)
 		    };
 	    }
@@ -76,39 +96,52 @@ namespace ProjectionMapping
 	    {
 		    return target switch
 		    {
-			    ETrackingTarget.LWrist2Thumb => singleton.LeftHand.Wrist2Thumb.Previous,
-			    ETrackingTarget.LWrist2Index => singleton.LeftHand.Wrist2Index.Previous,
-			    ETrackingTarget.LWrist2Middle => singleton.LeftHand.Wrist2Middle.Previous,
-			    ETrackingTarget.LWrist2Ring => singleton.LeftHand.Wrist2Ring.Previous,
-			    ETrackingTarget.LWrist2Pinky => singleton.LeftHand.Wrist2Pinky.Previous,
-			    ETrackingTarget.LThumb2Index => singleton.LeftHand.Thumb2Index.Previous,
-			    ETrackingTarget.LIndex2Middle => singleton.LeftHand.Index2Middle.Previous,
-			    ETrackingTarget.LMiddle2Ring => singleton.LeftHand.Middle2Ring.Previous,
-			    ETrackingTarget.LRing2Pinky => singleton.LeftHand.Ring2Pinky.Previous,
-			    ETrackingTarget.LPinky2Thumb => singleton.LeftHand.Pinky2Thumb.Previous,
-			    ETrackingTarget.RWrist2Thumb => singleton.RightHand.Wrist2Thumb.Previous,
-			    ETrackingTarget.RWrist2Index => singleton.RightHand.Wrist2Index.Previous,
-			    ETrackingTarget.RWrist2Middle => singleton.RightHand.Wrist2Middle.Previous,
-			    ETrackingTarget.RWrist2Ring => singleton.RightHand.Wrist2Ring.Previous,
-			    ETrackingTarget.RWrist2Pinky => singleton.RightHand.Wrist2Pinky.Previous,
-			    ETrackingTarget.RThumb2Index => singleton.RightHand.Thumb2Index.Previous,
-			    ETrackingTarget.RIndex2Middle => singleton.RightHand.Index2Middle.Previous,
-			    ETrackingTarget.RMiddle2Ring => singleton.RightHand.Middle2Ring.Previous,
-			    ETrackingTarget.RRing2Pinky => singleton.RightHand.Ring2Pinky.Previous,
-			    ETrackingTarget.RPinky2Thumb => singleton.RightHand.Pinky2Thumb.Previous,
+			    ETrackingTarget.LWrist2Thumb => singleton.LeftHand.Wrist2Thumb.PreviousInput,
+			    ETrackingTarget.LWrist2Index => singleton.LeftHand.Wrist2Index.PreviousInput,
+			    ETrackingTarget.LWrist2Middle => singleton.LeftHand.Wrist2Middle.PreviousInput,
+			    ETrackingTarget.LWrist2Ring => singleton.LeftHand.Wrist2Ring.PreviousInput,
+			    ETrackingTarget.LWrist2Pinky => singleton.LeftHand.Wrist2Pinky.PreviousInput,
+			    ETrackingTarget.LThumb2Index => singleton.LeftHand.Thumb2Index.PreviousInput,
+			    ETrackingTarget.LIndex2Middle => singleton.LeftHand.Index2Middle.PreviousInput,
+			    ETrackingTarget.LMiddle2Ring => singleton.LeftHand.Middle2Ring.PreviousInput,
+			    ETrackingTarget.LRing2Pinky => singleton.LeftHand.Ring2Pinky.PreviousInput,
+			    ETrackingTarget.LPinky2Thumb => singleton.LeftHand.Pinky2Thumb.PreviousInput,
+			    ETrackingTarget.RWrist2Thumb => singleton.RightHand.Wrist2Thumb.PreviousInput,
+			    ETrackingTarget.RWrist2Index => singleton.RightHand.Wrist2Index.PreviousInput,
+			    ETrackingTarget.RWrist2Middle => singleton.RightHand.Wrist2Middle.PreviousInput,
+			    ETrackingTarget.RWrist2Ring => singleton.RightHand.Wrist2Ring.PreviousInput,
+			    ETrackingTarget.RWrist2Pinky => singleton.RightHand.Wrist2Pinky.PreviousInput,
+			    ETrackingTarget.RThumb2Index => singleton.RightHand.Thumb2Index.PreviousInput,
+			    ETrackingTarget.RIndex2Middle => singleton.RightHand.Index2Middle.PreviousInput,
+			    ETrackingTarget.RMiddle2Ring => singleton.RightHand.Middle2Ring.PreviousInput,
+			    ETrackingTarget.RRing2Pinky => singleton.RightHand.Ring2Pinky.PreviousInput,
+			    ETrackingTarget.RPinky2Thumb => singleton.RightHand.Pinky2Thumb.PreviousInput,
 			    _ => -1f
 		    };
 	    }
 	    
-	    public static float3 GetPosition(HandData data, HandSettingISingleton setting)
+	    public static float3 GetLocalPosition(HandData data, HandSettingISingleton setting)
 	    {
 		    return setting.PickGesture switch
 		    {
 			    EHandPose.None => float3.zero,
-			    EHandPose.MiddleFinger => data.Wrist2Middle.Position,
-			    EHandPose.PeaceSign => data.Index2Middle.Position,
-			    EHandPose.RockNRoll or EHandPose.OkSign or EHandPose.ThumbsUp or EHandPose.GunSign => data.Thumb2Index.Position,
-			    EHandPose.HighFive or EHandPose.PhoneSign or EHandPose.ClenchedFist => data.Pinky2Thumb.Position,
+			    EHandPose.MiddleFinger => data.Wrist2Middle.LocalPosition,
+			    EHandPose.PeaceSign => data.Index2Middle.LocalPosition,
+			    EHandPose.RockNRoll or EHandPose.OkSign or EHandPose.ThumbsUp or EHandPose.GunSign => data.Thumb2Index.LocalPosition,
+			    EHandPose.HighFive or EHandPose.PhoneSign or EHandPose.ClenchedFist => data.Pinky2Thumb.LocalPosition,
+			    _ => float3.zero
+		    };
+	    }
+	    
+	    public static float3 GetScreenPosition(HandData data, HandSettingISingleton setting)
+	    {
+		    return setting.PickGesture switch
+		    {
+			    EHandPose.None => float3.zero,
+			    EHandPose.MiddleFinger => data.Wrist2Middle.ScreenPosition,
+			    EHandPose.PeaceSign => data.Index2Middle.ScreenPosition,
+			    EHandPose.RockNRoll or EHandPose.OkSign or EHandPose.ThumbsUp or EHandPose.GunSign => data.Thumb2Index.ScreenPosition,
+			    EHandPose.HighFive or EHandPose.PhoneSign or EHandPose.ClenchedFist => data.Pinky2Thumb.ScreenPosition,
 			    _ => float3.zero
 		    };
 	    }
@@ -125,7 +158,7 @@ namespace ProjectionMapping
 
 	    public static EHandPose GetPose(this HandData data)
 	    {
-		    if (data.Pinky2Thumb.Current <= -1 || data.Wrist2Index.Current <= -1) return EHandPose.None;
+		    if (data.Pinky2Thumb.CurrentInput <= -1 || data.Wrist2Index.CurrentInput <= -1) return EHandPose.None;
 		    
 		    var thumb = IsFingerCurled(data.Pinky2Thumb, 1.5f);
 		    var index = IsFingerCurled(data.Wrist2Index);
@@ -148,7 +181,7 @@ namespace ProjectionMapping
 			    _ => EHandPose.None
 		    };
 
-		    bool IsFingerCurled(PointData point, float threshold = 1.8f) => point.Current < threshold;
+		    bool IsFingerCurled(PointData point, float threshold = 1.8f) => point.CurrentInput < threshold;
 	    }
     }
 }

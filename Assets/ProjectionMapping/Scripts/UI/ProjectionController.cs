@@ -37,15 +37,15 @@ namespace ProjectionMapping
 	    }
 
 	    // Bruh
-	    private static string DataToText(HandData data) => $"Wrist2Thumb : {data.Wrist2Thumb.Current:F}\n" +
-	                                                       $"Wrist2Index : {data.Wrist2Index.Current:F}\n" +
-	                                                       $"Wrist2Middle : {data.Wrist2Middle.Current:F}\n" +
-	                                                       $"Wrist2Ring : {data.Wrist2Ring.Current:F}\n" +
-	                                                       $"Wrist2Pinky : {data.Wrist2Pinky.Current:F}\n" +
-	                                                       $"Thumb2Index : {data.Thumb2Index.Current:F}\n" +
-	                                                       $"Index2Middle : {data.Index2Middle.Current:F}\n" +
-	                                                       $"Middle2Ring : {data.Middle2Ring.Current:F}\n" +
-	                                                       $"Ring2Pinky : {data.Ring2Pinky.Current:F}\n" +
-	                                                       $"Pinky2Thumb : {data.Pinky2Thumb.Current:F}\n";
+	    private static string DataToText(HandData data) => $"Wrist2Thumb : {data.Wrist2Thumb.CurrentInput:F}\n" +
+	                                                       $"Wrist2Index : {data.Wrist2Index.CurrentInput:F}\n" +
+	                                                       $"Wrist2Middle : {data.Wrist2Middle.CurrentInput:F}\n" +
+	                                                       $"Wrist2Ring : {data.Wrist2Ring.CurrentInput:F}\n" +
+	                                                       $"Wrist2Pinky : {data.Wrist2Pinky.CurrentInput:F}\n" +
+	                                                       $"Thumb2Index : {data.Thumb2Index.CurrentInput:F}\n" +
+	                                                       $"Index2Middle : {data.Index2Middle.CurrentInput:F}\n" +
+	                                                       $"Middle2Ring : {data.Middle2Ring.CurrentInput:F}\n" +
+	                                                       $"Ring2Pinky : {data.Ring2Pinky.CurrentInput:F}\n" +
+	                                                       $"Pinky2Thumb : {data.Pinky2Thumb.CurrentInput:F}\n";
     }
 }

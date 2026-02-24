@@ -7,8 +7,8 @@ namespace ProjectionMapping
     public struct HandPointIData : IComponentData
     {
 	    public byte ID;
-	    public EHand EHand;
 	    public bool IsTracked;
+	    public EHand EHand;
 	    public float3 ScreenPosition;
     }
 
@@ -25,10 +25,20 @@ namespace ProjectionMapping
     {
 	    public EHandPose LeftCurrentHandPose;
 	    public EHandPose LeftPreviousHandPose;
-	    public float3 LeftOrigin;
 	    public EHandPose RightCurrentHandPose;
 	    public EHandPose RightPreviousHandPose;
-	    public float3 RightOrigin;
+	    public float3 LeftLocalPosition;
+	    public float3 RightLocalPosition;
+    }
+
+    public struct HandScreenISingleton : IComponentData
+    {
+	    public float3 LeftCurrentScreenPosition;
+	    public float3 LeftPreviousScreenPosition;
+	    public float3 LeftDeltaPosition;
+	    public float3 RightCurrentScreenPosition;
+	    public float3 RightPreviousScreenPosition;
+	    public float3 RightDeltaPosition;
     }
     
     public struct PointSpawnIData : IComponentData
@@ -39,9 +49,9 @@ namespace ProjectionMapping
     public struct GrabbableData
     {
 	    public bool Valid;
-	    public Entity Target;
 	    public float3 PointOnBody;
 	    public float3 Origin;
+	    public Entity Target;
     }
 
     public struct HandGrabbableIData : IComponentData

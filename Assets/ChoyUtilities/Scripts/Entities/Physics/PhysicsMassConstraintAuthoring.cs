@@ -37,7 +37,8 @@ namespace EugeneC.ECS
 		public bool Z;
 	}
 	
-	[UpdateInGroup(typeof(Eu_PhysicsSystemGroup), OrderFirst = true)]
+	[UpdateInGroup(typeof(Eu_InitializationSystemGroup))]
+	[UpdateAfter(typeof(InitializePhysicsMassISystem))]
 	public partial struct InitializeLockRotationISystem : ISystem
 	{
 		[BurstCompile]

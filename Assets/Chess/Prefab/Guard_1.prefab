@@ -15,9 +15,9 @@ GameObject:
   - component: {fileID: 8173232626504945712}
   - component: {fileID: 1771560791046775197}
   - component: {fileID: 6381940817822648878}
-  - component: {fileID: 4897974099974969379}
+  - component: {fileID: -7889095428270653319}
   m_Layer: 0
-  m_Name: Player_1
+  m_Name: Guard_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -69,7 +69,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 033d82a4184967d4aa5dc32445dcaac6, type: 2}
+  - {fileID: 2100000, guid: 4a3d9e61b40ab9e469193578a9bd6902, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -168,7 +168,7 @@ MonoBehaviour:
   lockX: 1
   lockY: 0
   lockZ: 1
---- !u!114 &4897974099974969379
+--- !u!114 &-7889095428270653319
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
