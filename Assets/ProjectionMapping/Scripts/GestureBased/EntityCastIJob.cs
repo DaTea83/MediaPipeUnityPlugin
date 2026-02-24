@@ -34,18 +34,11 @@ namespace ProjectionMapping
 			if (!GrabLookup.HasComponent(hitBody.Entity)) return;
 			// Make sure only one hand can access the entity at the same time
 			if (GrabLookup[hitBody.Entity].IsGrabbed) return;
-
-			float3 pointOnBody;
-			{
-				//Convert world transform to local transform
-				var localTrans = Inverse(new MTransform(hitBody.WorldFromBody));
-				pointOnBody = Mul(localTrans, pickCollector.Hit.Position);
-			}
 			
 			DataRef.Value = new GestureData()
 			{
 				GrabEntity = hitBody.Entity,
-				Distance = math.distance(pointOnBody, RayInput.Start),
+				Distance = math.distance(hitBody.WorldFromBody.pos, RayInput.Start),
 				Valid = true
 			};
 		}

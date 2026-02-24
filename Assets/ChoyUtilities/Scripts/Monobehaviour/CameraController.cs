@@ -16,7 +16,7 @@ namespace EugeneC.Utilities
 
 		public event Action OnCameraReady;
 
-		private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
+		private readonly CancellationTokenSource _tokenSource = new();
 		public void CameraCancellation() => _tokenSource.Cancel();
 
 		private async void OnEnable()
@@ -38,7 +38,7 @@ namespace EugeneC.Utilities
 			CameraCancellation();
 		}
 
-		public async Task RunFadeScreen(UtilityCollection.EFadeType fadeType, float duration)
+		public async Awaitable RunFadeScreen(UtilityCollection.EFadeType fadeType, float duration)
 		{
 			await Awaitable.EndOfFrameAsync(_tokenSource.Token);
 			await _tokenSource.Token.FadeScreenAsync(blackScreenImg, fadeType, duration, Time.deltaTime);

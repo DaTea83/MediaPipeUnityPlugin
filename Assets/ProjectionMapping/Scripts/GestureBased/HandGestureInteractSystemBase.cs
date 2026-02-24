@@ -20,10 +20,14 @@ namespace ProjectionMapping
 		public NativeReference<GestureData> LeftDataRef = new(Allocator.Persistent);
 		public NativeReference<GestureData> RightDataRef = new(Allocator.Persistent);
 		
-		private bool _leftScheduled;
-		private bool _rightScheduled;
-		
 		private const float CastMagnitude = 1000f;
+
+		private void CompleteHands()
+		{
+			JobHandle.CombineDependencies(LeftDependency, RightDependency).Complete();
+			LeftDependency = default;
+			RightDependency = default;
+		}
 
 		protected override void OnCreate()
 		{
@@ -44,16 +48,11 @@ namespace ProjectionMapping
 			var cast = SystemAPI.GetSingleton<ColliderCastISingleton>();
 			var dir = (float3)CameraController.Instance.transform.forward;
 			
-			if (_leftScheduled) LeftDependency.Complete();
-			if (_rightScheduled) RightDependency.Complete();
-			_leftScheduled = false;
-			_rightScheduled = false;
-			
 			if (pose.LeftCurrentHandPose == settings.PickGesture && pose.LeftPreviousHandPose != settings.PickGesture)
 			{
 				var pos = pose.LeftLocalPosition;
 
-				Dependency = new EntityCastIJob
+				var leftHandle = new EntityCastIJob
 				{
 					CollisionWorld = physicsWorld.CollisionWorld,
 					IgnoreStatic = cast.IgnoreStatic,
@@ -69,13 +68,14 @@ namespace ProjectionMapping
 					}
 
 				}.Schedule(Dependency);
-				
-				LeftDependency = Dependency;
-				_leftScheduled = true;
+
+				LeftDependency = leftHandle;
+				Dependency = JobHandle.CombineDependencies(Dependency, leftHandle);
 			}
 			else if (pose.LeftCurrentHandPose != settings.PickGesture && pose.LeftPreviousHandPose == settings.PickGesture)
 			{
-				LeftDependency.Complete();
+				CompleteHands();
+
 				if (LeftDataRef.Value.GrabEntity != Entity.Null)
 				{
 					var grab = SystemAPI.GetComponent<HandGrabbableIData>(LeftDataRef.Value.GrabEntity);
@@ -83,18 +83,14 @@ namespace ProjectionMapping
 					SystemAPI.SetComponent(LeftDataRef.Value.GrabEntity, grab);
 				}
 				
-				LeftDataRef.Value = new GestureData()
-				{
-					Valid = false
-				};
-				LeftDependency = default;
+				LeftDataRef.Value = new GestureData { Valid = false };
 			}
 			
 			if (pose.RightCurrentHandPose == settings.PickGesture && pose.RightPreviousHandPose != settings.PickGesture)
 			{
 				var pos = pose.RightLocalPosition;
 
-				Dependency = new EntityCastIJob
+				var rightHandle = new EntityCastIJob
 				{
 					CollisionWorld = physicsWorld.CollisionWorld,
 					IgnoreStatic = cast.IgnoreStatic,
@@ -110,13 +106,14 @@ namespace ProjectionMapping
 					}
 
 				}.Schedule(Dependency);
-				
-				RightDependency = Dependency;
-				_rightScheduled = true;
+
+				RightDependency = rightHandle;
+				Dependency = JobHandle.CombineDependencies(Dependency, rightHandle);
 			}
 			else if (pose.RightCurrentHandPose != settings.PickGesture && pose.RightPreviousHandPose == settings.PickGesture)
 			{
-				RightDependency.Complete();
+				CompleteHands();
+
 				if (RightDataRef.Value.GrabEntity != Entity.Null)
 				{
 					var grab = SystemAPI.GetComponent<HandGrabbableIData>(RightDataRef.Value.GrabEntity);
@@ -124,19 +121,16 @@ namespace ProjectionMapping
 					SystemAPI.SetComponent(RightDataRef.Value.GrabEntity, grab);	
 				}
 				
-				RightDataRef.Value = new GestureData()
-				{
-					Valid = false
-				};
-				RightDependency = default;
+				RightDataRef.Value = new GestureData { Valid = false };
 			}
 			
-			settings.CamDirection = dir;
 			SystemAPI.SetSingleton(settings);
 		}
 
 		protected override void OnDestroy()
 		{
+			CompleteHands();
+
 			LeftDataRef.Dispose();
 			RightDataRef.Dispose();
 		}

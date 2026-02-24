@@ -12,24 +12,24 @@ namespace ChessGame
 	{
 		[SerializeField] private float delay = 3f;
 		[SerializeField] private ESpawnType spawnType = ESpawnType.Player;
+		[SerializeField] private GameObject playerPrefab;
+		[SerializeField] private GameObject guardPrefab;
 		[SerializeField] private float3 offset = new float3(0f, 2f, 0f);
 		
 		private class SpawnPlayerTimerAuthoringBaker : Baker<SpawnDelayEntityAuthoring>
 		{
 			public override void Bake(SpawnDelayEntityAuthoring authoring)
 			{
-				if (GameController.Instance is null) return;
-				
 				var e = GetEntity(TransformUsageFlags.Dynamic);
 
 				Entity prefab;
 				switch (authoring.spawnType)
 				{
 					case ESpawnType.Player:
-						prefab = GetEntity(GameController.Instance.playerPrefab, TransformUsageFlags.Dynamic);
+						prefab = GetEntity(authoring.playerPrefab, TransformUsageFlags.Dynamic);
 						break;
 					case ESpawnType.Guards:
-						prefab = GetEntity(GameController.Instance.guardPrefab, TransformUsageFlags.Dynamic);
+						prefab = GetEntity(authoring.guardPrefab, TransformUsageFlags.Dynamic);
 						break;
 					default:
 						prefab = Entity.Null;
@@ -69,6 +69,7 @@ namespace ChessGame
 				if (spawn.ValueRO.Time > 0) continue;
 				
 				var newSpawn = ecb.Instantiate(spawn.ValueRO.Prefab);
+				if (newSpawn == Entity.Null) continue;
 				var nLt = LocalTransform.FromPositionRotation(ltw.ValueRO.Position + spawn.ValueRO.Offset, ltw.ValueRO.Rotation);
 				
 				ecb.SetComponent(newSpawn, nLt);

@@ -18,7 +18,6 @@ namespace ProjectionMapping
 	    public bool UseGesture;
 	    public EHandPose PickGesture;
 	    public EHandPose NavigateGesture;
-	    public float3 CamDirection;
     }
 
     public struct HandPoseISingleton : IComponentData

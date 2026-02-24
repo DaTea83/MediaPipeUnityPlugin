@@ -1,4 +1,5 @@
 ﻿using EugeneC.ECS;
+using EugeneC.Utilities;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -32,9 +33,10 @@ namespace ProjectionMapping
 			_interactSystemBase.RightDependency = default;
 			combined.Complete();
 			
+			if (CameraController.Instance is null) return;
+			
 			var dt = SystemAPI.Time.DeltaTime;
-			var settings = SystemAPI.GetSingleton<HandSettingISingleton>();
-			var dir = settings.CamDirection;
+			var dir = (float3)CameraController.Instance.transform.forward;
 			var pose = SystemAPI.GetSingleton<HandPoseISingleton>();
 			
 
