@@ -12,7 +12,7 @@ namespace Mediapipe.Unity
 {
 	public class AssetBundleResourceManager : IResourceManager
 	{
-		private static readonly string _TAG = nameof(AssetBundleResourceManager);
+		private static readonly string Tag = nameof(AssetBundleResourceManager);
 
 		private static string _assetBundlePath;
 		private static string _cachePathRoot;
@@ -39,7 +39,7 @@ namespace Mediapipe.Unity
 		{
 			if (assetBundle is not null)
 			{
-				Logger.LogWarning(_TAG, "AssetBundle is already loaded");
+				Logger.LogWarning(Tag, "AssetBundle is already loaded");
 				yield break;
 			}
 
@@ -60,7 +60,7 @@ namespace Mediapipe.Unity
 
 			if (File.Exists(destFilePath) && !overwriteDestination)
 			{
-				Logger.LogInfo(_TAG, $"{name} will not be copied to {destFilePath} because it already exists");
+				Logger.LogInfo(Tag, $"{name} will not be copied to {destFilePath} because it already exists");
 				yield break;
 			}
 
@@ -78,7 +78,7 @@ namespace Mediapipe.Unity
 					throw new IOException($"Failed to load {name} from {assetBundle.name}");
 				}
 
-				Logger.LogVerbose(_TAG, $"Writing {name} data to {destFilePath}...");
+				Logger.LogVerbose(Tag, $"Writing {name} data to {destFilePath}...");
 				if (!Directory.Exists(_cachePathRoot))
 				{
 					var _ = Directory.CreateDirectory(_cachePathRoot);
@@ -87,7 +87,7 @@ namespace Mediapipe.Unity
 				var bytes = (assetLoadReq.asset as TextAsset)?.bytes;
 				if (bytes == null) yield break;
 				File.WriteAllBytes(destFilePath, bytes);
-				Logger.LogVerbose(_TAG, $"{name} is saved to {destFilePath} (length={bytes.Length})");
+				Logger.LogVerbose(Tag, $"{name} is saved to {destFilePath} (length={bytes.Length})");
 			}
 		}
 

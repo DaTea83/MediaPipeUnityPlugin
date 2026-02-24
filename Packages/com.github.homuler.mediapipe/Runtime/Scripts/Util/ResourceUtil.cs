@@ -16,21 +16,21 @@ namespace Mediapipe
 
 		internal delegate bool NativeResourceProvider(string path, IntPtr dest);
 
-		private static readonly string _TAG = nameof(ResourceUtil);
+		private static readonly string Tag = nameof(ResourceUtil);
 
-		private static bool _IsInitialized;
-		private static readonly Dictionary<string, string> _AssetPathMap = new Dictionary<string, string>();
+		private static bool _isInitialized;
+		private static readonly Dictionary<string, string> AssetPathMap = new Dictionary<string, string>();
 
 		public static void EnableCustomResolver()
 		{
-			if (_IsInitialized)
+			if (_isInitialized)
 			{
 				return;
 			}
 
 			SafeNativeMethods.mp__SetCustomGlobalPathResolver__P(PathToResourceAsFile);
 			SafeNativeMethods.mp__SetCustomGlobalResourceProvider__P(GetResourceContents);
-			_IsInitialized = true;
+			_isInitialized = true;
 		}
 
 		/// <summary>
@@ -44,7 +44,7 @@ namespace Mediapipe
 		/// <param name="assetPath">
 		///   The file path of the asset.
 		/// </param>
-		public static void SetAssetPath(string assetKey, string assetPath) => _AssetPathMap[assetKey] = assetPath;
+		public static void SetAssetPath(string assetKey, string assetPath) => AssetPathMap[assetKey] = assetPath;
 
 		/// <summary>
 		///   Registers the asset path to the resource manager.
@@ -60,24 +60,24 @@ namespace Mediapipe
 		/// <param name="assetPath">
 		///   The file path of the asset.
 		/// </param>
-		public static void AddAssetPath(string assetKey, string assetPath) => _AssetPathMap.Add(assetKey, assetPath);
+		public static void AddAssetPath(string assetKey, string assetPath) => AssetPathMap.Add(assetKey, assetPath);
 
 		/// <summary>
 		///   Removes the asset key from the resource manager.
 		/// </summary>
 		/// <param name="assetKey"></param>
-		public static bool RemoveAssetPath(string assetKey) => _AssetPathMap.Remove(assetKey);
+		public static bool RemoveAssetPath(string assetKey) => AssetPathMap.Remove(assetKey);
 
 		public static bool TryGetFilePath(string assetPath, out string filePath)
 		{
 			// try to find the file path by the requested asset path
-			if (_AssetPathMap.TryGetValue(assetPath, out filePath))
+			if (AssetPathMap.TryGetValue(assetPath, out filePath))
 			{
 				return true;
 			}
 
 			// try to find the file path by the asset name
-			if (_AssetPathMap.TryGetValue(GetAssetNameFromPath(assetPath), out filePath))
+			if (AssetPathMap.TryGetValue(GetAssetNameFromPath(assetPath), out filePath))
 			{
 				return true;
 			}
@@ -91,7 +91,7 @@ namespace Mediapipe
 			UnityEngine.Debug.Log($"{assetPath} is requested");
 			try
 			{
-				Logger.LogDebug(_TAG, $"{assetPath} is requested");
+				Logger.LogDebug(Tag, $"{assetPath} is requested");
 				if (TryGetFilePath(assetPath, out var filePath))
 				{
 					return filePath;
@@ -113,7 +113,7 @@ namespace Mediapipe
 
 			try
 			{
-				Logger.LogDebug(_TAG, $"{path} is requested");
+				Logger.LogDebug(Tag, $"{path} is requested");
 
 				if (!TryGetFilePath(path, out var filePath))
 				{
