@@ -19,11 +19,9 @@ namespace Mediapipe.Unity
 #if UNITY_EDITOR
 		private void OnValidate()
 		{
-			if (!UnityEditor.PrefabUtility.IsPartOfAnyPrefab(this))
-			{
-				ApplyLineWidth(_lineWidth);
-				ApplyKeypointRadius(_keypointRadius);
-			}
+			if (UnityEditor.PrefabUtility.IsPartOfAnyPrefab(this)) return;
+			ApplyLineWidth(_lineWidth);
+			ApplyKeypointRadius(_keypointRadius);
 		}
 #endif
 
@@ -77,10 +75,7 @@ namespace Mediapipe.Unity
 			{
 				CallActionForAll(targets, (annotation, target) =>
 				{
-					if (annotation != null)
-					{
-						annotation.Draw(target, threshold);
-					}
+					annotation?.Draw(target, threshold);
 				});
 			}
 		}
@@ -107,10 +102,7 @@ namespace Mediapipe.Unity
 		{
 			foreach (var detection in children)
 			{
-				if (detection != null)
-				{
-					detection.SetLineWidth(lineWidth);
-				}
+				detection?.SetLineWidth(lineWidth);
 			}
 		}
 
