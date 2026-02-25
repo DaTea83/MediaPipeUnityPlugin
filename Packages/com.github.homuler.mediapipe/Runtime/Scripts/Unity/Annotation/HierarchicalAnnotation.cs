@@ -84,7 +84,7 @@ namespace Mediapipe.Unity
 		protected TH InstantiateChild<TH>(GameObject prefab)
 			where TH : HierarchicalAnnotation
 		{
-			Instantiate(prefab, transform).TryGetComponent<TH>(out var annotation);
+			if(!Instantiate(prefab, transform).TryGetComponent<TH>(out var annotation)) return null;
 			annotation.isMirrored = isMirrored;
 			annotation.rotationAngle = rotationAngle;
 			return annotation;
