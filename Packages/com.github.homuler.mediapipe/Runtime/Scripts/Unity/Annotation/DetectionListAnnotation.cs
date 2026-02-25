@@ -48,10 +48,7 @@ namespace Mediapipe.Unity
 			{
 				CallActionForAll(targets, (annotation, target) =>
 				{
-					if (annotation != null)
-					{
-						annotation.Draw(target, imageSize, threshold);
-					}
+					annotation?.Draw(target, imageSize, threshold);
 				});
 			}
 		}

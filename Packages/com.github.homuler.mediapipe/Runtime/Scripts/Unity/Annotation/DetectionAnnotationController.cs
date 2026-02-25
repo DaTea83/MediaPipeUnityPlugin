@@ -10,7 +10,7 @@ namespace Mediapipe.Unity
 {
 	public class DetectionAnnotationController : AnnotationController<DetectionAnnotation>
 	{
-		[SerializeField, Range(0, 1)] private float _threshold = 0.0f;
+		[SerializeField, Range(0, 1)] private float threshold = 0.0f;
 
 		private Detection _currentTarget;
 
@@ -27,8 +27,8 @@ namespace Mediapipe.Unity
 
 		protected override void SyncNow()
 		{
-			isStale = false;
-			annotation.Draw(_currentTarget, _threshold);
+			IsStale = false;
+			annotation.Draw(_currentTarget, threshold);
 		}
 	}
 }

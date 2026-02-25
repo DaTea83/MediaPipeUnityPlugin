@@ -26,7 +26,7 @@ namespace Mediapipe.Unity
 		where T : HierarchicalAnnotation
 	{
 		[SerializeField] protected T annotation;
-		protected bool isStale = false;
+		protected bool IsStale = false;
 
 		public bool isMirrored
 		{
@@ -69,7 +69,7 @@ namespace Mediapipe.Unity
 
 		protected virtual void Update()
 		{
-			if (isStale)
+			if (IsStale)
 			{
 				SyncNow();
 			}
@@ -77,18 +77,18 @@ namespace Mediapipe.Unity
 
 		protected virtual void OnDestroy()
 		{
-			if (annotation != null)
+			if (annotation is not null)
 			{
 				Destroy(annotation);
 				annotation = null;
 			}
 
-			isStale = false;
+			IsStale = false;
 		}
 
 		/// <summary>
 		///   Draw annotations in current thread.
-		///   This method must set <see cref="isStale" /> to false.
+		///   This method must set <see cref="IsStale" /> to false.
 		/// </summary>
 		/// <remarks>
 		///   This method can only be called from main thread.
@@ -100,7 +100,7 @@ namespace Mediapipe.Unity
 			if (IsTargetChanged(newTarget, currentTarget))
 			{
 				currentTarget = newTarget;
-				isStale = true;
+				IsStale = true;
 			}
 		}
 

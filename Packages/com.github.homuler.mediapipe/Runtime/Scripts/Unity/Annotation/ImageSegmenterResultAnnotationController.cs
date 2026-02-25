@@ -46,7 +46,7 @@ namespace Mediapipe.Unity
 			{
 				_currentTarget = newTarget;
 				ReadCurrentMasks();
-				isStale = true;
+				IsStale = true;
 			}
 		}
 
@@ -54,7 +54,7 @@ namespace Mediapipe.Unity
 		{
 			lock (_currentTargetLock)
 			{
-				isStale = false;
+				IsStale = false;
 				annotation.Draw();
 			}
 		}

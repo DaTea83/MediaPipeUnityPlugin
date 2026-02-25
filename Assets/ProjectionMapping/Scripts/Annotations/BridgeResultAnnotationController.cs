@@ -18,12 +18,12 @@ namespace ProjectionMapping
 	    private void UpdateCurrentTarget(HandLandmarkerResult newTarget)
 	    {
 		    newTarget.CloneTo(ref _currentTarget);
-		    isStale = true;
+		    IsStale = true;
 	    }
 	    
 	    protected override void SyncNow()
 	    {
-		    isStale = false;
+		    IsStale = false;
 		    annotation.SetHandedness(_currentTarget.handedness);
 		    annotation.Draw(_currentTarget.handLandmarks);
 	    }

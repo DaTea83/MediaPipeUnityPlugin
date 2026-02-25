@@ -29,7 +29,7 @@ namespace Mediapipe.Unity
 			lock (_currentTargetLock)
 			{
 				newTarget.CloneTo(ref _currentTarget);
-				isStale = true;
+				IsStale = true;
 			}
 		}
 
@@ -37,7 +37,7 @@ namespace Mediapipe.Unity
 		{
 			lock (_currentTargetLock)
 			{
-				isStale = false;
+				IsStale = false;
 				annotation.Draw(_currentTarget, imageSize, _threshold);
 			}
 		}

@@ -36,7 +36,7 @@ namespace Mediapipe.Unity
 
 		protected override void SyncNow()
 		{
-			isStale = false;
+			IsStale = false;
 			annotation.Draw(_currentHandLandmarkLists, _visualizeZ);
 
 			if (_currentHandedness != null)

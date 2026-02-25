@@ -46,7 +46,7 @@ namespace Mediapipe.Unity
 
 		protected override void SyncNow()
 		{
-			isStale = false;
+			IsStale = false;
 			annotation.Draw(_currentTarget, _scale, _visualizeZ);
 		}
 	}

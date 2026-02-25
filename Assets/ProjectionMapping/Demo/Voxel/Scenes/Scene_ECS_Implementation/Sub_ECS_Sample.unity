@@ -261,7 +261,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useGrabAny: 0
   useGesture: 1
-  gestureType: 64
+  pickGesture: 128
+  navigateHandPose: 32
 --- !u!4 &1262669431
 Transform:
   m_ObjectHideFlags: 0
@@ -324,7 +325,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ignoreTriggers: 1
   ignoreStatic: 1
-  deleteAllEntityOnClick: 0
+  deleteAllEntityOnClick: 1
   deleteTagEntityOnClick: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

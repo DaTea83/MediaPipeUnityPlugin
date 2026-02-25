@@ -50,7 +50,7 @@ namespace Mediapipe.Unity
 					_currentTarget.segmentationMasks.Clear();
 				}
 
-				isStale = true;
+				IsStale = true;
 			}
 		}
 
@@ -58,7 +58,7 @@ namespace Mediapipe.Unity
 		{
 			lock (_currentTargetLock)
 			{
-				isStale = false;
+				IsStale = false;
 				annotation.Draw(_currentTarget.poseLandmarks, _visualizeZ);
 			}
 		}

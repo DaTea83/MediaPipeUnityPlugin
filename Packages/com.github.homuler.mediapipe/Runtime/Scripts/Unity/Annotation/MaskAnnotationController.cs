@@ -43,7 +43,7 @@ namespace Mediapipe.Unity
 
 		protected override void SyncNow()
 		{
-			isStale = false;
+			IsStale = false;
 			if (_currentTarget == null)
 			{
 				annotation.Clear();
