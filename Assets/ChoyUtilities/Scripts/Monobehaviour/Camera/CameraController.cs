@@ -23,14 +23,10 @@ namespace EugeneC.Utilities
 		{
 			try
 			{
-				await Awaitable.WaitForSecondsAsync(3f, _tokenSource.Token);
-				
+				await Awaitable.WaitForSecondsAsync(.1f, _tokenSource.Token);
 				await RunFadeScreen(UtilityCollection.EFadeType.FadeOut, initialFadeOutTime);
 			}
-			catch (Exception e)
-			{
-				Debug.LogException(e);
-			}
+			catch (Exception e) { Debug.LogException(e); }
 		}
 
 		private void OnDisable()
