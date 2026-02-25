@@ -18,15 +18,15 @@ namespace Mediapipe
 
 		public CalculatorGraph() : base()
 		{
-			UnsafeNativeMethods.mp_CalculatorGraph__(out var ptr).Assert();
-			this.ptr = ptr;
+			UnsafeNativeMethods.mp_CalculatorGraph__(out var intPtr).Assert();
+			this.ptr = intPtr;
 		}
 
 		private CalculatorGraph(byte[] serializedConfig) : base()
 		{
-			UnsafeNativeMethods.mp_CalculatorGraph__PKc_i(serializedConfig, serializedConfig.Length, out var ptr)
+			UnsafeNativeMethods.mp_CalculatorGraph__PKc_i(serializedConfig, serializedConfig.Length, out var intPtr)
 				.Assert();
-			this.ptr = ptr;
+			this.ptr = intPtr;
 		}
 
 		public CalculatorGraph(CalculatorGraphConfig config) : this(config.ToByteArray())

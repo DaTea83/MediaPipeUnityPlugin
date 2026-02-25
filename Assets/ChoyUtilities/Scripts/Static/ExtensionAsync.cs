@@ -6,13 +6,29 @@ using UnityEngine.UI;
 #if UNITY_2023_1_OR_NEWER
 using UnityEngine;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace EugeneC.Utilities
 {
 	public static partial class UtilityCollection
 	{
 		private const string TaskCancellationMessage = "Task was cancelled";
+		
+		public static async Awaitable AwaitableUntil(this CancellationToken cancellationToken, Func<bool> condition)
+		{
+			while (!condition())
+			{
+				await Awaitable.NextFrameAsync(cancellationToken);
+			}
+		}
+		
+		public static async Awaitable AwaitableUntil(this CancellationToken cancellationToken, Func<bool> condition, Action onWaitDone)
+		{
+			while (!condition())
+			{
+				onWaitDone?.Invoke();
+				await Awaitable.NextFrameAsync(cancellationToken);
+			}
+		}
 
 		#region Fade Screen Async
 

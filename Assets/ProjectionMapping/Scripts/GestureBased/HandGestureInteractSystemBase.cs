@@ -22,13 +22,6 @@ namespace ProjectionMapping
 		
 		private const float CastMagnitude = 1000f;
 
-		private void CompleteHands()
-		{
-			JobHandle.CombineDependencies(LeftDependency, RightDependency).Complete();
-			LeftDependency = default;
-			RightDependency = default;
-		}
-
 		protected override void OnCreate()
 		{
 			RequireForUpdate<ColliderCastISingleton>();
@@ -133,6 +126,13 @@ namespace ProjectionMapping
 
 			LeftDataRef.Dispose();
 			RightDataRef.Dispose();
+		}
+		
+		private void CompleteHands()
+		{
+			JobHandle.CombineDependencies(LeftDependency, RightDependency).Complete();
+			LeftDependency = default;
+			RightDependency = default;
 		}
 	}
 }
