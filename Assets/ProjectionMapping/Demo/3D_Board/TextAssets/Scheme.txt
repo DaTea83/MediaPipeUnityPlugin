@@ -1,0 +1,16 @@
+﻿0   : Border
+w   : Walkway
+.   : Empty
++   : Entrance
+-   : Exit
+a   : Building_Empty
+b   : Building_Up
+c   : Building_Right
+d   : Building_Down
+e   : Building_Left
+f   : Building_UpRight
+g   : Building_UpLeft
+h   : Building_DownRight
+i   : Building_DownLeft
+j   : Building_UpDown
+k   : Building_LeftRight

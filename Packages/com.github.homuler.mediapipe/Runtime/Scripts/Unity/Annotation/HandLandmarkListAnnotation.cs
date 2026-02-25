@@ -4,184 +4,190 @@
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-
 using mptcc = Mediapipe.Tasks.Components.Containers;
 
 namespace Mediapipe.Unity
 {
 #pragma warning disable IDE0065
-  using Color = UnityEngine.Color;
+	using Color = UnityEngine.Color;
+
 #pragma warning restore IDE0065
+	
+	public enum EHand : byte
+	{
+		Left,
+		Right,
+		None = byte.MaxValue, 
+	}
 
-  public sealed class HandLandmarkListAnnotation : HierarchicalAnnotation
-  {
-    [SerializeField] private PointListAnnotation _landmarkListAnnotation;
-    [SerializeField] private ConnectionListAnnotation _connectionListAnnotation;
-    [SerializeField] private Color _leftLandmarkColor = Color.green;
-    [SerializeField] private Color _rightLandmarkColor = Color.green;
+	public static class HandLandmarkCollection
+	{
+		public static readonly IReadOnlyList<(int, int)> Connections = new List<(int, int)>
+		{
+			(0, 1),
+			(1, 2),
+			(2, 3),
+			(3, 4),
+			(0, 5),
+			(5, 9),
+			(9, 13),
+			(13, 17),
+			(0, 17),
+			(5, 6),
+			(6, 7),
+			(7, 8),
+			(9, 10),
+			(10, 11),
+			(11, 12),
+			(13, 14),
+			(14, 15),
+			(15, 16),
+			(17, 18),
+			(18, 19),
+			(19, 20),
+		};
+		
+		public const int LandmarkCount = 21;
+	}
 
-    public enum Hand
-    {
-      Left,
-      Right,
-    }
+	public sealed class HandLandmarkListAnnotation : HierarchicalAnnotation
+	{
+		[SerializeField] private PointListAnnotation pointListAnnotation;
+		[SerializeField] private ConnectionListAnnotation connectionListAnnotation;
+		[SerializeField] private Color leftLandmarkColor = Color.green;
+		[SerializeField] private Color rightLandmarkColor = Color.green;
 
-    private const int _LandmarkCount = 21;
-    private readonly List<(int, int)> _connections = new List<(int, int)> {
-      (0, 1),
-      (1, 2),
-      (2, 3),
-      (3, 4),
-      (0, 5),
-      (5, 9),
-      (9, 13),
-      (13, 17),
-      (0, 17),
-      (5, 6),
-      (6, 7),
-      (7, 8),
-      (9, 10),
-      (10, 11),
-      (11, 12),
-      (13, 14),
-      (14, 15),
-      (15, 16),
-      (17, 18),
-      (18, 19),
-      (19, 20),
-    };
+		public EHand handedness = EHand.None;
+		public Action<EHand, float> OnFingerDistanceChanged;
 
-    public override bool isMirrored
-    {
-      set
-      {
-        _landmarkListAnnotation.isMirrored = value;
-        _connectionListAnnotation.isMirrored = value;
-        base.isMirrored = value;
-      }
-    }
+		public override bool isMirrored
+		{
+			set
+			{
+				pointListAnnotation.isMirrored = value;
+				connectionListAnnotation.isMirrored = value;
+				base.isMirrored = value;
+			}
+		}
 
-    public override RotationAngle rotationAngle
-    {
-      set
-      {
-        _landmarkListAnnotation.rotationAngle = value;
-        _connectionListAnnotation.rotationAngle = value;
-        base.rotationAngle = value;
-      }
-    }
+		public override RotationAngle rotationAngle
+		{
+			set
+			{
+				pointListAnnotation.rotationAngle = value;
+				connectionListAnnotation.rotationAngle = value;
+				base.rotationAngle = value;
+			}
+		}
 
-    public PointAnnotation this[int index] => _landmarkListAnnotation[index];
+		public PointAnnotation this[int index] => pointListAnnotation[index];
 
-    private void Start()
-    {
-      _landmarkListAnnotation.Fill(_LandmarkCount);
-      _connectionListAnnotation.Fill(_connections, _landmarkListAnnotation);
-    }
+		private void Start()
+		{
+			pointListAnnotation.Fill(HandLandmarkCollection.LandmarkCount);
+			connectionListAnnotation.Fill(HandLandmarkCollection.Connections, pointListAnnotation);
+			
+			pointListAnnotation.hand = this;
+		}
 
-    public void SetLeftLandmarkColor(Color leftLandmarkColor)
-    {
-      _leftLandmarkColor = leftLandmarkColor;
-    }
+		public void SetLeftLandmarkColor(Color leftColor) => leftLandmarkColor = leftColor;
 
-    public void SetRightLandmarkColor(Color rightLandmarkColor)
-    {
-      _rightLandmarkColor = rightLandmarkColor;
-    }
+		public void SetRightLandmarkColor(Color rightColor) => rightLandmarkColor = rightColor;
 
-    public void SetLandmarkRadius(float landmarkRadius)
-    {
-      _landmarkListAnnotation.SetRadius(landmarkRadius);
-    }
+		public void SetLandmarkRadius(float landmarkRadius)
+		{
+			pointListAnnotation.SetRadius(landmarkRadius);
+		}
 
-    public void SetConnectionColor(Color connectionColor)
-    {
-      _connectionListAnnotation.SetColor(connectionColor);
-    }
+		public void SetConnectionColor(Color connectionColor)
+		{
+			connectionListAnnotation.SetColor(connectionColor);
+		}
 
-    public void SetConnectionWidth(float connectionWidth)
-    {
-      _connectionListAnnotation.SetLineWidth(connectionWidth);
-    }
+		public void SetConnectionWidth(float connectionWidth)
+		{
+			connectionListAnnotation.SetLineWidth(connectionWidth);
+		}
 
-    public void SetHandedness(Hand handedness)
-    {
-      if (handedness == Hand.Left)
-      {
-        _landmarkListAnnotation.SetColor(_leftLandmarkColor);
-      }
-      else if (handedness == Hand.Right)
-      {
-        _landmarkListAnnotation.SetColor(_rightLandmarkColor);
-      }
-    }
+		// For some reason, left & right results are inverted
+		public void SetHandedness(EHand handed)
+		{
+			switch (handed)
+			{
+				case EHand.Left:
+					handedness = EHand.Right;
+					pointListAnnotation.SetColor(rightLandmarkColor);
+					break;
+				case EHand.Right:
+					handedness = EHand.Left;
+					pointListAnnotation.SetColor(leftLandmarkColor);
+					break;
+			}
+		}
 
-    public void SetHandedness(IReadOnlyList<Classification> handedness)
-    {
-      if (handedness == null || handedness.Count == 0 || handedness[0].Label == "Left")
-      {
-        SetHandedness(Hand.Left);
-      }
-      else if (handedness[0].Label == "Right")
-      {
-        SetHandedness(Hand.Right);
-      }
-      // ignore unknown label
-    }
+		public void SetHandedness(IReadOnlyList<Classification> handedness)
+		{
+			if (handedness == null || handedness.Count == 0 || handedness[0].Label == "Left")
+			{
+				SetHandedness(EHand.Left);
+			}
+			else if (handedness[0].Label == "Right")
+			{
+				SetHandedness(EHand.Right);
+			}
+			// ignore unknown label
+		}
 
-    public void SetHandedness(ClassificationList handedness)
-    {
-      SetHandedness(handedness.Classification);
-    }
+		public void SetHandedness(ClassificationList handedness)
+		{
+			SetHandedness(handedness.Classification);
+		}
 
-    public void SetHandedness(IReadOnlyList<mptcc.Category> handedness)
-    {
-      if (handedness == null || handedness.Count == 0 || handedness[0].categoryName == "Left")
-      {
-        SetHandedness(Hand.Left);
-      }
-      else if (handedness[0].categoryName == "Right")
-      {
-        SetHandedness(Hand.Right);
-      }
-      // ignore unknown label
-    }
+		public void SetHandedness(IReadOnlyList<mptcc.Category> handedness)
+		{
+			if (handedness == null || handedness.Count == 0 || handedness[0].categoryName == "Left")
+			{
+				SetHandedness(EHand.Left);
+			}
+			else if (handedness[0].categoryName == "Right")
+			{
+				SetHandedness(EHand.Right);
+			}
+			// ignore unknown label
+		}
 
-    public void SetHandedness(mptcc.Classifications handedness)
-    {
-      SetHandedness(handedness.categories);
-    }
+		public void SetHandedness(mptcc.Classifications handedness)
+		{
+			SetHandedness(handedness.categories);
+		}
 
-    public void Draw(IReadOnlyList<NormalizedLandmark> target, bool visualizeZ = false)
-    {
-      if (ActivateFor(target))
-      {
-        _landmarkListAnnotation.Draw(target, visualizeZ);
-        // Draw explicitly because connection annotation's targets remain the same.
-        _connectionListAnnotation.Redraw();
-      }
-    }
+		public void Draw(IReadOnlyList<NormalizedLandmark> target, bool visualizeZ = false)
+		{
+			if (!ActivateFor(target)) return;
+			pointListAnnotation.Draw(target, visualizeZ);
+			// Draw explicitly because connection annotation's targets remain the same.
+			connectionListAnnotation.Redraw();
+		}
 
-    public void Draw(NormalizedLandmarkList target, bool visualizeZ = false)
-    {
-      Draw(target?.Landmark, visualizeZ);
-    }
+		public void Draw(NormalizedLandmarkList target, bool visualizeZ = false)
+		{
+			Draw(target?.Landmark, visualizeZ);
+		}
 
-    public void Draw(IReadOnlyList<mptcc.NormalizedLandmark> target, bool visualizeZ = false)
-    {
-      if (ActivateFor(target))
-      {
-        _landmarkListAnnotation.Draw(target, visualizeZ);
-        // Draw explicitly because connection annotation's targets remain the same.
-        _connectionListAnnotation.Redraw();
-      }
-    }
+		public void Draw(IReadOnlyList<mptcc.NormalizedLandmark> target, bool visualizeZ = false)
+		{
+			if (!ActivateFor(target)) return;
+			pointListAnnotation.Draw(target, visualizeZ);
+			// Draw explicitly because connection annotation's targets remain the same.
+			connectionListAnnotation.Redraw();
+		}
 
-    public void Draw(mptcc.NormalizedLandmarks target, bool visualizeZ = false)
-    {
-      Draw(target.landmarks, visualizeZ);
-    }
-  }
+		public void Draw(mptcc.NormalizedLandmarks target, bool visualizeZ = false)
+		{
+			Draw(target.landmarks, visualizeZ);
+		}
+	}
 }

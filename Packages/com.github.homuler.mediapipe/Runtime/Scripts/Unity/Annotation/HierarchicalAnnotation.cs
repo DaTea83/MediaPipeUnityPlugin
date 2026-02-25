@@ -8,91 +8,86 @@ using UnityEngine;
 
 namespace Mediapipe.Unity
 {
-  public interface IHierachicalAnnotation
-  {
-    IHierachicalAnnotation root { get; }
-    Transform transform { get; }
-    RectTransform GetAnnotationLayer();
-    UnityEngine.Rect GetScreenRect();
-  }
+	public interface IHierachicalAnnotation
+	{
+		IHierachicalAnnotation root { get; }
+		Transform transform { get; }
+		UnityEngine.Rect GetScreenRect();
+	}
 
-  public abstract class HierarchicalAnnotation : MonoBehaviour, IHierachicalAnnotation
-  {
-    private IHierachicalAnnotation _root;
-    public IHierachicalAnnotation root
-    {
-      get
-      {
-        if (_root == null)
-        {
-          var parentObj = transform.parent?.gameObject;
-          _root = (parentObj != null && parentObj.TryGetComponent<IHierachicalAnnotation>(out var parent)) ? parent.root : this;
-        }
-        return _root;
-      }
-      protected set => _root = value;
-    }
+	public abstract class HierarchicalAnnotation : MonoBehaviour, IHierachicalAnnotation
+	{
+		private IHierachicalAnnotation _root;
+		private RectTransform _cachedScreenRectTransform;
 
-    public RectTransform GetAnnotationLayer()
-    {
-      return root.transform.parent.gameObject.GetComponent<RectTransform>();
-    }
+		public IHierachicalAnnotation root
+		{
+			get
+			{
+				if (_root != null) return _root;
+				var parentObj = transform.parent?.gameObject;
+				if (parentObj is null) return this;
+				_root = parentObj.TryGetComponent<IHierachicalAnnotation>(out var parent)
+					? parent.root : this;
 
-    public UnityEngine.Rect GetScreenRect()
-    {
-      return GetAnnotationLayer().rect;
-    }
+				return _root;
+			}
+			protected set => _root = value;
+		}
 
-    public bool isActive => gameObject.activeSelf;
-    public bool isActiveInHierarchy => gameObject.activeInHierarchy;
+		private RectTransform ResolveScreenRectTransform()
+		{
+			if (_cachedScreenRectTransform is not null) return _cachedScreenRectTransform;
+			var parent = root.transform.parent;
+			_cachedScreenRectTransform = parent as RectTransform;
 
-    public void SetActive(bool isActive)
-    {
-      if (this.isActive != isActive)
-      {
-        gameObject.SetActive(isActive);
-      }
-    }
+			return _cachedScreenRectTransform;
+		}
 
-    /// <summary>
-    ///   Prepare to annotate <paramref name="target" />.
-    ///   If <paramref name="target" /> is not null, it activates itself.
-    /// </summary>
-    /// <return>
-    ///   If it is activated and <paramref name="target" /> can be drawn.
-    ///   In effect, it returns if <paramref name="target" /> is null or not.
-    /// </return>
-    /// <param name="target">Data to be annotated</param>
-    protected bool ActivateFor<T>(T target)
-    {
-      if (target is null)
-      {
-        SetActive(false);
-        return false;
-      }
-      SetActive(true);
-      return true;
-    }
+		public UnityEngine.Rect GetScreenRect() => ResolveScreenRectTransform()?.rect ?? default;
 
-    public virtual bool isMirrored { get; set; }
-    public virtual RotationAngle rotationAngle { get; set; } = RotationAngle.Rotation0;
+		// activeSelf only take accounts for the object itself is active or not
+		// activeInHierarchy include whether the object's parent is also active or not
+		public bool isActiveInHierarchy => gameObject.activeInHierarchy;
 
-    protected TAnnotation InstantiateChild<TAnnotation>(GameObject prefab) 
-      where TAnnotation : HierarchicalAnnotation
-    {
-      var annotation = Instantiate(prefab, transform).GetComponent<TAnnotation>();
-      annotation.isMirrored = isMirrored;
-      annotation.rotationAngle = rotationAngle;
-      return annotation;
-    }
+		public virtual void SetActive(bool active)
+		{
+			if (gameObject.activeSelf != active)
+			{
+				gameObject.SetActive(active);
+			}
+		}
 
-    protected TAnnotation InstantiateChild<TAnnotation>(string name = "Game Object") 
-      where TAnnotation : HierarchicalAnnotation
-    {
-      var gameObject = new GameObject(name);
-      gameObject.transform.SetParent(transform);
+		/// <summary>
+		///   Prepare to annotate <paramref name="target" />.
+		///   If <paramref name="target" /> is not null, it activates itself.
+		/// </summary>
+		/// <return>
+		///   If it is activated and <paramref name="target" /> can be drawn.
+		///   In effect, it returns if <paramref name="target" /> is null or not.
+		/// </return>
+		/// <param name="target">Data to be annotated</param>
+		protected virtual bool ActivateFor<T>(T target)
+		{
+			if (target is null)
+			{
+				SetActive(false);
+				return false;
+			}
+			SetActive(true);
+			return true;
+		}
 
-      return gameObject.AddComponent<TAnnotation>();
-    }
-  }
+		public virtual bool isMirrored { get; set; }
+		public virtual RotationAngle rotationAngle { get; set; } = RotationAngle.Rotation0;
+
+		protected TH InstantiateChild<TH>(GameObject prefab)
+			where TH : HierarchicalAnnotation
+		{
+			Instantiate(prefab, transform).TryGetComponent<TH>(out var annotation);
+			annotation.isMirrored = isMirrored;
+			annotation.rotationAngle = rotationAngle;
+			return annotation;
+		}
+	}
 }

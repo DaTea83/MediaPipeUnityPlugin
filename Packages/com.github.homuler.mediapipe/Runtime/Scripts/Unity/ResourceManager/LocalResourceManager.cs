@@ -12,60 +12,63 @@ using UnityEngine;
 
 namespace Mediapipe.Unity
 {
-  public class LocalResourceManager : IResourceManager
-  {
-    private static readonly string _TAG = nameof(LocalResourceManager);
+	public class LocalResourceManager : IResourceManager
+	{
+		private const string Tag = nameof(LocalResourceManager);
 
-    private static string _RelativePath;
-    private static readonly string _AssetPathRoot = "Packages/com.github.homuler.mediapipe/PackageResources/MediaPipe";
-    private static string _CachePathRoot;
+		private const string AssetPathRoot = "Packages/com.github.homuler.mediapipe/PackageResources/MediaPipe";
 
-    public LocalResourceManager(string path)
-    {
-      ResourceUtil.EnableCustomResolver();
-      _RelativePath = path;
-      _CachePathRoot = Path.Combine(Application.persistentDataPath, _RelativePath);
-    }
+		private static string _cachePathRoot;
 
-    public LocalResourceManager() : this("") { }
+		public LocalResourceManager(string path)
+		{
+			ResourceUtil.EnableCustomResolver();
+			_cachePathRoot = Path.Combine(Application.persistentDataPath, path);
+		}
 
-    IEnumerator IResourceManager.PrepareAssetAsync(string name, string uniqueKey, bool overwriteDestination)
-    {
-      var destFilePath = GetCachePathFor(uniqueKey);
-      ResourceUtil.SetAssetPath(name, destFilePath);
+		public LocalResourceManager() : this("")
+		{
+		}
 
-      if (File.Exists(destFilePath) && !overwriteDestination)
-      {
-        Logger.LogInfo(_TAG, $"{name} will not be copied to {destFilePath} because it already exists");
-        yield break;
-      }
+		IEnumerator IResourceManager.PrepareAssetAsync(string name, string uniqueKey, bool overwriteDestination)
+		{
+			var destFilePath = GetCachePathFor(uniqueKey);
+			ResourceUtil.SetAssetPath(name, destFilePath);
 
-      var assetPath = GetAssetPathFor(name);
-      var asset = AssetDatabase.LoadAssetAtPath<TextAsset>(assetPath);
+			if (File.Exists(destFilePath) && !overwriteDestination)
+			{
+				Logger.LogInfo(Tag, $"{name} will not be copied to {destFilePath} because it already exists");
+				yield break;
+			}
 
-      if (asset == null)
-      {
-        throw new FileNotFoundException($"{assetPath} is not found. Check if {name} is included in the package");
-      }
+			var assetPath = GetAssetPathFor(name);
+			var asset = AssetDatabase.LoadAssetAtPath<TextAsset>(assetPath);
 
-      Logger.LogVerbose(_TAG, $"Writing {name} data to {destFilePath}...");
-      if (!Directory.Exists(_CachePathRoot))
-      {
-        var _ = Directory.CreateDirectory(_CachePathRoot);
-      }
-      File.WriteAllBytes(destFilePath, asset.bytes);
-      Logger.LogVerbose(_TAG, $"{name} is saved to {destFilePath} (length={asset.bytes.Length})");
-    }
+			if (asset is null)
+			{
+				throw new FileNotFoundException(
+					$"{assetPath} is not found. Check if {name} is included in the package");
+			}
 
-    private static string GetAssetPathFor(string assetName)
-    {
-      return Path.Combine(_AssetPathRoot, assetName);
-    }
+			Logger.LogVerbose(Tag, $"Writing {name} data to {destFilePath}...");
+			if (!Directory.Exists(_cachePathRoot))
+			{
+				Directory.CreateDirectory(_cachePathRoot);
+			}
 
-    private static string GetCachePathFor(string assetName)
-    {
-      return Path.Combine(_CachePathRoot, assetName);
-    }
-  }
+			File.WriteAllBytes(destFilePath, asset.bytes);
+			Logger.LogVerbose(Tag, $"{name} is saved to {destFilePath} (length={asset.bytes.Length})");
+		}
+
+		private static string GetAssetPathFor(string assetName)
+		{
+			return Path.Combine(AssetPathRoot, assetName);
+		}
+
+		private static string GetCachePathFor(string assetName)
+		{
+			return Path.Combine(_cachePathRoot, assetName);
+		}
+	}
 }
 #endif
