@@ -204,8 +204,8 @@ MonoBehaviour:
   navigateHandPose: 32
   navigationAxisType: 0
   navigationScale:
-    x: 10
-    y: 5
+    x: 3
+    y: -2
 --- !u!4 &524959820
 Transform:
   m_ObjectHideFlags: 0

@@ -1,5 +1,6 @@
 using System;
 using EugeneC.Singleton;
+using EugeneC.Utilities;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -47,23 +48,23 @@ namespace ProjectionMapping
 		        _ => throw new ArgumentOutOfRangeException()
 	        };
 
-	        scale = math.abs(scale.x) > 1f ? scale : float2.zero;
+	        scale = math.abs(scale.x) > 0.75f ? scale : float2.zero;
 
 	        // Can only choose one between turn and move
 	        if (math.abs(scale.x) > math.abs(scale.y))
 	        {
 		        var rotation = cameraTransform.eulerAngles;
 		        scale.x = math.clamp(scale.x, -12f, 12f);
-		        rotation.y += scale.x;
-		        cameraTransform.eulerAngles = math.lerp(cameraTransform.eulerAngles, rotation, _handSetting.NavigationScale.x * Time.deltaTime);
+		        rotation.y += scale.x * _handSetting.NavigationScale.x;
+		        cameraTransform.eulerAngles = math.lerp(cameraTransform.eulerAngles, rotation, Time.deltaTime.SmoothFactor());
 	        }
 	        else if(math.abs(scale.x) < math.abs(scale.y))
 	        {
-		        scale = math.abs(scale.y) > 2f ? scale : float2.zero;
+		        scale = math.abs(scale.y) > 0.2f ? scale : float2.zero;
 		        var startPos = cameraTransform.transform.position; 
-		        scale.y = math.clamp(scale.y, -2f, 2f);
+		        scale.y *= _handSetting.NavigationScale.y * 0.1f;
 		        cameraTransform.transform.position = math.lerp(startPos, 
-			        startPos + scale.y * cameraTransform.transform.forward, _handSetting.NavigationScale.y * Time.deltaTime);
+			        startPos + scale.y * cameraTransform.transform.forward, Time.deltaTime.SmoothFactor());
 	        }
         }
     }
