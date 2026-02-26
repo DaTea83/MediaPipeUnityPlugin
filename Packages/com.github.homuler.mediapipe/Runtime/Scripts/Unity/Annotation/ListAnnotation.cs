@@ -83,7 +83,6 @@ namespace Mediapipe.Unity
 		protected virtual T InstantiateChild(bool active = true)
 		{
 			var annotation = InstantiateChild<T>(annotationPrefab.gameObject);
-			if (annotation is null) { return null; }
 			annotation.SetActive(active);
 			return annotation;
 		}
