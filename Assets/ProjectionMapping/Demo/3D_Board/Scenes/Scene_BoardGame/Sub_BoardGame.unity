@@ -202,6 +202,10 @@ MonoBehaviour:
   useGesture: 1
   pickGesture: 128
   navigateHandPose: 32
+  navigationAxisType: 0
+  navigationScale:
+    x: 10
+    y: 5
 --- !u!4 &524959820
 Transform:
   m_ObjectHideFlags: 0

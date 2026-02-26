@@ -1,8 +1,16 @@
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace ProjectionMapping
 {
+	public enum ENavigationAxisType : byte
+	{
+		XY,
+		XZ,
+		YZ
+	}
+	
 	[DisallowMultipleComponent]
     public sealed class HandTrackSingletonAuthoring : MonoBehaviour
     {
@@ -10,7 +18,10 @@ namespace ProjectionMapping
 	    [SerializeField] private bool useGesture;
 	    [Space]
 	    [SerializeField] private EHandPose pickGesture = EHandPose.OkSign;
+	    [Space]
 	    [SerializeField] private EHandPose navigateHandPose = EHandPose.GunSign;
+	    [SerializeField] private ENavigationAxisType navigationAxisType = ENavigationAxisType.XY;
+	    [SerializeField] private float2 navigationScale = new float2(1f, 1f);
 	    
 	    private void OnValidate()
 	    {
@@ -31,7 +42,9 @@ namespace ProjectionMapping
 				    UseGrabAny = authoring.useGrabAny,
 				    UseGesture = authoring.useGesture,
 				    PickGesture = authoring.pickGesture,
-				    NavigateGesture = authoring.navigateHandPose
+				    NavigateGesture = authoring.navigateHandPose,
+				    NavigationAxisType = authoring.navigationAxisType,
+				    NavigationScale = authoring.navigationScale
 			    });
 		    }
 	    }

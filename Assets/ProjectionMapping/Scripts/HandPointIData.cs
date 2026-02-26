@@ -18,6 +18,8 @@ namespace ProjectionMapping
 	    public bool UseGesture;
 	    public EHandPose PickGesture;
 	    public EHandPose NavigateGesture;
+	    public ENavigationAxisType NavigationAxisType;
+	    public float2 NavigationScale;
     }
 
     public struct HandPoseISingleton : IComponentData
