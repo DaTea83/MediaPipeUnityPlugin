@@ -23,10 +23,8 @@ namespace EugeneC.ECS
 			{
 				DependsOn(authoring.textAsset);
 				var e = GetEntity(TransformUsageFlags.Dynamic);
-
-				var builder = new BlobBuilder(Allocator.Temp);
-				var pattern = MakeBlob(authoring, ref builder);
-				builder.Dispose();
+				
+				var pattern = MakeBlob(authoring);
 				AddBlobAsset(ref pattern, out _);
 				
 				AddComponent(e, new TextGridSpawnIData
@@ -51,9 +49,9 @@ namespace EugeneC.ECS
 				}
 			}
 
-			private static BlobAssetReference<BlobArray<FixedList512Bytes<byte>>> MakeBlob(TextGridSpawnAuthoring authoring, 
-				ref BlobBuilder builder)
+			private static BlobAssetReference<BlobArray<FixedList512Bytes<byte>>> MakeBlob(TextGridSpawnAuthoring authoring)
 			{
+				using var builder = new BlobBuilder(Allocator.Temp);
 				ref var patternBlob = ref builder.ConstructRoot<BlobArray<FixedList512Bytes<byte>>>();
 				
 				var arrayBuilder = builder.Allocate(ref patternBlob, 1);

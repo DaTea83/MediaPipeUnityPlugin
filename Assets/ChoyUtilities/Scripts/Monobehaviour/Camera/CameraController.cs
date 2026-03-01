@@ -9,10 +9,14 @@ using UnityEngine.UI;
 namespace EugeneC.Utilities
 {
 	[DisallowMultipleComponent]
+	[RequireComponent(typeof(Camera))]
 	public sealed class CameraController : GenericSingleton<CameraController>
 	{
 		[SerializeField] private Image blackScreenImg;
 		[SerializeField] private float initialFadeOutTime = 5f;
+
+		private Camera _camera;
+		public Camera Cam => _camera;
 
 		public event Action OnCameraReady;
 
@@ -23,6 +27,7 @@ namespace EugeneC.Utilities
 		{
 			try
 			{
+				_camera = GetComponent<Camera>();
 				await Awaitable.WaitForSecondsAsync(.1f, _tokenSource.Token);
 				await RunFadeScreen(UtilityCollection.EFadeType.FadeOut, initialFadeOutTime);
 			}
@@ -34,7 +39,7 @@ namespace EugeneC.Utilities
 			CameraCancellation();
 		}
 
-		public async Awaitable RunFadeScreen(UtilityCollection.EFadeType fadeType, float duration)
+		public async Task RunFadeScreen(UtilityCollection.EFadeType fadeType, float duration)
 		{
 			await Awaitable.EndOfFrameAsync(_tokenSource.Token);
 			await _tokenSource.Token.FadeScreenAsync(blackScreenImg, fadeType, duration, Time.deltaTime);

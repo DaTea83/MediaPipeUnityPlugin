@@ -9,15 +9,15 @@ using System.Linq;
 //In case of debugging and this is blocking the way just comment out [InitializeOnLoad]
 //After finish debugging uncomment back
 
-namespace EugeneC.Utilities
+namespace EugeneC.Editor
 {
 #if UNITY_EDITOR
 
 	[InitializeOnLoad]
 	internal static class LoadIconDisplay
 	{
-		static bool _hierarchyHasFocus;
-		static EditorWindow _window;
+		private static bool _hierarchyHasFocus;
+		private static EditorWindow _window;
 
 		static LoadIconDisplay()
 		{

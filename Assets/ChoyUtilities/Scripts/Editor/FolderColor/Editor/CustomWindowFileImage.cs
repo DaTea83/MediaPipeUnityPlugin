@@ -7,12 +7,12 @@ namespace FolderColor
 
 	public class CustomWindowFileImage : EditorWindow
 	{
-		string assetPath;
+		private string _assetPath;
 
 		public static void ShowWindow(string assetPathGive)
 		{
-			CustomWindowFileImage window = GetWindow<CustomWindowFileImage>("Custom Folder");
-			window.assetPath = assetPathGive;
+			var window = GetWindow<CustomWindowFileImage>("Custom Folder");
+			window._assetPath = assetPathGive;
 			window.Show();
 		}
 
@@ -20,9 +20,9 @@ namespace FolderColor
 		{
 			if (GUI.Button(new Rect(0, 0, 100, 100), "None"))
 			{
-				if (ProjectAssetViewerCustomisation.ModificationData.assetModified.Contains(assetPath))
+				if (ProjectAssetViewerCustomisation.ModificationData.assetModified.Contains(_assetPath))
 				{
-					RemoveReference(assetPath);
+					RemoveReference(_assetPath);
 					ProjectAssetViewerCustomisation.SaveData();
 				}
 
@@ -51,10 +51,10 @@ namespace FolderColor
 
 				if (GUI.Button(new Rect(x, y, buttonWidth, buttonHeight), texture))
 				{
-					if (ProjectAssetViewerCustomisation.ModificationData.assetModified.Contains(assetPath))
-						RemoveReference(assetPath);
+					if (ProjectAssetViewerCustomisation.ModificationData.assetModified.Contains(_assetPath))
+						RemoveReference(_assetPath);
 
-					ProjectAssetViewerCustomisation.ModificationData.assetModified.Add(assetPath);
+					ProjectAssetViewerCustomisation.ModificationData.assetModified.Add(_assetPath);
 					ProjectAssetViewerCustomisation.ModificationData.assetModifiedTexturePath.Add(
 						AssetDatabase.GUIDToAssetPath(texturesPath[i]));
 					ProjectAssetViewerCustomisation.SaveData();

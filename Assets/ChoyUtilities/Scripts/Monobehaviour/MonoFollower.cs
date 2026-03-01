@@ -13,15 +13,10 @@ namespace EugeneC.Mono
 
 		private float _factor;
 
-		private void OnValidate()
-		{
-			if (target is null) return;
-			offset = transform.position - target.position;
-		}
-
 		private void OnEnable()
 		{
 			if (target is null) return;
+			offset = transform.position - target.position;
 			_factor = smoothFollowSpeed > 0 ? smoothFollowSpeed : 1f;
 		}
 

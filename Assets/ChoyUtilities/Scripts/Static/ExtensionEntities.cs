@@ -5,10 +5,10 @@ namespace EugeneC.Utilities
 {
 	public static partial class HelperCollection
 	{
-		public static (Entity, Entity) GetSimulationEntities<T, U>(this TriggerEvent triggerEvent,
-			ComponentLookup<T> aLookup, ComponentLookup<U> bLookup)
+		public static (Entity, Entity) GetSimulationEntities<T, TU>(this TriggerEvent triggerEvent,
+			ComponentLookup<T> aLookup, ComponentLookup<TU> bLookup)
 			where T : unmanaged, IComponentData
-			where U : unmanaged, IComponentData
+			where TU : unmanaged, IComponentData
 		{
 			Entity aEntity, bEntity;
 

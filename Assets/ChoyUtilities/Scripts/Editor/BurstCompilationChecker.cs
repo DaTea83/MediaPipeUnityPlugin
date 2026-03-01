@@ -1,7 +1,7 @@
 using Unity.Burst;
 using UnityEngine;
 
-namespace EugeneC.Utilities
+namespace EugeneC.Editor
 {
 #if UNITY_EDITOR
 	/// <summary>

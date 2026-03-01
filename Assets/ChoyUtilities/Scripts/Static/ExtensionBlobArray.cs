@@ -23,9 +23,9 @@ namespace EugeneC.Utilities
 		/// For what is IComparer check out: https://learn.microsoft.com/en-us/dotnet/api/system.collections.icomparer?view=net-9.0
 		/// IComparable : https://learn.microsoft.com/en-us/dotnet/api/system.icomparable?view=net-9.0
 		/// </remarks>
-		public static int LowerBound<T, U>(ref this BlobArray<T> array, T value, U comparer)
+		public static int LowerBound<T, TComparer>(ref this BlobArray<T> array, T value, TComparer comparer)
 			where T : struct
-			where U : IComparer<T>
+			where TComparer : IComparer<T>
 		{
 			int leftBound = 0;
 			int rightBound = array.Length;

@@ -20,18 +20,14 @@ namespace EugeneC.Utilities
 			return pos;
 		}
 
-		public static Quaternion RotateTowards(this Transform ob, Vector3 target, float speed)
+		public static Quaternion RotateTowards(this Transform ob, float3 target, float speed)
 		{
-			Vector3 dir = (target - ob.position).normalized;
-			Quaternion lookTowards = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
+			var dir = math.normalize(target - (float3)ob.position);
+			var lookTowards = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z));
 			return Quaternion.Slerp(ob.rotation, lookTowards, Time.deltaTime * speed);
 		}
 
-		public static Vector3 GetMidPoint(this Vector3 pointA, Vector3 pointB)
-		{
-			Vector3 midpoint = (pointA + pointB) * 0.5f;
-			return midpoint;
-		}
+		public static float3 GetMidPoint(this float3 pointA, float3 pointB) => (pointA + pointB) * 0.5f;
 
 		public static bool FinishRotate(this Transform ob, Vector3 target, float threshold = 5f)
 		{
@@ -45,17 +41,15 @@ namespace EugeneC.Utilities
 			if (posList is null || currentPosition is null) return null;
 
 			Transform nearest = null;
-			float distonearest = 0f;
+			float disToNearest = 0f;
 
-			foreach (Transform pos in posList)
+			foreach (var pos in posList)
 			{
 				if (pos is null) continue;
-				float distance = (currentPosition.position - pos.position).magnitude;
-				if (nearest is null || distance < distonearest) //&& CurrentPosition.CanMoveThere(nearest))) 
-				{
-					nearest = pos;
-					distonearest = distance;
-				}
+				var distance = (currentPosition.position - pos.position).magnitude;
+				if (nearest is not null && !(distance < disToNearest)) continue; //&& CurrentPosition.CanMoveThere(nearest))) 
+				nearest = pos;
+				disToNearest = distance;
 			}
 
 			return nearest;
@@ -69,43 +63,36 @@ namespace EugeneC.Utilities
 			Transform nearest = null;
 			float disToNearest = 0f;
 
-			foreach (Transform pos in posList)
+			foreach (var pos in posList)
 			{
 				if (pos is null || prevPos is null) continue;
 				if (prevPos.Contains(pos)) continue;
-				float distance = (currentPosition.position - pos.position).magnitude;
-				if (nearest is null || distance < disToNearest) //&& CurrentPosition.CanMoveThere(nearest))) 
-				{
-					nearest = pos;
-					disToNearest = distance;
-				}
+				var distance = (currentPosition.position - pos.position).magnitude;
+				if (nearest is not null && !(distance < disToNearest)) continue; //&& CurrentPosition.CanMoveThere(nearest))) 
+				nearest = pos;
+				disToNearest = distance;
 			}
 
 			return nearest;
 		}
 
-		public static bool CanMoveThere(this Transform pos, Vector3 target, string tag)
+		public static bool CanMoveThere(this Transform pos, float3 target, string tag)
 		{
-			Vector3 dir = (target - pos.position).normalized;
-			Ray ray = new Ray(pos.position, dir);
-			if (Physics.Raycast(ray, out RaycastHit hitInfo))
-			{
-				if (hitInfo.collider.CompareTag(tag))
-					return false;
-			}
-
-			return true;
+			var dir = math.normalize(target - (float3)pos.position);
+			var ray = new Ray(pos.position, dir);
+			if (!Physics.Raycast(ray, out var hitInfo)) return true;
+			return !hitInfo.collider.CompareTag(tag);
 		}
 
 		public static Transform FindNearestEnemy(this GameObject bot, List<GameObject> objectList)
 		{
 			Transform target = null;
-			float disToNearest = 0f;
+			var disToNearest = 0f;
 
 			foreach (var potentialTarget in objectList)
 			{
 				if (potentialTarget == bot) continue;
-				float distance = (bot.transform.position - potentialTarget.transform.position).magnitude;
+				var distance = (bot.transform.position - potentialTarget.transform.position).magnitude;
 
 				if (target is not null && !(distance < disToNearest)) continue;
 				target = potentialTarget.transform;
@@ -115,15 +102,15 @@ namespace EugeneC.Utilities
 			return target;
 		}
 
-		public static GameObject FindNearestObjectInRange(this Transform ob, List<GameObject> oblist, float maxRange)
+		public static GameObject FindNearestObjectInRange(this Transform ob, List<GameObject> obList, float maxRange)
 		{
 			GameObject nearest = null;
 			float distanceToNearest = 0;
 
-			foreach (var spawned in oblist)
+			foreach (var spawned in obList)
 			{
 				if (spawned.transform == ob) continue;
-				float distance = Vector3.Distance(ob.position, spawned.transform.position);
+				var distance = math.distance(ob.position, spawned.transform.position);
 
 				if (!(distance <= maxRange)) continue;
 				if (nearest is not null && !(distance < distanceToNearest)) continue;
