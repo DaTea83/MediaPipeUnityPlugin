@@ -1,4 +1,5 @@
 ﻿using System;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace EugeneC.ECS
@@ -6,10 +7,11 @@ namespace EugeneC.ECS
 	[DisallowMultipleComponent]
 	public sealed class AgentPoint : MonoBehaviour
 	{
-		public EBakingLineType bakingLineType;
 		public EAgentSpeed agentSpeed;
 		public float overrideSpeed;
 		public float pointThreshold = 0.2f;
+		
+		public float3 position => transform.position;
 
 		private void OnDrawGizmos()
 		{
@@ -21,7 +23,9 @@ namespace EugeneC.ECS
 	[Serializable]
 	public struct PointSerializable
 	{
-		public AgentPoint[] points;
+		public Color color;
+		public EBakingLineType bakingLineType;
+		public AgentPoint[] agentPoints;
 	}
 
 	public enum EBakingLineType : byte
