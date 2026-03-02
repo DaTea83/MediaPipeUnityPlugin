@@ -19,7 +19,7 @@ namespace ProjectionMapping
 	    {
 		    try
 		    {
-			    await Cts.Token.AwaitableUntil(() => GameController.Instance is not null);
+			    await Token.AwaitableUntil(() => CameraController.Instance is not null);
 			    
 			    _world = World.DefaultGameObjectInjectionWorld;
 			    var system = _world.GetExistingSystemManaged<HandDataEventSystemBase>();

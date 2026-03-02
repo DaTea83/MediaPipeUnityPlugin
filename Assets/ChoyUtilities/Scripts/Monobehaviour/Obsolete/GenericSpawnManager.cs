@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using EugeneC.Singleton;
 using UnityEngine;
 
-namespace EugeneC.Singleton
+namespace EugeneC.Obsolete
 {
 	//TODO: Make a new version, mark this as deprecated 
+	[Obsolete]
 	public abstract class GenericSpawnManager<T> : GenericSingleton<GenericSpawnManager<T>>
 		where T : Enum
 	{
@@ -45,6 +47,7 @@ namespace EugeneC.Singleton
 		}
 	}
 
+	[Obsolete]
 	[Serializable]
 	public struct SpawnSerialize<T>
 		where T : Enum

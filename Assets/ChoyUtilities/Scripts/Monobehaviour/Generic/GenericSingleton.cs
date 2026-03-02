@@ -8,7 +8,8 @@ namespace EugeneC.Singleton
 	{
 		public static T Instance { get; private set; }
 		
-		protected CancellationTokenSource Cts { get; } = new();
+		protected readonly CancellationTokenSource Cts = new();
+		protected CancellationToken Token => Cts.Token;
 
 		protected virtual void InitSingleton()
 		{

@@ -32,7 +32,7 @@ namespace EugeneC.Singleton
 		{
 			try
 			{
-				await Awaitable.NextFrameAsync(Cts.Token);
+				await Awaitable.NextFrameAsync(Token);
 				if (canvasRef is null) return;
 				CanvasPos = (RectTransform)canvasRef.transform;
 
@@ -77,7 +77,7 @@ namespace EugeneC.Singleton
 
 			OnOpenUi?.Invoke();
 			var t = newUi.OnStartOpen();
-			await Awaitable.WaitForSecondsAsync(math.abs(t));
+			await Awaitable.WaitForSecondsAsync(math.abs(t), Token);
 			newUi.OnEndOpen();
 			IsTransitioning = false;
 
@@ -94,7 +94,7 @@ namespace EugeneC.Singleton
 
 			OnCloseUi?.Invoke();
 			var t = newUi.OnStartClose();
-			await Awaitable.WaitForSecondsAsync(math.abs(t));
+			await Awaitable.WaitForSecondsAsync(math.abs(t), Token);
 			newUi.OnEndClose();
 
 			await Awaitable.NextFrameAsync();
@@ -117,12 +117,12 @@ namespace EugeneC.Singleton
 				i = i < t ? t : i;
 			}
 
-			await Awaitable.WaitForSecondsAsync(i);
+			await Awaitable.WaitForSecondsAsync(i, Token);
 
 			foreach (var ui in OpenedUi)
 			{
 				ui.OnEndClose();
-				await Awaitable.NextFrameAsync();
+				await Awaitable.NextFrameAsync(Token);
 				ui.gameObject.SetActive(false);
 			}
 

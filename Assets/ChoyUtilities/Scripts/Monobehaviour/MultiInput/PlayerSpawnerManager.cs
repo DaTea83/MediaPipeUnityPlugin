@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using EugeneC.Singleton;
+using EugeneC.Obsolete;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -8,7 +8,10 @@ using UnityEngine.SceneManagement;
 namespace EugeneC.Utilities
 {
 // Combination of input manager and spawn manager
+	
+#pragma warning disable CS0612
 	public class PlayerSpawnerManager : GenericSpawnManager<PlayerSpawnerManager.PlayerTypeEnum>
+#pragma warning restore CS0612
 	{
 		public enum PlayerTypeEnum
 		{

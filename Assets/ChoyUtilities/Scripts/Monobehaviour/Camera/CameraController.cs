@@ -23,16 +23,16 @@ namespace EugeneC.Utilities
 			try
 			{
 				Cam = GetComponent<Camera>();
-				await Awaitable.WaitForSecondsAsync(.1f, Cts.Token);
+				await Awaitable.WaitForSecondsAsync(.1f, Token);
 				await RunFadeScreen(UtilityCollection.EFadeType.FadeOut, initialFadeOutTime);
 			}
 			catch (Exception e) { Debug.LogException(e); }
 		}
 
-		public async Task RunFadeScreen(UtilityCollection.EFadeType fadeType, float duration)
+		public async Awaitable RunFadeScreen(UtilityCollection.EFadeType fadeType, float duration)
 		{
-			await Awaitable.EndOfFrameAsync(Cts.Token);
-			await Cts.Token.FadeScreenAsync(blackScreenImg, fadeType, duration, Time.deltaTime);
+			await Awaitable.EndOfFrameAsync(Token);
+			await Token.FadeScreenAsync(blackScreenImg, fadeType, duration, Time.deltaTime);
 			OnCameraReady?.Invoke();
 		}
 	}

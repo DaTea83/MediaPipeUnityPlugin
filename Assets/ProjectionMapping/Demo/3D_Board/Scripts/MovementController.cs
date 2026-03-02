@@ -21,7 +21,7 @@ namespace ProjectionMapping
         {
 	        try
 	        {
-		        await Awaitable.EndOfFrameAsync(Cts.Token);
+		        await Awaitable.EndOfFrameAsync(Token);
 		        _world = World.DefaultGameObjectInjectionWorld;
 		        
 		        var system = _world.GetExistingSystemManaged<HandDataEventSystemBase>();

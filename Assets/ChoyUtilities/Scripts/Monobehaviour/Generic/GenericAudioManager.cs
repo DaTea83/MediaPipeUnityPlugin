@@ -50,7 +50,7 @@ namespace EugeneC.Singleton
 		{
 			try
 			{
-				await Awaitable.NextFrameAsync(Cts.Token);
+				await Awaitable.NextFrameAsync(Token);
 				if (audioSourcePrefab is null) return;
 
 				AudioSources = new AudioSource[poolCount];

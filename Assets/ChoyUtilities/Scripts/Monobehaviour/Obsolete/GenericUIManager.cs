@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace EugeneC.Obsolete
 {
+	[Obsolete]
 	public abstract class GenericUIManager<T> : GenericSingleton<GenericUIManager<T>>
 		where T : Enum
 	{

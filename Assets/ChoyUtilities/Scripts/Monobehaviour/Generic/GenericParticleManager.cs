@@ -37,7 +37,7 @@ namespace EugeneC.Singleton
 		{
 			try
 			{
-				await Awaitable.WaitForSecondsAsync(.1f, Cts.Token);
+				await Awaitable.WaitForSecondsAsync(.1f, Token);
 
 				ParticleSystems = new SystemSerialize[particleEffects.Length];
 				var currentSystem = 0;
@@ -74,7 +74,7 @@ namespace EugeneC.Singleton
 
 		public virtual void PauseAllEffects()
 		{
-			PauseIndexes = new();
+			PauseIndexes = new List<int>();
 			for (var i = 0; i < ParticleSystems.Length; i++)
 			{
 				var system = ParticleSystems[i];
