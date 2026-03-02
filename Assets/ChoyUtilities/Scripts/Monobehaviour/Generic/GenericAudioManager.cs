@@ -115,7 +115,7 @@ namespace EugeneC.Singleton
 
 		public virtual bool PauseAllClips(bool isStop = false)
 		{
-			PauseIndexes = new();
+			PauseIndexes = new List<int>();
 			for (var i = 0; i < AudioSources.Length; i++)
 			{
 				var currentSource = AudioSources[i];
