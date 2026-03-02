@@ -4,42 +4,38 @@ using UnityEngine;
 
 namespace EugeneC.Singleton
 {
+	//TODO: Make a new version, mark this as deprecated 
 	public abstract class GenericSpawnManager<T> : GenericSingleton<GenericSpawnManager<T>>
 		where T : Enum
 	{
 		public SpawnSerialize<T>[] serializedOb;
-		Dictionary<T, SpawnSerialize<T>> _spawnDictionary = new();
+		private readonly Dictionary<T, SpawnSerialize<T>> _spawnDictionary = new();
 
 		public List<GameObject> spawnedObjects = new();
 
-		protected override void Awake()
+		protected virtual void Start()
 		{
-			base.Awake();
 			foreach (var spawnPrefab in serializedOb)
 				_spawnDictionary[spawnPrefab.spawnId] = spawnPrefab;
 		}
 
 		public GameObject SpawnObject(T id, Vector3 pos, Quaternion rot)
 		{
-			GameObject newob = null;
-			if (_spawnDictionary.TryGetValue(id, out SpawnSerialize<T> spawnPrefab))
-			{
-				int key = UnityEngine.Random.Range(0, spawnPrefab.prefab.Length);
-				GameObject c = spawnPrefab.prefab[key];
-				newob = Instantiate(c, pos, rot);
-				spawnedObjects.Add(newob);
-			}
+			GameObject newObj = null;
+			if (!_spawnDictionary.TryGetValue(id, out SpawnSerialize<T> spawnPrefab)) return null;
+			var key = UnityEngine.Random.Range(0, spawnPrefab.prefab.Length);
+			var c = spawnPrefab.prefab[key];
+			newObj = Instantiate(c, pos, rot);
+			spawnedObjects.Add(newObj);
 
-			return newob;
+			return newObj;
 		}
 
 		public void DespawnObject(GameObject despawnob)
 		{
-			if (spawnedObjects.Contains(despawnob))
-			{
-				spawnedObjects.Remove(despawnob);
-				Destroy(despawnob);
-			}
+			if (!spawnedObjects.Contains(despawnob)) return;
+			spawnedObjects.Remove(despawnob);
+			Destroy(despawnob);
 		}
 
 		public void DespawnEverything()

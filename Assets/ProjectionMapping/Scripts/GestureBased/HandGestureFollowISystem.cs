@@ -50,7 +50,7 @@ namespace ProjectionMapping
 					SystemAPI.SetComponent(e, grab);
 				}
 				var lt = SystemAPI.GetComponent<LocalTransform>(e);
-				MoveEntity(pose.LeftLocalPosition, dir, _interactSystemBase.LeftDataRef.Value.Distance, 
+				MoveEntity(pose.LeftLocalPosition, dir, _interactSystemBase.LeftDataRef.Value.Distance * 0.9f, 
 					 ref lt, dt);
 				SystemAPI.SetComponent(e, lt);
 			}
@@ -65,7 +65,7 @@ namespace ProjectionMapping
 					SystemAPI.SetComponent(e, grab);
 				}
 				var lt = SystemAPI.GetComponent<LocalTransform>(e);
-				MoveEntity(pose.RightLocalPosition, dir, _interactSystemBase.RightDataRef.Value.Distance, 
+				MoveEntity(pose.RightLocalPosition, dir, _interactSystemBase.RightDataRef.Value.Distance * 0.9f, 
 					 ref lt, dt);
 				SystemAPI.SetComponent(e, lt);
 			}

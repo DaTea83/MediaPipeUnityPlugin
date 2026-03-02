@@ -21,7 +21,7 @@ namespace ProjectionMapping
         {
 	        try
 	        {
-		        await Awaitable.EndOfFrameAsync();
+		        await Awaitable.EndOfFrameAsync(Cts.Token);
 		        _world = World.DefaultGameObjectInjectionWorld;
 		        
 		        var system = _world.GetExistingSystemManaged<HandDataEventSystemBase>();
@@ -48,23 +48,68 @@ namespace ProjectionMapping
 		        _ => throw new ArgumentOutOfRangeException()
 	        };
 
-	        scale = math.abs(scale.x) > 0.75f ? scale : float2.zero;
+	        var rotation = cameraTransform.eulerAngles;
+	        var startPos = cameraTransform.transform.position; 
+	        
+	        var absX = math.abs(scale.x);
+	        var absY = math.abs(scale.y);
 
-	        // Can only choose one between turn and move
-	        if (math.abs(scale.x) > math.abs(scale.y))
+	        if ((int)absX == (int)absY) return;
+
+	        var useX = absX > absY;
+	        var input = useX ? scale.x : scale.y;
+	        var inputScale = useX ? _handSetting.NavigationScale.x : _handSetting.NavigationScale.y;
+	        var transformType = useX ? _handSetting.XTransformType : _handSetting.YTransformType;
+	        var rotateScale = useX ? _handSetting.NavigationScale.x : _handSetting.NavigationScale.y;
+	        
+	        if (math.abs(input) <= 0.2f) return;
+
+	        switch (transformType)
 	        {
-		        var rotation = cameraTransform.eulerAngles;
-		        scale.x = math.clamp(scale.x, -12f, 12f);
-		        rotation.y += scale.x * _handSetting.NavigationScale.x;
-		        cameraTransform.eulerAngles = math.lerp(cameraTransform.eulerAngles, rotation, Time.deltaTime.SmoothFactor());
+		        case ENavigationTransformType.Up:
+			        ApplyMove(cameraTransform.up);
+			        break;
+		        case ENavigationTransformType.Right:
+			        ApplyMove(cameraTransform.right);
+			        break;
+		        case ENavigationTransformType.Forward:
+			        ApplyMove(cameraTransform.forward);
+			        break;
+		        case ENavigationTransformType.RotateX:
+			        ApplyRotate(0);
+			        break;
+		        case ENavigationTransformType.RotateY:
+			        ApplyRotate(1);
+			        break;
+		        case ENavigationTransformType.RotateZ:
+			        ApplyRotate(2);
+			        break;
+		        default:
+			        throw new ArgumentOutOfRangeException();
 	        }
-	        else if(math.abs(scale.x) < math.abs(scale.y))
+
+	        return;
+
+	        void ApplyRotate(int axisIndex)
 	        {
-		        scale = math.abs(scale.y) > 0.2f ? scale : float2.zero;
-		        var startPos = cameraTransform.transform.position; 
-		        scale.y *= _handSetting.NavigationScale.y * 0.1f;
-		        cameraTransform.transform.position = math.lerp(startPos, 
-			        startPos + scale.y * cameraTransform.transform.forward, Time.deltaTime.SmoothFactor());
+		        float clamped = math.clamp(input, -12f, 12f);
+		        rotation[axisIndex] += clamped * rotateScale;
+		        cameraTransform.eulerAngles = math.lerp(
+			        cameraTransform.eulerAngles,
+			        rotation,
+			        Time.deltaTime.SmoothFactor());
+	        }
+
+	        void ApplyMove(float3 direction)
+	        {
+		        var move = input * inputScale;
+		        var target = (float3)startPos + move * direction;
+		        var clamp = _handSetting.ClampSize;
+		        target = clamp is { x: <= 0, y: <= 0, z: <= 0 } ? target 
+			        : math.clamp(target, -clamp, clamp);
+		        
+		        cameraTransform.position = math.lerp(
+			        startPos, target, Time.deltaTime.SmoothFactor());
 	        }
         }
     }

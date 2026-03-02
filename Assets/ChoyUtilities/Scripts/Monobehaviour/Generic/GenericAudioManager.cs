@@ -9,14 +9,14 @@ namespace EugeneC.Singleton
 #if UNITY_2023_2_OR_NEWER
 
 	// For audio randomization use the Unity new Random Audio Container, hence why there's a version requirement
-	public abstract class GenericAudioManager<T, U> : GenericSingleton<U>
-		where T : Enum
-		where U : MonoBehaviour
+	public abstract class GenericAudioManager<TEnum, TMono> : GenericSingleton<TMono>
+		where TEnum : Enum
+		where TMono : MonoBehaviour
 	{
 		[Serializable]
 		public struct AudioResourceSerialize
 		{
-			public T id;
+			public TEnum id;
 			public AudioResource audio;
 		}
 
@@ -50,7 +50,7 @@ namespace EugeneC.Singleton
 		{
 			try
 			{
-				await Awaitable.NextFrameAsync();
+				await Awaitable.NextFrameAsync(Cts.Token);
 				if (audioSourcePrefab is null) return;
 
 				AudioSources = new AudioSource[poolCount];
@@ -68,12 +68,12 @@ namespace EugeneC.Singleton
 				Debug.LogException(e);
 			}
 		}
-
-		public virtual void PlayClipAtPos(T id, float3 pos, byte audioPriority = (byte)EAudioPriority.Average)
+		
+		public virtual void PlayClipAtPos(TEnum id, float3 pos, byte audioPriority = (byte)EAudioPriority.Average)
 		{
-			if (!Enum.IsDefined(typeof(T), id)) return;
+			if (!Enum.IsDefined(typeof(TEnum), id)) return;
 			var resourceIndex = Array.FindIndex(audioResource,
-				r => EqualityComparer<T>.Default.Equals(r.id, id));
+				r => EqualityComparer<TEnum>.Default.Equals(r.id, id));
 
 			var resource = audioResource[resourceIndex].audio;
 			PlayClipAtPos(resource, pos, audioPriority);
@@ -94,7 +94,7 @@ namespace EugeneC.Singleton
 			CurrentIndex %= AudioSources.Length;
 		}
 
-		public virtual void PlayClip(T id, byte audioPriority = (byte)EAudioPriority.Average) =>
+		public virtual void PlayClip(TEnum id, byte audioPriority = (byte)EAudioPriority.Average) =>
 			PlayClipAtPos(id, float3.zero, audioPriority);
 
 		public virtual void PlayClip(AudioResource resource, byte audioPriority = (byte)EAudioPriority.Average) =>

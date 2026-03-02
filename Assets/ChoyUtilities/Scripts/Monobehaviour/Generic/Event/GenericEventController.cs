@@ -4,6 +4,7 @@ using UnityEngine.Events;
 
 namespace EugeneC.Singleton
 {
+	//TODO
 	public abstract class GenericEventController<T> : GenericSingleton<T>
 		where T : MonoBehaviour
 

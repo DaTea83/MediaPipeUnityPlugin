@@ -27,8 +27,6 @@ namespace EugeneC.Utilities
 			return Quaternion.Slerp(ob.rotation, lookTowards, Time.deltaTime * speed);
 		}
 
-		public static float3 GetMidPoint(this float3 pointA, float3 pointB) => (pointA + pointB) * 0.5f;
-
 		public static bool FinishRotate(this Transform ob, Vector3 target, float threshold = 5f)
 		{
 			Vector3 dir = (target - ob.position).normalized;

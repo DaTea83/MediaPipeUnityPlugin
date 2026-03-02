@@ -20,6 +20,7 @@ namespace ProjectionMapping
 			{
 				var e = GetEntity(TransformUsageFlags.Dynamic);
 				AddComponent<HandGrabbableIData>(e);
+				AddBuffer<GrabbableOverlapIBuffer>(e);
 			}
 		}
 	}

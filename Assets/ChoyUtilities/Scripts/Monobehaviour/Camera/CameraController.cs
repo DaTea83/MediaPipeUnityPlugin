@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using EugeneC.Singleton;
 using UnityEditor;
@@ -15,34 +14,25 @@ namespace EugeneC.Utilities
 		[SerializeField] private Image blackScreenImg;
 		[SerializeField] private float initialFadeOutTime = 5f;
 
-		private Camera _camera;
-		public Camera Cam => _camera;
+		public Camera Cam { get; private set; }
 
 		public event Action OnCameraReady;
-
-		private readonly CancellationTokenSource _tokenSource = new();
-		public void CameraCancellation() => _tokenSource.Cancel();
 
 		private async void OnEnable()
 		{
 			try
 			{
-				_camera = GetComponent<Camera>();
-				await Awaitable.WaitForSecondsAsync(.1f, _tokenSource.Token);
+				Cam = GetComponent<Camera>();
+				await Awaitable.WaitForSecondsAsync(.1f, Cts.Token);
 				await RunFadeScreen(UtilityCollection.EFadeType.FadeOut, initialFadeOutTime);
 			}
 			catch (Exception e) { Debug.LogException(e); }
 		}
 
-		private void OnDisable()
-		{
-			CameraCancellation();
-		}
-
 		public async Task RunFadeScreen(UtilityCollection.EFadeType fadeType, float duration)
 		{
-			await Awaitable.EndOfFrameAsync(_tokenSource.Token);
-			await _tokenSource.Token.FadeScreenAsync(blackScreenImg, fadeType, duration, Time.deltaTime);
+			await Awaitable.EndOfFrameAsync(Cts.Token);
+			await Cts.Token.FadeScreenAsync(blackScreenImg, fadeType, duration, Time.deltaTime);
 			OnCameraReady?.Invoke();
 		}
 	}

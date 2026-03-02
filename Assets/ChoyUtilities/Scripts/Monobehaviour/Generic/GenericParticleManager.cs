@@ -5,14 +5,14 @@ using UnityEngine;
 
 namespace EugeneC.Singleton
 {
-	public abstract class GenericParticleManager<T, U> : GenericSingleton<U>
-		where T : Enum
-		where U : MonoBehaviour
+	public abstract class GenericParticleManager<TEnum, TMono> : GenericSingleton<TMono>
+		where TEnum : Enum
+		where TMono : MonoBehaviour
 	{
 		[Serializable]
 		public struct ParticleSerialize
 		{
-			public T id;
+			public TEnum id;
 			public ParticleSystem particle;
 		}
 
@@ -32,12 +32,12 @@ namespace EugeneC.Singleton
 
 		protected SystemSerialize[] ParticleSystems;
 		protected List<int> PauseIndexes;
-
+		
 		protected virtual async void Start()
 		{
 			try
 			{
-				await Awaitable.WaitForSecondsAsync(0.5f);
+				await Awaitable.WaitForSecondsAsync(.1f, Cts.Token);
 
 				ParticleSystems = new SystemSerialize[particleEffects.Length];
 				var currentSystem = 0;
@@ -55,16 +55,13 @@ namespace EugeneC.Singleton
 					currentSystem++;
 				}
 			}
-			catch (Exception e)
-			{
-				Debug.LogException(e);
-			}
+			catch (Exception e) { Debug.LogException(e); }
 		}
-
-		public virtual void PlayEffectAtPosition(T id, float3 position)
+		
+		public virtual void PlayEffectAtPosition(TEnum id, float3 position)
 		{
-			if (!Enum.IsDefined(typeof(T), id)) return;
-			var index = Array.FindIndex(particleEffects, i => EqualityComparer<T>.Default.Equals(i.id, id));
+			if (!Enum.IsDefined(typeof(TEnum), id)) return;
+			var index = Array.FindIndex(particleEffects, i => EqualityComparer<TEnum>.Default.Equals(i.id, id));
 
 			var particle = ParticleSystems[index].particles[ParticleSystems[index].currentIndex];
 			particle.transform.position = position;

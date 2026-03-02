@@ -149,13 +149,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DrawColliders: 0
-  DrawColliderEdges: 0
-  DrawColliderAabbs: 0
+  DrawColliderEdges: 1
+  DrawColliderAabbs: 1
   DrawMassProperties: 0
   DrawBroadphase: 0
   DrawContacts: 0
   DrawCollisionEvents: 0
-  DrawTriggerEvents: 0
+  DrawTriggerEvents: 1
   DrawJoints: 0
   ColliderDisplayMode: 0
   ColliderEdgesDisplayMode: 0

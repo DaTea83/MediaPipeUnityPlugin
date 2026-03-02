@@ -1,5 +1,7 @@
 using System;
+using System.Threading;
 using EugeneC.Singleton;
+using EugeneC.Utilities;
 using TMPro;
 using Unity.Entities;
 using UnityEngine;
@@ -11,19 +13,25 @@ namespace ProjectionMapping
 	    [SerializeField] private TMP_Text poseText;
 	    [SerializeField] private TMP_Text dataText;
 	    
+	    private readonly CancellationTokenSource _cts = new();
 	    private World _world;
 	    
 	    private async void Start()
 	    {
 		    try
 		    {
-			    await Awaitable.EndOfFrameAsync();
+			    await _cts.Token.AwaitableUntil(() => GameController.Instance is not null);
 			    _world = World.DefaultGameObjectInjectionWorld;
 			    var system = _world.GetExistingSystemManaged<HandDataEventSystemBase>();
 			    system.OnPoseChanged += OnGetHandPoses;
 			    system.OnHandDataChanged += OnGetHandData;
 		    }
 		    catch (Exception e){ Debug.Log(e);}
+	    }
+
+	    private void OnDisable()
+	    {
+		    _cts?.Cancel();
 	    }
 
 	    private void OnGetHandPoses(EHandPose left, EHandPose right)

@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/RTGame/Scene_RTGame.unity
+    guid: e8661d4aad84a554c8fa963b671964ec
+  - enabled: 1
     path: Assets/ProjectionMapping/Demo/3D_Board/Scene_BoardGame.unity
     guid: 696df8279a9dec942846d90dc6fb5c30
   - enabled: 1

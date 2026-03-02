@@ -8,14 +8,14 @@ using UnityEngine;
 
 namespace EugeneC.Singleton
 {
-	public abstract class GenericUiManager<T, U> : GenericSingleton<U>
-		where T : Enum
-		where U : MonoBehaviour
+	public abstract class GenericUiManager<TEnum, TMono> : GenericSingleton<TMono>
+		where TEnum : Enum
+		where TMono : MonoBehaviour
 	{
 		[Serializable]
 		public struct UiSerialize
 		{
-			public T id;
+			public TEnum id;
 			public UiHelper prefab;
 		}
 
@@ -26,9 +26,7 @@ namespace EugeneC.Singleton
 		protected RectTransform CanvasPos;
 		protected readonly List<UiHelper> OpenedUi = new();
 		protected bool IsTransitioning;
-		protected CancellationTokenSource TokenSource;
-
-		public void CancelTask() => TokenSource.Cancel();
+		
 		public event Action OnOpenUi;
 		public event Action OnCloseUi;
 
@@ -36,7 +34,7 @@ namespace EugeneC.Singleton
 		{
 			try
 			{
-				await Awaitable.NextFrameAsync();
+				await Awaitable.NextFrameAsync(Cts.Token);
 				if (canvasRef is null) return;
 				CanvasPos = (RectTransform)canvasRef.transform;
 
@@ -56,11 +54,12 @@ namespace EugeneC.Singleton
 			}
 		}
 
-		private async void OnDisable()
+		protected override async void OnDisable()
 		{
 			try
 			{
 				await CloseAll();
+				base.OnDisable();
 			}
 			catch (Exception e)
 			{
@@ -68,10 +67,10 @@ namespace EugeneC.Singleton
 			}
 		}
 
-		public virtual async Task<(UiHelper, bool)> Open(T id)
+		public virtual async Task<(UiHelper, bool)> Open(TEnum id)
 		{
-			if (!Enum.IsDefined(typeof(T), id)) return (null, false);
-			var index = Array.FindIndex(uiElements, i => EqualityComparer<T>.Default.Equals(i.id, id));
+			if (!Enum.IsDefined(typeof(TEnum), id)) return (null, false);
+			var index = Array.FindIndex(uiElements, i => EqualityComparer<TEnum>.Default.Equals(i.id, id));
 
 			IsTransitioning = true;
 			var newUi = UiObjects[index];
@@ -87,10 +86,10 @@ namespace EugeneC.Singleton
 			return (newUi, true);
 		}
 
-		public virtual async Task<(UiHelper, bool)> Close(T id, float time)
+		public virtual async Task<(UiHelper, bool)> Close(TEnum id, float time)
 		{
-			if (!Enum.IsDefined(typeof(T), id)) return (null, false);
-			var index = Array.FindIndex(uiElements, i => EqualityComparer<T>.Default.Equals(i.id, id));
+			if (!Enum.IsDefined(typeof(TEnum), id)) return (null, false);
+			var index = Array.FindIndex(uiElements, i => EqualityComparer<TEnum>.Default.Equals(i.id, id));
 
 			IsTransitioning = true;
 			var newUi = UiObjects[index];
@@ -134,9 +133,9 @@ namespace EugeneC.Singleton
 			return true;
 		}
 
-		public virtual async Task<bool> Replace(T id)
+		public virtual async Task<bool> Replace(TEnum id)
 		{
-			if (!Enum.IsDefined(typeof(T), id)) return false;
+			if (!Enum.IsDefined(typeof(TEnum), id)) return false;
 			var c = await CloseAll();
 			if (!c) return false;
 			await Open(id);
