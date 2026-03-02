@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using EugeneC.Mono;
 using Unity.Mathematics;
 using UnityEngine;
@@ -67,7 +65,7 @@ namespace EugeneC.Singleton
 			}
 		}
 
-		public virtual async Task<(UiHelper, bool)> Open(TEnum id)
+		public virtual async Awaitable<(UiHelper, bool)> Open(TEnum id)
 		{
 			if (!Enum.IsDefined(typeof(TEnum), id)) return (null, false);
 			var index = Array.FindIndex(uiElements, i => EqualityComparer<TEnum>.Default.Equals(i.id, id));
@@ -86,7 +84,7 @@ namespace EugeneC.Singleton
 			return (newUi, true);
 		}
 
-		public virtual async Task<(UiHelper, bool)> Close(TEnum id, float time)
+		public virtual async Awaitable<(UiHelper, bool)> Close(TEnum id, float time)
 		{
 			if (!Enum.IsDefined(typeof(TEnum), id)) return (null, false);
 			var index = Array.FindIndex(uiElements, i => EqualityComparer<TEnum>.Default.Equals(i.id, id));
@@ -107,7 +105,7 @@ namespace EugeneC.Singleton
 			return (newUi, true);
 		}
 
-		public virtual async Task<bool> CloseAll()
+		public virtual async Awaitable<bool> CloseAll()
 		{
 			IsTransitioning = true;
 			var i = 0f;
@@ -133,7 +131,7 @@ namespace EugeneC.Singleton
 			return true;
 		}
 
-		public virtual async Task<bool> Replace(TEnum id)
+		public virtual async Awaitable<bool> Replace(TEnum id)
 		{
 			if (!Enum.IsDefined(typeof(TEnum), id)) return false;
 			var c = await CloseAll();

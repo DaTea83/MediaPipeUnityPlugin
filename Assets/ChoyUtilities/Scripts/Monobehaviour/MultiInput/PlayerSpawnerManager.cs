@@ -38,8 +38,9 @@ namespace EugeneC.Utilities
 			CheckForExistingDevices();
 		}
 
-		private void OnDisable()
+		protected override void OnDisable()
 		{
+			base.OnDisable();
 			InputSystem.onDeviceChange -= OnDeviceChange;
 			SceneManager.sceneLoaded -= OnSceneLoaded;
 
@@ -48,9 +49,9 @@ namespace EugeneC.Utilities
 			PlayerSpawnController.Instance.UnsubOnResetGame(ResetGame);
 		}
 
-		void OnAllowNewJoinChange(bool change) => allowNewJoin = change;
+		private void OnAllowNewJoinChange(bool change) => allowNewJoin = change;
 
-		void OnDeviceChange(InputDevice device, InputDeviceChange change)
+		private void OnDeviceChange(InputDevice device, InputDeviceChange change)
 		{
 			if (change == InputDeviceChange.Added)
 			{
@@ -64,7 +65,7 @@ namespace EugeneC.Utilities
 			}
 		}
 
-		void CheckForExistingDevices()
+		private void CheckForExistingDevices()
 		{
 			foreach (var device in InputSystem.devices)
 			{
@@ -72,40 +73,32 @@ namespace EugeneC.Utilities
 			}
 		}
 
-		void TryRegisterDevice(InputDevice device)
+		private void TryRegisterDevice(InputDevice device)
 		{
-			if (allowNewJoin)
+			if (!allowNewJoin) return;
+			if (device is not Gamepad && (device is not Keyboard || !allowKeyboard)) return;
+			if (_deviceRegistry.ContainsKey(device)) return;
+			if (_playerRegistry.Count < playerLimitCount)
 			{
-				if (device is Gamepad || (device is Keyboard && allowKeyboard))
-				{
-					if (!_deviceRegistry.ContainsKey(device))
-					{
-						if (_playerRegistry.Count < playerLimitCount)
-						{
-							GameObject playerObj = SpawnObject(playerType, defaultSpawnLocation.position,
-								Quaternion.identity);
-							if (playerObj != null)
-							{
-								IControlBinder controlBinder = playerObj.GetComponent<IControlBinder>();
+				var playerObj = SpawnObject(playerType, defaultSpawnLocation.position,
+					Quaternion.identity);
+				if (playerObj is null) return;
+				var controlBinder = playerObj.GetComponent<IControlBinder>();
 
-								if (controlBinder != null)
-									RegisterPlayer(controlBinder, device);
-								else
-									Debug.LogError(
-										"Spawned object does not have a component that implements IControlBinder.");
-							}
-						}
-						else
-							Debug.Log("Player limit reached. Cannot register new player.");
-					}
-				}
+				if (controlBinder != null)
+					RegisterPlayer(controlBinder, device);
+				else
+					Debug.LogError(
+						"Spawned object does not have a component that implements IControlBinder.");
 			}
+			else
+				Debug.Log("Player limit reached. Cannot register new player.");
 		}
 
-		void RegisterPlayer(IControlBinder playerBinder, InputDevice device)
+		private void RegisterPlayer(IControlBinder playerBinder, InputDevice device)
 		{
-			ControlSchemeEnum controlScheme = UtilityMethods.GetDeviceType(device);
-			MultiInputSystem registry = new MultiInputSystem(device, actionAsset, controlScheme);
+			var controlScheme = UtilityMethods.GetDeviceType(device);
+			var registry = new MultiInputSystem(device, actionAsset, controlScheme);
 
 			_deviceRegistry.Add(device, registry);
 			_playerRegistry.Add(registry, playerBinder);
@@ -113,39 +106,35 @@ namespace EugeneC.Utilities
 			registry.BindObject(playerBinder);
 		}
 
-		void UnregisterDevice(InputDevice device)
+		private void UnregisterDevice(InputDevice device)
 		{
-			if (_deviceRegistry.TryGetValue(device, out MultiInputSystem registry))
+			if (!_deviceRegistry.TryGetValue(device, out var registry)) return;
+			if (!_playerRegistry.TryGetValue(registry, out var playerBinder)) return;
+			registry.UnbindObject();
+
+			var binderBehaviour = playerBinder as MonoBehaviour;
+			if (binderBehaviour is not null)
 			{
-				if (_playerRegistry.TryGetValue(registry, out IControlBinder playerBinder))
-				{
-					registry.UnbindObject();
+				DespawnObject(binderBehaviour.gameObject);
+				_playerRegistry.Remove(registry);
+				_deviceRegistry.Remove(device);
 
-					MonoBehaviour binderBehaviour = playerBinder as MonoBehaviour;
-					if (binderBehaviour != null)
-					{
-						DespawnObject(binderBehaviour.gameObject);
-						_playerRegistry.Remove(registry);
-						_deviceRegistry.Remove(device);
-
-						Debug.Log(
-							$"Unregistered player {playerBinder.GetType().Name} and removed device {device.displayName}");
-					}
-					else
-						Debug.LogError($"{playerBinder.GetType().Name} is not a MonoBehaviour. Cannot despawn object.");
-				}
+				Debug.Log(
+					$"Unregistered player {playerBinder.GetType().Name} and removed device {device.displayName}");
 			}
+			else
+				Debug.LogError($"{playerBinder.GetType().Name} is not a MonoBehaviour. Cannot despawn object.");
 		}
 
-		void UnregisterAll()
+		private void UnregisterAll()
 		{
 			foreach (var registry in _playerRegistry.Keys)
 				registry.UnbindObject();
 
 			foreach (var playerBinder in _playerRegistry.Values)
 			{
-				MonoBehaviour binderBehaviour = playerBinder as MonoBehaviour;
-				if (binderBehaviour != null)
+				var binderBehaviour = playerBinder as MonoBehaviour;
+				if (binderBehaviour is not null)
 					DespawnObject(binderBehaviour.gameObject);
 			}
 
@@ -155,19 +144,19 @@ namespace EugeneC.Utilities
 			Debug.Log("All players have been unregistered.");
 		}
 
-		void ResetGame(object sender, EventArgs e)
+		private void ResetGame(object sender, EventArgs e)
 		{
 			UnregisterAll();
 			CheckForExistingDevices();
 		}
 
-		void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+		private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
 		{
 			Debug.Log($"Scene loaded: {scene.name}");
 			ReinstantiatePlayers();
 		}
 
-		void ReinstantiatePlayers()
+		private void ReinstantiatePlayers()
 		{
 			List<MultiInputSystem> registries = new List<MultiInputSystem>(_playerRegistry.Keys);
 			_playerRegistry.Clear();
@@ -175,7 +164,7 @@ namespace EugeneC.Utilities
 			foreach (var registry in registries)
 			{
 				GameObject playerObj = SpawnObject(PlayerTypeEnum.PlayerType1, Vector3.zero, Quaternion.identity);
-				if (playerObj != null)
+				if (playerObj is not null)
 				{
 					IControlBinder controlBinder = playerObj.GetComponent<IControlBinder>();
 					if (controlBinder != null)
@@ -194,18 +183,16 @@ namespace EugeneC.Utilities
 			}
 		}
 
-		void AllInputControl(bool able)
+		private void AllInputControl(bool able)
 		{
 			foreach (var players in spawnedObjects)
 			{
-				IControlBinder controlBinder = players.GetComponent<IControlBinder>();
-				if (controlBinder != null)
-				{
-					if (able)
-						controlBinder.Registry.EnableInput();
-					else
-						controlBinder.Registry.DisableInput();
-				}
+				var controlBinder = players.GetComponent<IControlBinder>();
+				if (controlBinder == null) continue;
+				if (able)
+					controlBinder.Registry.EnableInput();
+				else
+					controlBinder.Registry.DisableInput();
 			}
 		}
 	}

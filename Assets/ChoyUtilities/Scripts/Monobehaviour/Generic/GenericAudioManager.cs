@@ -69,17 +69,17 @@ namespace EugeneC.Singleton
 			}
 		}
 		
-		public virtual void PlayClipAtPos(TEnum id, float3 pos, byte audioPriority = (byte)EAudioPriority.Average)
+		public virtual float PlayClipAtPos(TEnum id, float3 pos, byte audioPriority = (byte)EAudioPriority.Average)
 		{
-			if (!Enum.IsDefined(typeof(TEnum), id)) return;
+			if (!Enum.IsDefined(typeof(TEnum), id)) return 0f;
 			var resourceIndex = Array.FindIndex(audioResource,
 				r => EqualityComparer<TEnum>.Default.Equals(r.id, id));
 
 			var resource = audioResource[resourceIndex].audio;
-			PlayClipAtPos(resource, pos, audioPriority);
+			return PlayClipAtPos(resource, pos, audioPriority);
 		}
 
-		public virtual void PlayClipAtPos(AudioResource resource, float3 pos,
+		public virtual float PlayClipAtPos(AudioResource resource, float3 pos,
 			byte audioPriority = (byte)EAudioPriority.Average)
 		{
 			var currentSource = AudioSources[CurrentIndex];
@@ -88,26 +88,32 @@ namespace EugeneC.Singleton
 			currentSource.resource = resource;
 			currentSource.priority = audioPriority;
 			currentSource.Play();
+			
+			var lengthSeconds = currentSource.clip?.length ?? 0f;
 
 			PreviousIndex = CurrentIndex;
 			CurrentIndex++;
 			CurrentIndex %= AudioSources.Length;
+			
+			return lengthSeconds;
 		}
 
-		public virtual void PlayClip(TEnum id, byte audioPriority = (byte)EAudioPriority.Average) =>
+		public virtual float PlayClip(TEnum id, byte audioPriority = (byte)EAudioPriority.Average) =>
 			PlayClipAtPos(id, float3.zero, audioPriority);
 
-		public virtual void PlayClip(AudioResource resource, byte audioPriority = (byte)EAudioPriority.Average) =>
+		public virtual float PlayClip(AudioResource resource, byte audioPriority = (byte)EAudioPriority.Average) =>
 			PlayClipAtPos(resource, float3.zero, audioPriority);
 
-		public virtual void StopClip(int idx = -1)
+		public virtual bool StopClip(int idx = -1)
 		{
 			idx = idx == -1 ? PreviousIndex : idx;
 			var source = AudioSources[idx];
-			if (source.isPlaying) source.Stop();
+			if (!source.isPlaying) return false;
+			source.Stop();
+			return true;
 		}
 
-		public virtual void PauseAllClips(bool isStop = false)
+		public virtual bool PauseAllClips(bool isStop = false)
 		{
 			PauseIndexes = new();
 			for (var i = 0; i < AudioSources.Length; i++)
@@ -120,16 +126,20 @@ namespace EugeneC.Singleton
 					currentSource.Stop();
 				PauseIndexes.Add(i);
 			}
+			
+			return PauseIndexes.Count == AudioSources.Length;
 		}
 
-		public virtual void ResumeClips()
+		public virtual bool ResumeClips()
 		{
-			if (PauseIndexes is null) return;
+			if (PauseIndexes is null) return false;
 
 			foreach (var index in PauseIndexes)
 				AudioSources[index].Play();
 
 			PauseIndexes.Clear();
+			
+			return true;
 		}
 	}
 
