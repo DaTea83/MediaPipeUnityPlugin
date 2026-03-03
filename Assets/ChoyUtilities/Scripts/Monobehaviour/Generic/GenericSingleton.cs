@@ -10,9 +10,17 @@ namespace EugeneC.Singleton
 	{
 		public static T Instance { get; private set; }
 
-		private readonly CancellationTokenSource _cts = new();
+		private CancellationTokenSource _cts = new();
 		protected CancellationToken Token => _cts.Token;
-		protected void CancelTask() => _cts.Cancel();
+		protected event Action OnCancelTask;
+
+		protected void CancelTask()
+		{
+			_cts?.Cancel();
+			_cts?.Dispose();
+			_cts = new CancellationTokenSource();
+			OnCancelTask?.Invoke();
+		}
 		
 		protected Random RandomInstance { get; private set; }
 
