@@ -5,7 +5,7 @@ using UnityEngine;
 
 // ReSharper disable Unity.PerformanceCriticalCodeInvocation
 
-namespace EugeneC.Editor
+namespace EugeneC.Editor.ChoyUtilities.Scripts.Editor
 {
 	[AddComponentMenu("Eugene/Animation Recorder")]
 	[RequireComponent(typeof(Animator))]

@@ -2,6 +2,7 @@
 
 namespace EugeneC.Utilities
 {
+	//TODO
 	[RequireComponent(typeof(Camera))]
 	public class CustomProjection : MonoBehaviour
 	{

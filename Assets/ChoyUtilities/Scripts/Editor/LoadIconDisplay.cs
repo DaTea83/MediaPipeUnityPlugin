@@ -1,7 +1,7 @@
-using UnityEditor;
 using System;
-using UnityEngine;
 using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
 //Origin: https://www.youtube.com/watch?v=EFh7tniBqkk
 
@@ -9,7 +9,7 @@ using System.Linq;
 //In case of debugging and this is blocking the way just comment out [InitializeOnLoad]
 //After finish debugging uncomment back
 
-namespace EugeneC.Editor
+namespace EugeneC.Editor.ChoyUtilities.Scripts.Editor
 {
 #if UNITY_EDITOR
 
@@ -25,20 +25,24 @@ namespace EugeneC.Editor
 			EditorApplication.update += OnEditorUpdate;
 		}
 
-		static void OnEditorUpdate()
+		private static void OnEditorUpdate()
 		{
 			_window ??= Resources.FindObjectsOfTypeAll<EditorWindow>()
 				.FirstOrDefault(window => window.GetType().Name == "SceneHierarchyWindow");
 
-			_hierarchyHasFocus = EditorWindow.focusedWindow != null && EditorWindow.focusedWindow == _window;
+			_hierarchyHasFocus = EditorWindow.focusedWindow is not null && EditorWindow.focusedWindow == _window;
 		}
 
-		static void OnHierarchyWindowItemOnGUI(int instanceID, Rect selectionRect)
+		private static void OnHierarchyWindowItemOnGUI(int instanceID, Rect selectionRect)
 		{
+#if UNITY_6000_3_OR_NEWER			
+			if (EditorUtility.EntityIdToObject(instanceID) is not GameObject obj) return;
+#else
 			if (EditorUtility.InstanceIDToObject(instanceID) is not GameObject obj) return;
+#endif			
 
 			//Is this a prefab? If yes return
-			if (PrefabUtility.GetCorrespondingObjectFromOriginalSource(obj) != null) return;
+			if (PrefabUtility.GetCorrespondingObjectFromOriginalSource(obj) is not null) return;
 
 			//Check if the game object has any component, if null return
 			Component[] components = obj.GetComponents<Component>();
