@@ -16,7 +16,7 @@ namespace EugeneC.Utilities
 
 		public Camera Cam { get; private set; }
 
-		public event Action OnCameraReady;
+		public bool IsCameraReady { get; private set; }
 
 		private async void OnEnable()
 		{
@@ -33,7 +33,7 @@ namespace EugeneC.Utilities
 		{
 			await Awaitable.EndOfFrameAsync(Token);
 			await Token.FadeScreenAsync(blackScreenImg, fadeType, duration, Time.deltaTime);
-			OnCameraReady?.Invoke();
+			IsCameraReady = true;
 		}
 	}
 

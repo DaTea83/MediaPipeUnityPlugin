@@ -25,8 +25,8 @@ namespace ProjectionMapping
     public sealed class HandTrackSingletonAuthoring : MonoBehaviour
     {
 	    [Header("Threshold")] 
-	    [SerializeField, Range(0.2f, 6f)] private float pinky2Thumb = 1.5f;
-	    [SerializeField, Range(0.2f, 6f)] private float wrist2Index = 1.8f, 
+	    [SerializeField, Range(0.2f, 10f)] private float pinky2Thumb = 1.5f;
+	    [SerializeField, Range(0.2f, 10f)] private float wrist2Index = 1.8f, 
 		    wrist2Middle = 1.8f, 
 		    wrist2Ring = 1.8f, 
 		    wrist2Pinky = 1.8f, 
@@ -42,7 +42,7 @@ namespace ProjectionMapping
 	    [SerializeField] private ENavigationTransformType xTransformType = ENavigationTransformType.Up;
 	    [SerializeField] private ENavigationTransformType yTransformType = ENavigationTransformType.Up;
 	    [SerializeField] private float2 navigationScale = new float2(1f, 1f);
-	    [SerializeField] private float3 clampSize;
+	    [SerializeField] private float3 clampArea;
 	    
 	    private void OnValidate()
 	    {
@@ -74,7 +74,7 @@ namespace ProjectionMapping
 				    Thumb2IndexThreshold = authoring.thumb2Index,
 				    XTransformType = authoring.xTransformType,
 				    YTransformType = authoring.yTransformType,
-				    ClampSize = authoring.clampSize
+				    ClampSize = authoring.clampArea
 			    });
 		    }
 	    }

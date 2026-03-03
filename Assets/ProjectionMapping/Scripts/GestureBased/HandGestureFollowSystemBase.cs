@@ -3,15 +3,13 @@ using EugeneC.Utilities;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
-using Unity.Physics;
 using Unity.Transforms;
-using UnityEngine;
 
 namespace ProjectionMapping
 {
 	[UpdateInGroup(typeof(HandGestureSystemGroup))]
 	[UpdateAfter(typeof(HandGestureInteractSystemBase))]
-	public partial class HandGestureFollowISystem : SystemBase
+	public partial class HandGestureFollowSystemBase : SystemBase
 	{
 		private HandGestureInteractSystemBase _interactSystemBase;
 		
@@ -49,10 +47,14 @@ namespace ProjectionMapping
 					grab.IsGrabbed = true;
 					SystemAPI.SetComponent(e, grab);
 				}
-				var lt = SystemAPI.GetComponent<LocalTransform>(e);
-				MoveEntity(pose.LeftLocalPosition, dir, _interactSystemBase.LeftDataRef.Value.Distance * 0.9f, 
-					 ref lt, dt);
-				SystemAPI.SetComponent(e, lt);
+
+				if (!grab.IsTrigger)
+				{
+					var lt = SystemAPI.GetComponent<LocalTransform>(e);
+					MoveEntity(pose.LeftLocalPosition, dir, _interactSystemBase.LeftDataRef.Value.Distance * 0.9f,
+						ref lt, dt);
+					SystemAPI.SetComponent(e, lt);
+				}
 			}
 
 			if (_interactSystemBase.RightDataRef.Value.Valid)
@@ -64,10 +66,14 @@ namespace ProjectionMapping
 					grab.IsGrabbed = true;
 					SystemAPI.SetComponent(e, grab);
 				}
-				var lt = SystemAPI.GetComponent<LocalTransform>(e);
-				MoveEntity(pose.RightLocalPosition, dir, _interactSystemBase.RightDataRef.Value.Distance * 0.9f, 
-					 ref lt, dt);
-				SystemAPI.SetComponent(e, lt);
+
+				if (!grab.IsTrigger)
+				{
+					var lt = SystemAPI.GetComponent<LocalTransform>(e);
+					MoveEntity(pose.RightLocalPosition, dir, _interactSystemBase.RightDataRef.Value.Distance * 0.9f,
+						ref lt, dt);
+					SystemAPI.SetComponent(e, lt);
+				}
 			}
 		}
 

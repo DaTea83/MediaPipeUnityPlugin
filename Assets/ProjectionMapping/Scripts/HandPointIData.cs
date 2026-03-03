@@ -66,6 +66,7 @@ namespace ProjectionMapping
 
     public struct HandGrabbableIData : IComponentData
     {
+	    public bool IsTrigger;
 	    public bool IsGrabbed;
     }
 

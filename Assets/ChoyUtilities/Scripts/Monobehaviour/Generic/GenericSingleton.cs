@@ -1,5 +1,7 @@
+using System;
 using System.Threading;
 using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 namespace EugeneC.Singleton
 {
@@ -7,9 +9,12 @@ namespace EugeneC.Singleton
 		where T : MonoBehaviour
 	{
 		public static T Instance { get; private set; }
+
+		private readonly CancellationTokenSource _cts = new();
+		protected CancellationToken Token => _cts.Token;
+		protected void CancelTask() => _cts.Cancel();
 		
-		protected readonly CancellationTokenSource Cts = new();
-		protected CancellationToken Token => Cts.Token;
+		protected Random RandomInstance { get; private set; }
 
 		protected virtual void InitSingleton()
 		{
@@ -28,6 +33,16 @@ namespace EugeneC.Singleton
 				Instance = null;
 		}
 
+		protected virtual void InitRandom()
+		{
+			var systemMilliseconds = (uint)Environment.TickCount;
+#if UNITY_6000_3_OR_NEWER			
+			RandomInstance = Random.CreateFromIndex(systemMilliseconds + (uint)this.GetEntityId());
+#else
+			RandomInstance = Random.CreateFromIndex(systemMilliseconds + (uint)this.GetInstanceID());
+#endif
+		}
+
 		protected void KeepSingleton(bool keep)
 		{
 			if (keep) DontDestroyOnLoad(this);
@@ -36,11 +51,12 @@ namespace EugeneC.Singleton
 		protected virtual void Awake()
 		{
 			InitSingleton();
+			InitRandom();
 		}
 
 		protected virtual void OnDisable()
 		{
-			Cts.Cancel();
+			CancelTask();
 		}
 
 		protected virtual void OnDestroy()
