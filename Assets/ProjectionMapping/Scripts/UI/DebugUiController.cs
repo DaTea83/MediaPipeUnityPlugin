@@ -28,20 +28,7 @@ namespace ProjectionMapping
 		    }
 		    catch (Exception e){ Debug.Log(e);}
 	    }
-
-	    private float _time;
-	    private float _value;
-	    private void Update()
-	    {
-		    _time += Time.deltaTime;
-		    if (_time > 10f)
-		    {
-			    _time = 0f;
-			    _value = this.gameObject.RandomValue();
-			    Debug.Log($"No. {_value}");
-		    }
-	    }
-
+	    
 	    private void OnGetHandPoses(EHandPose left, EHandPose right)
 	    {
 		    poseText.text = $"Left: {left}\nRight: {right}";

@@ -1,3 +1,4 @@
+using System;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -24,9 +25,9 @@ namespace EugeneC.Utilities
 		public static float RandomValue(this GameObject obj)
 		{
 #if UNITY_6000_3_OR_NEWER			
-			var ran = Random.CreateFromIndex((uint)obj.GetEntityId() + (uint)Time.time << 4 + 1);
+			var ran = Random.CreateFromIndex((uint)obj.GetEntityId() + (uint)Time.time + (uint)Time.deltaTime);
 #else
-			var ran = Random.CreateFromIndex((uint)obj.GetInstanceID() + (uint)Time.time << 4 + 1);
+			var ran = Random.CreateFromIndex((uint)obj.GetInstanceID() + (uint)Environment.TickCount + (uint)Time.deltaTime);
 #endif
 			return ran.NextFloat();
 		}
@@ -34,9 +35,9 @@ namespace EugeneC.Utilities
 		public static float RandomValue(this GameObject obj, float min, float max)
 		{
 #if UNITY_6000_3_OR_NEWER			
-			var ran = Random.CreateFromIndex((uint)obj.GetEntityId() + (uint)Time.time << 4 + 1);
+			var ran = Random.CreateFromIndex((uint)obj.GetEntityId() + (uint)Time.time + (uint)Time.deltaTime);
 #else
-			var ran = Random.CreateFromIndex((uint)obj.GetInstanceID() + (uint)Time.time << 4 + 1);
+			var ran = Random.CreateFromIndex((uint)obj.GetInstanceID() + (uint)Environment.TickCount + (uint)Time.deltaTime);
 #endif
 			return ran.NextFloat(min, max);
 		}
@@ -44,9 +45,9 @@ namespace EugeneC.Utilities
 		public static int RandomValue(this GameObject obj, int min, int max)
 		{
 #if UNITY_6000_3_OR_NEWER			
-			var ran = Random.CreateFromIndex((uint)obj.GetEntityId() + (uint)Time.time << 4 + 1);
+			var ran = Random.CreateFromIndex((uint)obj.GetEntityId() + (uint)Time.time + (uint)Time.deltaTime);
 #else
-			var ran = Random.CreateFromIndex((uint)obj.GetInstanceID() + (uint)Time.time << 4 + 1);
+			var ran = Random.CreateFromIndex((uint)obj.GetInstanceID() + (uint)Environment.TickCount + (uint)Time.deltaTime);
 #endif
 			return ran.NextInt(min, max);
 		}

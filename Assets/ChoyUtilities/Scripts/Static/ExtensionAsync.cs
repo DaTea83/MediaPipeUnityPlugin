@@ -356,10 +356,7 @@ namespace EugeneC.Utilities
 				obj.transform.rotation = endRot;
 				onDone?.Invoke();
 			}
-			catch
-			{
-				throw new Exception(TaskCancellationMessage);
-			}
+			catch { throw new Exception(TaskCancellationMessage); }
 		}
 
 		public static async Awaitable<bool> RotateObjectAsync(this CancellationToken token, Transform obj, float3 rotateTo,
@@ -437,7 +434,7 @@ namespace EugeneC.Utilities
 						timer += Time.unscaledDeltaTime;
 						var length = (int)math.ceil(timer / timePerChar);
 						length = math.clamp(length, 0, line.Length);
-						currentDisplaying = line.Substring(0, length);
+						currentDisplaying = line[..length];
 						displayTo(currentDisplaying);
 
 						await Awaitable.NextFrameAsync(token);
@@ -472,7 +469,7 @@ namespace EugeneC.Utilities
 						timer += Time.unscaledDeltaTime;
 						var length = (int)math.ceil(timer / timePerChar);
 						length = math.clamp(length, 0, line.Length);
-						currentDisplaying = line.Substring(0, length);
+						currentDisplaying = line[..length];
 						displayTo(currentDisplaying);
 
 						await Awaitable.NextFrameAsync(token);
@@ -492,10 +489,10 @@ namespace EugeneC.Utilities
 		{
 			try
 			{
-				Vector3 anchor = ob.position + (Vector3.down + dir) * 0.5f;
-				Vector3 axis = Vector3.Cross(Vector3.up, dir);
+				var anchor = ob.position + (Vector3.down + dir) * 0.5f;
+				var axis = Vector3.Cross(Vector3.up, dir);
 
-				for (int i = 0; i <= (90 / rollSpeed); i++)
+				for (var i = 0; i <= (90 / rollSpeed); i++)
 				{
 					ob.RotateAround(anchor, axis, i);
 					await Awaitable.WaitForSecondsAsync(rollCooldown, token);

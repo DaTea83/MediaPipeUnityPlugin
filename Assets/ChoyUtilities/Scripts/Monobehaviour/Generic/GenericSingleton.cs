@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using UnityEngine;
-using Random = Unity.Mathematics.Random;
 
 namespace EugeneC.Singleton
 {
