@@ -15,28 +15,40 @@ namespace EugeneC.Utilities
 		public static int Modulo(int x, int y) => (x % y + y) % y;
 
 		// Reminder is recommended to use RandomAuthoring so u don't need to keep constructs a new Random instance
-		public static float Random01(Entity entity, double et)
+		public static float RandomValue(Entity entity, double et)
 		{
 			var ran = Random.CreateFromIndex((uint)entity.Index + (uint)et << 4 + 1);
 			return ran.NextFloat();
 		}
 
-		public static float Random01(GameObject obj)
+		public static float RandomValue(this GameObject obj)
 		{
+#if UNITY_6000_3_OR_NEWER			
+			var ran = Random.CreateFromIndex((uint)obj.GetEntityId() + (uint)Time.time << 4 + 1);
+#else
 			var ran = Random.CreateFromIndex((uint)obj.GetInstanceID() + (uint)Time.time << 4 + 1);
+#endif
 			return ran.NextFloat();
 		}
-
-		public static float RandomRange(float min, float max)
+		
+		public static float RandomValue(this GameObject obj, float min, float max)
 		{
-			var ran = Random.CreateFromIndex((uint)System.Environment.TickCount << 4 + 1);
+#if UNITY_6000_3_OR_NEWER			
+			var ran = Random.CreateFromIndex((uint)obj.GetEntityId() + (uint)Time.time << 4 + 1);
+#else
+			var ran = Random.CreateFromIndex((uint)obj.GetInstanceID() + (uint)Time.time << 4 + 1);
+#endif
 			return ran.NextFloat(min, max);
 		}
 
-		public static uint RandomUInt()
+		public static int RandomValue(this GameObject obj, int min, int max)
 		{
-			var ran = Random.CreateFromIndex((uint)System.Environment.TickCount << 4 + 1);
-			return ran.NextUInt();
+#if UNITY_6000_3_OR_NEWER			
+			var ran = Random.CreateFromIndex((uint)obj.GetEntityId() + (uint)Time.time << 4 + 1);
+#else
+			var ran = Random.CreateFromIndex((uint)obj.GetInstanceID() + (uint)Time.time << 4 + 1);
+#endif
+			return ran.NextInt(min, max);
 		}
 
 		public static float3 GetClosestPointInSplineSegment(float3 lineStart, float3 lineEnd, float3 point, out float t)

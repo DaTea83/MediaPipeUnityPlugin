@@ -113,7 +113,7 @@ namespace EugeneC.Singleton
 			{
 				OnCloseUi?.Invoke();
 				var t = ui.OnStartClose();
-				//Get the highest value
+				//Get the highest value and delay the said value
 				i = i < t ? t : i;
 			}
 

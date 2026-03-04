@@ -22,8 +22,6 @@ namespace EugeneC.Singleton
 			OnCancelTask?.Invoke();
 		}
 		
-		protected Random RandomInstance { get; private set; }
-
 		protected virtual void InitSingleton()
 		{
 			if (Instance is not null && Instance != this)
@@ -41,16 +39,6 @@ namespace EugeneC.Singleton
 				Instance = null;
 		}
 
-		protected virtual void InitRandom()
-		{
-			var systemMilliseconds = (uint)Environment.TickCount;
-#if UNITY_6000_3_OR_NEWER			
-			RandomInstance = Random.CreateFromIndex(systemMilliseconds + (uint)this.GetEntityId());
-#else
-			RandomInstance = Random.CreateFromIndex(systemMilliseconds + (uint)this.GetInstanceID());
-#endif
-		}
-
 		protected void KeepSingleton(bool keep)
 		{
 			if (keep) DontDestroyOnLoad(this);
@@ -59,7 +47,6 @@ namespace EugeneC.Singleton
 		protected virtual void Awake()
 		{
 			InitSingleton();
-			InitRandom();
 		}
 
 		protected virtual void OnDisable()
