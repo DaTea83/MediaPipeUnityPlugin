@@ -14,7 +14,7 @@ namespace Mediapipe.Unity.Sample
 	{
 		[SerializeField] private AppSettings appSettings;
 
-		public InferenceMode InferenceMode { get; private set; }
+		public EInferenceMode EInferenceMode { get; private set; }
 		public bool IsFinished { get; private set; }
 		private bool _isGlogInitialized;
 
@@ -72,7 +72,7 @@ namespace Mediapipe.Unity.Sample
 			}
 
 			DecideInferenceMode();
-			if (InferenceMode == InferenceMode.GPU)
+			if (EInferenceMode == EInferenceMode.GPU)
 			{
 #if UNITY_EDITOR				
 				Debug.Log("Initializing GPU resources...");
@@ -100,16 +100,16 @@ namespace Mediapipe.Unity.Sample
 		private void DecideInferenceMode()
 		{
 #if UNITY_EDITOR_OSX || UNITY_EDITOR_WIN
-			if (appSettings.preferableInferenceMode == InferenceMode.GPU)
+			if (appSettings.PreferableEInferenceMode == EInferenceMode.GPU)
 			{
 #if UNITY_EDITOR				
 				Debug.LogWarning("Current platform does not support GPU inference mode, so falling back to CPU mode");
 #endif				
 			}
 
-			InferenceMode = InferenceMode.CPU;
+			EInferenceMode = EInferenceMode.CPU;
 #else
-      InferenceMode = appSettings.preferableInferenceMode;
+			EInferenceMode = appSettings.PreferableEInferenceMode;
 #endif
 		}
 

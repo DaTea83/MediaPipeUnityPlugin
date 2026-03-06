@@ -1,21 +1,24 @@
-using System.Globalization;
 using UnityEngine;
 
 namespace EugeneC.Utilities
 {
 	[AddComponentMenu("Eugene/FPS Counter")]
+	[RequireComponent(typeof(TMPro.TMP_Text))]
 	public sealed class MonoFpsCounter : MonoBehaviour
 	{
 		[SerializeField] private TMPro.TMP_Text displayText;
 
-		public float FPS => _frames / _time;
+		private float FPS => _frames / _time;
 
 		private float _frames;
 		private float _time;
 
 		private void Start()
 		{
-			Application.targetFrameRate = -1;
+			QualitySettings.vSyncCount = 0;
+			Application.targetFrameRate = 500;
+
+			displayText ??= GetComponent<TMPro.TMP_Text>();
 			InvokeRepeating(nameof(UpdateText), .1f, .5f);
 		}
 

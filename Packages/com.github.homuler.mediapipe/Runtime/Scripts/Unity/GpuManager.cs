@@ -13,12 +13,12 @@ namespace Mediapipe.Unity
 {
 	public static class GpuManager
 	{
-		private const string _Tag = nameof(GpuManager);
+		private const string Tag = nameof(GpuManager);
 
 		private delegate void PluginCallback(int eventId);
 
-		private static readonly object _SetupLock = new object();
-		private static IntPtr _PlatformGlContext = IntPtr.Zero;
+		private static readonly object SetupLock = new object();
+		private static IntPtr _platformGlContext = IntPtr.Zero;
 
 		public static GpuResources GpuResources { get; private set; }
 		public static GlCalculatorHelper GlCalculatorHelper { get; private set; }
@@ -35,11 +35,11 @@ namespace Mediapipe.Unity
 		/// </remarks>
 		public static IEnumerator Initialize()
 		{
-			lock (_SetupLock)
+			lock (SetupLock)
 			{
 				if (IsInitialized)
 				{
-					Logger.LogInfo(_Tag, "Already initialized");
+					Logger.LogInfo(Tag, "Already initialized");
 					yield break;
 				}
 
@@ -57,7 +57,7 @@ namespace Mediapipe.Unity
 
 				try
 				{
-					GpuResources = GpuResources.Create(_PlatformGlContext);
+					GpuResources = GpuResources.Create(_platformGlContext);
 					GlCalculatorHelper = new GlCalculatorHelper();
 					GlCalculatorHelper.InitializeForTest(GpuResources);
 
@@ -66,7 +66,7 @@ namespace Mediapipe.Unity
 				catch (EntryPointNotFoundException e)
 				{
 					Logger.LogException(e);
-					Logger.LogError(_Tag, "Failed to create GpuResources. Did you build libraries with GPU enabled?");
+					Logger.LogError(Tag, "Failed to create GpuResources. Did you build libraries with GPU enabled?");
 				}
 				catch (Exception e)
 				{
@@ -118,14 +118,14 @@ namespace Mediapipe.Unity
 		{
 			if (request.platformGlContext == IntPtr.Zero)
 			{
-				Logger.LogWarning(_Tag,
+				Logger.LogWarning(Tag,
 					"EGL context is not found, so MediaPipe won't share their EGL contexts with Unity");
 				return;
 			}
 
-			Logger.LogVerbose(_Tag, $"EGL context is found: {request.platformGlContext}");
+			Logger.LogVerbose(Tag, $"EGL context is found: {request.platformGlContext}");
 
-			_PlatformGlContext = request.platformGlContext;
+			_platformGlContext = request.platformGlContext;
 		}
 	}
 }

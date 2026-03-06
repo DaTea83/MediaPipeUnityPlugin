@@ -14,7 +14,6 @@ namespace Mediapipe.Unity
 		[SerializeField] private RawImage screen;
 
 		private ImageSource _imageSource;
-		private RectTransform _rectTransform => screen.rectTransform;
 
 		public Texture texture
 		{
@@ -39,12 +38,12 @@ namespace Mediapipe.Unity
 
 		public void Resize(int width, int height)
 		{
-			_rectTransform.sizeDelta = new Vector2(width, height);
+			screen.rectTransform.sizeDelta = new Vector2(width, height);
 		}
 
 		public void Rotate(RotationAngle rotationAngle)
 		{
-			_rectTransform.localEulerAngles = rotationAngle.GetEulerAngles();
+			screen.rectTransform.localEulerAngles = rotationAngle.GetEulerAngles();
 		}
 
 		public void ReadSync(Experimental.TextureFrame textureFrame)
@@ -75,25 +74,18 @@ namespace Mediapipe.Unity
 				// It should be taken into account that the image will be rotated later.
 				var rotation = _imageSource.rotation;
 
-				if (rotation == RotationAngle.Rotation0 || rotation == RotationAngle.Rotation180)
-				{
-					rect = FlipHorizontally(rect);
-				}
-				else
-				{
-					rect = FlipVertically(rect);
-				}
+				rect = rotation is RotationAngle.Rotation0 or RotationAngle.Rotation180 ? FlipHorizontally(rect) : FlipVertically(rect);
 			}
 
 			uvRect = rect;
 		}
 
-		private UnityEngine.Rect FlipHorizontally(UnityEngine.Rect rect)
+		private static UnityEngine.Rect FlipHorizontally(UnityEngine.Rect rect)
 		{
 			return new UnityEngine.Rect(1 - rect.x, rect.y, -rect.width, rect.height);
 		}
 
-		private UnityEngine.Rect FlipVertically(UnityEngine.Rect rect)
+		private static UnityEngine.Rect FlipVertically(UnityEngine.Rect rect)
 		{
 			return new UnityEngine.Rect(rect.x, 1 - rect.y, rect.width, -rect.height);
 		}

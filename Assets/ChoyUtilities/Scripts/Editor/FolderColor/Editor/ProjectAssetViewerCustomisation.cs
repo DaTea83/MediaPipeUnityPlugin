@@ -7,7 +7,7 @@ namespace FolderColor
 {
 #if UNITY_EDITOR
 
-	public class ProjectAssetViewerCustomisation
+	public abstract class ProjectAssetViewerCustomisation
 	{
 		[System.Serializable]
 		public class AssetModificationData

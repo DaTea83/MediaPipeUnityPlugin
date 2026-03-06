@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="BackendCodeEditorMiscSettings">
+    <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexedValue" value="true" type="bool" />
+    <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
+    <option name="/Default/RiderDebugger/RiderRestoreDecompile/RestoreDecompileSetting/@EntryValue" value="false" type="bool" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="420d2e07-03eb-4171-90eb-daf9fbfef505" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/Assets/AddressableAssetsData/link.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AddressableAssetsData/link.xml.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ProjectionMapping/Scripts/Solutions/MappingSolution.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ProjectionMapping/Scripts/Solutions/MappingSolution.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/com.github.homuler.mediapipe/Runtime/Scripts/Common/AppSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/com.github.homuler.mediapipe/Runtime/Scripts/Common/AppSettings.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/com.github.homuler.mediapipe/Runtime/Scripts/Common/Bootstrap.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/com.github.homuler.mediapipe/Runtime/Scripts/Common/Bootstrap.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/com.github.homuler.mediapipe/Runtime/Scripts/Common/GraphRunner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/com.github.homuler.mediapipe/Runtime/Scripts/Common/GraphRunner.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/com.github.homuler.mediapipe/Runtime/Scripts/Common/InferenceMode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/com.github.homuler.mediapipe/Runtime/Scripts/Common/EInferenceMode.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/com.github.homuler.mediapipe/Runtime/Scripts/Common/InferenceMode.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/com.github.homuler.mediapipe/Runtime/Scripts/Common/EInferenceMode.cs.meta" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 2
+}]]></component>
+  <component name="ProjectId" id="3AYLe8VycL8uzE7FvKglEJzdEPG" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.RadMigrateCodeStyle": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "feature/ECS-Support",
+    "ignore.virus.scanning.warn.message": "true",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="420d2e07-03eb-4171-90eb-daf9fbfef505" name="Changes" comment="" />
+      <created>1772764650907</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1772764650907</updated>
+      <workItem from="1772764653370" duration="29000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

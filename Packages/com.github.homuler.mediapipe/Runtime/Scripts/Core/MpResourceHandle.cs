@@ -118,10 +118,8 @@ namespace Mediapipe
 			var ok = SafeNativeMethods.absl_Status__ok(statusPtr);
 			if (!ok)
 			{
-				using (var status = new Status(statusPtr, true))
-				{
-					status.AssertOk();
-				}
+				using var status = new Status(statusPtr, true);
+				status.AssertOk();
 			}
 			else
 			{

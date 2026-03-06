@@ -6,6 +6,7 @@ using UnityEngine.Audio;
 
 namespace EugeneC.Obsolete
 {
+	[Obsolete]
 	public class AudioManager : GenericSingleton<AudioManager>
 	{
 		public AudioSource SourcePrefab;

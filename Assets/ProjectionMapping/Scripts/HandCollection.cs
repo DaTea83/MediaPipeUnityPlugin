@@ -156,16 +156,16 @@ namespace ProjectionMapping
 		    };
 	    }
 
-	    public static EHandPose GetPose(this HandData data)
+	    public static EHandPose GetPose(this HandData data, HandSettingISingleton setting)
 	    {
 		    if (data.Pinky2Thumb.CurrentInput <= -1 || data.Wrist2Index.CurrentInput <= -1) return EHandPose.None;
 		    
-		    var thumb = IsFingerCurled(data.Pinky2Thumb, 1.5f);
-		    var index = IsFingerCurled(data.Wrist2Index);
-		    var middle = IsFingerCurled(data.Wrist2Middle);
-		    var ring = IsFingerCurled(data.Wrist2Ring);
-		    var pinky = IsFingerCurled(data.Wrist2Pinky);
-		    var pinch = IsFingerCurled(data.Thumb2Index, 1.1f);
+		    var thumb = IsFingerCurled(data.Pinky2Thumb, setting.Pinky2ThumbThreshold);
+		    var index = IsFingerCurled(data.Wrist2Index, setting.Wrist2IndexThreshold);
+		    var middle = IsFingerCurled(data.Wrist2Middle, setting.Wrist2MiddleThreshold);
+		    var ring = IsFingerCurled(data.Wrist2Ring, setting.Wrist2RingThreshold);
+		    var pinky = IsFingerCurled(data.Wrist2Pinky, setting.Wrist2PinkyThreshold);
+		    var pinch = IsFingerCurled(data.Thumb2Index, setting.Thumb2IndexThreshold);
 
 		    return thumb switch
 		    {

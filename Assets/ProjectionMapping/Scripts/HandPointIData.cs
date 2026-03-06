@@ -18,6 +18,17 @@ namespace ProjectionMapping
 	    public bool UseGesture;
 	    public EHandPose PickGesture;
 	    public EHandPose NavigateGesture;
+	    public ENavigationAxisType NavigationAxisType;
+	    public ENavigationTransformType XTransformType;
+	    public ENavigationTransformType YTransformType;
+	    public float Pinky2ThumbThreshold;
+	    public float Wrist2IndexThreshold;
+	    public float Wrist2MiddleThreshold;
+	    public float Wrist2RingThreshold;
+	    public float Wrist2PinkyThreshold;
+	    public float Thumb2IndexThreshold;
+	    public float2 NavigationScale;
+	    public float3 ClampSize;
     }
 
     public struct HandPoseISingleton : IComponentData
@@ -55,6 +66,14 @@ namespace ProjectionMapping
 
     public struct HandGrabbableIData : IComponentData
     {
+	    public bool IsTrigger;
 	    public bool IsGrabbed;
+    }
+
+    // Make sure it only register one trigger event in the time frame
+    [InternalBufferCapacity( 1 )]
+    public struct GrabbableOverlapIBuffer : IBufferElementData
+    {
+	    public byte Value;
     }
 }

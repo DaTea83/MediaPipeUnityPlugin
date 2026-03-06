@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace EugeneC.Obsolete
 {
+	[Obsolete]
 	//Combined method of AudioManager and SpawnManager
 	public class SpawnRandomManager : GenericSingleton<SpawnRandomManager>
 	{
@@ -15,7 +16,7 @@ namespace EugeneC.Obsolete
 		protected override void Awake()
 		{
 			base.Awake();
-			foreach (SpawnTerrain terrain in terrainPrefab)
+			foreach (var terrain in terrainPrefab)
 			{
 				_terrainDictionary[terrain.TerrainId] = terrain;
 			}
@@ -50,6 +51,7 @@ namespace EugeneC.Obsolete
 		}
 	}
 
+	[Obsolete]
 	[Serializable]
 	public class SpawnTerrain
 	{
@@ -57,6 +59,7 @@ namespace EugeneC.Obsolete
 		public GameObject[] Prefab;
 	}
 
+	[Obsolete]
 	public enum TerrainType
 	{
 		Area1,

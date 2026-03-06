@@ -7,6 +7,7 @@ using Random = UnityEngine.Random;
 
 namespace EugeneC.Obsolete
 {
+	[Obsolete]
 	public abstract class GenericAudioManager<T> : GenericSingleton<GenericAudioManager<T>>
 		where T : Enum
 	{

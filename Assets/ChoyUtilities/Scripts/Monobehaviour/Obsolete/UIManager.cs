@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace EugeneC.Obsolete
 {
+	[Obsolete]
 	public class UIManager : GenericSingleton<UIManager>
 	{
 		public UIObject[] uiObject;

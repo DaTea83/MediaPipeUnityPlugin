@@ -1,21 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using EugeneC.Mono;
 using Unity.Mathematics;
 using UnityEngine;
 
 namespace EugeneC.Singleton
 {
-	public abstract class GenericUiManager<T, U> : GenericSingleton<U>
-		where T : Enum
-		where U : MonoBehaviour
+	public abstract class GenericUiManager<TEnum, TMono> : GenericSingleton<TMono>
+		where TEnum : Enum
+		where TMono : MonoBehaviour
 	{
 		[Serializable]
 		public struct UiSerialize
 		{
-			public T id;
+			public TEnum id;
 			public UiHelper prefab;
 		}
 
@@ -26,9 +24,7 @@ namespace EugeneC.Singleton
 		protected RectTransform CanvasPos;
 		protected readonly List<UiHelper> OpenedUi = new();
 		protected bool IsTransitioning;
-		protected CancellationTokenSource TokenSource;
-
-		public void CancelTask() => TokenSource.Cancel();
+		
 		public event Action OnOpenUi;
 		public event Action OnCloseUi;
 
@@ -36,7 +32,7 @@ namespace EugeneC.Singleton
 		{
 			try
 			{
-				await Awaitable.NextFrameAsync();
+				await Awaitable.NextFrameAsync(Token);
 				if (canvasRef is null) return;
 				CanvasPos = (RectTransform)canvasRef.transform;
 
@@ -56,11 +52,12 @@ namespace EugeneC.Singleton
 			}
 		}
 
-		private async void OnDisable()
+		protected override async void OnDisable()
 		{
 			try
 			{
 				await CloseAll();
+				base.OnDisable();
 			}
 			catch (Exception e)
 			{
@@ -68,10 +65,10 @@ namespace EugeneC.Singleton
 			}
 		}
 
-		public virtual async Task<(UiHelper, bool)> Open(T id)
+		public virtual async Awaitable<(UiHelper, bool)> Open(TEnum id)
 		{
-			if (!Enum.IsDefined(typeof(T), id)) return (null, false);
-			var index = Array.FindIndex(uiElements, i => EqualityComparer<T>.Default.Equals(i.id, id));
+			if (!Enum.IsDefined(typeof(TEnum), id)) return (null, false);
+			var index = Array.FindIndex(uiElements, i => EqualityComparer<TEnum>.Default.Equals(i.id, id));
 
 			IsTransitioning = true;
 			var newUi = UiObjects[index];
@@ -80,24 +77,24 @@ namespace EugeneC.Singleton
 
 			OnOpenUi?.Invoke();
 			var t = newUi.OnStartOpen();
-			await Awaitable.WaitForSecondsAsync(math.abs(t));
+			await Awaitable.WaitForSecondsAsync(math.abs(t), Token);
 			newUi.OnEndOpen();
 			IsTransitioning = false;
 
 			return (newUi, true);
 		}
 
-		public virtual async Task<(UiHelper, bool)> Close(T id, float time)
+		public virtual async Awaitable<(UiHelper, bool)> Close(TEnum id, float time)
 		{
-			if (!Enum.IsDefined(typeof(T), id)) return (null, false);
-			var index = Array.FindIndex(uiElements, i => EqualityComparer<T>.Default.Equals(i.id, id));
+			if (!Enum.IsDefined(typeof(TEnum), id)) return (null, false);
+			var index = Array.FindIndex(uiElements, i => EqualityComparer<TEnum>.Default.Equals(i.id, id));
 
 			IsTransitioning = true;
 			var newUi = UiObjects[index];
 
 			OnCloseUi?.Invoke();
 			var t = newUi.OnStartClose();
-			await Awaitable.WaitForSecondsAsync(math.abs(t));
+			await Awaitable.WaitForSecondsAsync(math.abs(t), Token);
 			newUi.OnEndClose();
 
 			await Awaitable.NextFrameAsync();
@@ -108,7 +105,7 @@ namespace EugeneC.Singleton
 			return (newUi, true);
 		}
 
-		public virtual async Task<bool> CloseAll()
+		public virtual async Awaitable<bool> CloseAll()
 		{
 			IsTransitioning = true;
 			var i = 0f;
@@ -116,16 +113,16 @@ namespace EugeneC.Singleton
 			{
 				OnCloseUi?.Invoke();
 				var t = ui.OnStartClose();
-				//Get the highest value
+				//Get the highest value and delay the said value
 				i = i < t ? t : i;
 			}
 
-			await Awaitable.WaitForSecondsAsync(i);
+			await Awaitable.WaitForSecondsAsync(i, Token);
 
 			foreach (var ui in OpenedUi)
 			{
 				ui.OnEndClose();
-				await Awaitable.NextFrameAsync();
+				await Awaitable.NextFrameAsync(Token);
 				ui.gameObject.SetActive(false);
 			}
 
@@ -134,9 +131,9 @@ namespace EugeneC.Singleton
 			return true;
 		}
 
-		public virtual async Task<bool> Replace(T id)
+		public virtual async Awaitable<bool> Replace(TEnum id)
 		{
-			if (!Enum.IsDefined(typeof(T), id)) return false;
+			if (!Enum.IsDefined(typeof(TEnum), id)) return false;
 			var c = await CloseAll();
 			if (!c) return false;
 			await Open(id);

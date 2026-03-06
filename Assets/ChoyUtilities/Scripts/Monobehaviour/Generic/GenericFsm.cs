@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace EugeneC.Utilities
 {
-	public abstract class GenericFsm<T, W> : MonoBehaviour
-		where T : GenericFsm<T, W>
-		where W : Enum
+	public abstract class GenericFsm<T, TEnum> : MonoBehaviour
+		where T : GenericFsm<T, TEnum>
+		where TEnum : Enum
 	{
 		public abstract class State : MonoBehaviour
 		{
-			public abstract W StateEnum { get; }
+			public abstract TEnum StateEnum { get; }
 
 			protected T StateMachine;
 
@@ -18,8 +18,7 @@ namespace EugeneC.Utilities
 			{
 				get
 				{
-					if (StateMachine == null)
-						StateMachine = GetComponentInParent<T>();
+					StateMachine ??= GetComponentInParent<T>();
 					return StateMachine;
 				}
 			}
@@ -41,7 +40,7 @@ namespace EugeneC.Utilities
 			{
 			}
 
-			public virtual bool CanTransitionTo(W newStateID)
+			public virtual bool CanTransitionTo(TEnum newStateID)
 			{
 				return true;
 			}
@@ -49,14 +48,13 @@ namespace EugeneC.Utilities
 
 		public State currentState;
 		[SerializeField] private State previousState;
-		private Dictionary<W, State> _allStates = new Dictionary<W, State>();
+		private readonly Dictionary<TEnum, State> _allStates = new Dictionary<TEnum, State>();
 
 		public Animator characterAnimator;
 
 		private void Awake()
 		{
-			if (characterAnimator == null)
-				characterAnimator = GetComponentInChildren<Animator>();
+			characterAnimator ??= GetComponentInChildren<Animator>();
 
 			foreach (var state in GetComponentsInChildren<State>())
 			{
@@ -72,12 +70,12 @@ namespace EugeneC.Utilities
 			currentState?.Run();
 		}
 
-		public void ChangeState(W newStateID)
+		public void ChangeState(TEnum newStateID)
 		{
 			var newState = _allStates[newStateID];
 
 			if (newState == currentState) return;
-			else if (currentState != null && !currentState.CanTransitionTo(newStateID)) return;
+			else if (currentState is not null && !currentState.CanTransitionTo(newStateID)) return;
 			else
 			{
 				currentState?.OnExit();
@@ -89,7 +87,7 @@ namespace EugeneC.Utilities
 
 		public void BacktoPreviousState()
 		{
-			if (previousState != null) ChangeState(previousState.StateEnum);
+			if (previousState is not null) ChangeState(previousState.StateEnum);
 		}
 	}
 }

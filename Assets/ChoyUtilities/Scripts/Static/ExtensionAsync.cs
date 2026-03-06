@@ -6,13 +6,29 @@ using UnityEngine.UI;
 #if UNITY_2023_1_OR_NEWER
 using UnityEngine;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace EugeneC.Utilities
 {
 	public static partial class UtilityCollection
 	{
 		private const string TaskCancellationMessage = "Task was cancelled";
+		
+		public static async Awaitable AwaitableUntil(this CancellationToken cancellationToken, Func<bool> condition)
+		{
+			while (!condition())
+			{
+				await Awaitable.NextFrameAsync(cancellationToken);
+			}
+		}
+		
+		public static async Awaitable AwaitableUntil(this CancellationToken cancellationToken, Func<bool> condition, Action onWaitDone)
+		{
+			while (!condition())
+			{
+				onWaitDone?.Invoke();
+				await Awaitable.NextFrameAsync(cancellationToken);
+			}
+		}
 
 		#region Fade Screen Async
 
@@ -340,10 +356,7 @@ namespace EugeneC.Utilities
 				obj.transform.rotation = endRot;
 				onDone?.Invoke();
 			}
-			catch
-			{
-				throw new Exception(TaskCancellationMessage);
-			}
+			catch { throw new Exception(TaskCancellationMessage); }
 		}
 
 		public static async Awaitable<bool> RotateObjectAsync(this CancellationToken token, Transform obj, float3 rotateTo,
@@ -419,9 +432,9 @@ namespace EugeneC.Utilities
 					while (currentDisplaying != line)
 					{
 						timer += Time.unscaledDeltaTime;
-						int length = Mathf.CeilToInt(timer / timePerChar);
-						length = Mathf.Clamp(length, 0, line.Length);
-						currentDisplaying = line.Substring(0, length);
+						var length = (int)math.ceil(timer / timePerChar);
+						length = math.clamp(length, 0, line.Length);
+						currentDisplaying = line[..length];
 						displayTo(currentDisplaying);
 
 						await Awaitable.NextFrameAsync(token);
@@ -433,10 +446,42 @@ namespace EugeneC.Utilities
 				displayTo("");
 				onDone?.Invoke();
 			}
-			catch
+			catch { throw new Exception(TaskCancellationMessage); }
+		}
+		
+		public static async Awaitable DialogueAsync(this CancellationToken token, string[] dialogueList,
+			float dialogueDuration,
+			Action<string> displayTo, float timePerChar = 0.05f, Action onDone = null)
+		{
+			try
 			{
-				throw new Exception(TaskCancellationMessage);
+				if (dialogueList is null || dialogueList.Length == 0) return;
+
+				foreach (var line in dialogueList)
+				{
+					if (line == string.Empty) continue;
+
+					var timer = 0f;
+					var currentDisplaying = "";
+
+					while (currentDisplaying != line)
+					{
+						timer += Time.unscaledDeltaTime;
+						var length = (int)math.ceil(timer / timePerChar);
+						length = math.clamp(length, 0, line.Length);
+						currentDisplaying = line[..length];
+						displayTo(currentDisplaying);
+
+						await Awaitable.NextFrameAsync(token);
+					}
+
+					await Awaitable.WaitForSecondsAsync(dialogueDuration, token);
+				}
+
+				displayTo("");
+				onDone?.Invoke();
 			}
+			catch { throw new Exception(TaskCancellationMessage); }
 		}
 
 		public static async Awaitable RollRightAngleAsync(this CancellationToken token, Transform ob, float rollSpeed,
@@ -444,10 +489,10 @@ namespace EugeneC.Utilities
 		{
 			try
 			{
-				Vector3 anchor = ob.position + (Vector3.down + dir) * 0.5f;
-				Vector3 axis = Vector3.Cross(Vector3.up, dir);
+				var anchor = ob.position + (Vector3.down + dir) * 0.5f;
+				var axis = Vector3.Cross(Vector3.up, dir);
 
-				for (int i = 0; i <= (90 / rollSpeed); i++)
+				for (var i = 0; i <= (90 / rollSpeed); i++)
 				{
 					ob.RotateAround(anchor, axis, i);
 					await Awaitable.WaitForSecondsAsync(rollCooldown, token);

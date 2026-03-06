@@ -18,9 +18,9 @@ namespace Mediapipe.Unity
 {
 	public class WebCamSource : ImageSource
 	{
-		private readonly int _preferableDefaultWidth = 1280;
+		private readonly int _preferableDefaultWidth;
 
-		private const string _TAG = nameof(WebCamSource);
+		private const string Tag = nameof(WebCamSource);
 
 		private readonly ResolutionStruct[] _defaultAvailableResolutions;
 
@@ -30,8 +30,8 @@ namespace Mediapipe.Unity
 			_defaultAvailableResolutions = defaultAvailableResolutions;
 		}
 
-		private static readonly object _PermissionLock = new object();
-		private static bool _IsPermitted = false;
+		private static readonly object PermissionLock = new object();
+		private static bool _isPermitted = false;
 
 		private WebCamTexture _webCamTexture;
 
@@ -50,8 +50,7 @@ namespace Mediapipe.Unity
 
 		public override bool isVerticallyFlipped => isPrepared && webCamTexture.videoVerticallyMirrored;
 
-		public override bool isFrontFacing => isPrepared && (webCamDevice is WebCamDevice valueOfWebCamDevice) &&
-		                                      valueOfWebCamDevice.isFrontFacing;
+		public override bool isFrontFacing => isPrepared && (webCamDevice is { isFrontFacing: true });
 
 		public override RotationAngle rotation =>
 			!isPrepared ? RotationAngle.Rotation0 : (RotationAngle)webCamTexture.videoRotationAngle;
@@ -63,9 +62,9 @@ namespace Mediapipe.Unity
 			get => _webCamDevice;
 			set
 			{
-				if (_webCamDevice is WebCamDevice valueOfWebCamDevice)
+				if (_webCamDevice is { } valueOfWebCamDevice)
 				{
-					if (value is WebCamDevice valueOfValue && valueOfValue.name == valueOfWebCamDevice.name)
+					if (value is { } valueOfValue && valueOfValue.name == valueOfWebCamDevice.name)
 					{
 						// not changed
 						return;
@@ -83,7 +82,7 @@ namespace Mediapipe.Unity
 		}
 
 		public override string sourceName =>
-			(webCamDevice is WebCamDevice valueOfWebCamDevice) ? valueOfWebCamDevice.name : null;
+			(webCamDevice is { } valueOfWebCamDevice) ? valueOfWebCamDevice.name : null;
 
 		private WebCamDevice[] _availableSources;
 
@@ -125,7 +124,7 @@ namespace Mediapipe.Unity
 		{
 			yield return GetPermission();
 
-			if (!_IsPermitted)
+			if (!_isPermitted)
 			{
 				yield break;
 			}
@@ -137,7 +136,7 @@ namespace Mediapipe.Unity
 
 			availableSources = WebCamTexture.devices;
 
-			if (availableSources != null && availableSources.Length > 0)
+			if (availableSources is { Length: > 0 })
 			{
 				webCamDevice = availableSources[0];
 			}
@@ -145,9 +144,9 @@ namespace Mediapipe.Unity
 
 		private IEnumerator GetPermission()
 		{
-			lock (_PermissionLock)
+			lock (PermissionLock)
 			{
-				if (_IsPermitted)
+				if (_isPermitted)
 				{
 					yield break;
 				}
@@ -176,7 +175,7 @@ namespace Mediapipe.Unity
           yield break;
         }
 #endif
-				_IsPermitted = true;
+				_isPermitted = true;
 
 				yield return new WaitForEndOfFrame();
 			}
@@ -195,9 +194,12 @@ namespace Mediapipe.Unity
 		public override IEnumerator Play()
 		{
 			yield return Initialize();
-			if (!_IsPermitted)
+			lock (PermissionLock)
 			{
-				throw new InvalidOperationException("Not permitted to access cameras");
+				if (!_isPermitted)
+				{
+					throw new InvalidOperationException("Not permitted to access cameras");
+				}
 			}
 
 			InitializeWebCamTexture();
@@ -241,14 +243,14 @@ namespace Mediapipe.Unity
 			var resolutions = availableResolutions;
 			return resolutions == null || resolutions.Length == 0
 				? new ResolutionStruct()
-				: resolutions.OrderBy(resolution => resolution, new ResolutionStructComparer(_preferableDefaultWidth))
+				: resolutions.OrderBy(resolutionStruct => resolutionStruct, new ResolutionStructComparer(_preferableDefaultWidth))
 					.First();
 		}
 
 		private void InitializeWebCamTexture()
 		{
 			Stop();
-			if (webCamDevice is WebCamDevice valueOfWebCamDevice)
+			if (webCamDevice is { } valueOfWebCamDevice)
 			{
 				webCamTexture = new WebCamTexture(valueOfWebCamDevice.name, resolution.width, resolution.height,
 					(int)resolution.frameRate);

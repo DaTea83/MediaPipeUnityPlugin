@@ -205,9 +205,9 @@ namespace ProjectionMapping
 			pose.RightPreviousHandPose = pose.RightCurrentHandPose;
 
 			var (lValid, left) = tracking.GetHand(EHand.Left);
-			pose.LeftCurrentHandPose = lValid ? left.GetPose() : EHandPose.None;
+			pose.LeftCurrentHandPose = lValid ? left.GetPose(settings) : EHandPose.None;
 			var (rValid, right) = tracking.GetHand(EHand.Right);
-			pose.RightCurrentHandPose = rValid ? right.GetPose() : EHandPose.None;
+			pose.RightCurrentHandPose = rValid ? right.GetPose(settings) : EHandPose.None;
 
 			pose.LeftLocalPosition = HandCollection.GetLocalPosition(tracking.LeftHand, settings);
 			pose.RightLocalPosition = HandCollection.GetLocalPosition(tracking.RightHand, settings);

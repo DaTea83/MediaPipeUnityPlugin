@@ -14,6 +14,7 @@ namespace EugeneC.Obsolete
 	/// <remarks>
 	/// Obsolete, please use extensions from <see cref="UtilityMethods"/>>
 	/// </remarks>
+	[Obsolete]
 	public class AsyncManager : GenericSingleton<AsyncManager>
 	{
 		// Start is called before the first frame update

@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace EugeneC.Obsolete
 {
+	[Obsolete]
 	public class SpawnManager : GenericSingleton<SpawnManager>
 	{
 		public SpawnObject[] spawnObject;

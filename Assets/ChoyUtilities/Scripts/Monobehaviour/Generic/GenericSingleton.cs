@@ -1,3 +1,5 @@
+using System;
+using System.Threading;
 using UnityEngine;
 
 namespace EugeneC.Singleton
@@ -5,11 +7,23 @@ namespace EugeneC.Singleton
 	public abstract class GenericSingleton<T> : MonoBehaviour
 		where T : MonoBehaviour
 	{
-		public static T Instance { get; protected set; }
+		public static T Instance { get; private set; }
 
+		private CancellationTokenSource _cts = new();
+		protected CancellationToken Token => _cts.Token;
+		protected event Action OnCancelTask;
+
+		protected void CancelTask()
+		{
+			_cts?.Cancel();
+			_cts?.Dispose();
+			_cts = new CancellationTokenSource();
+			OnCancelTask?.Invoke();
+		}
+		
 		protected virtual void InitSingleton()
 		{
-			if (Instance != null && Instance != this)
+			if (Instance is not null && Instance != this)
 			{
 				Destroy(gameObject);
 				return;
@@ -32,6 +46,11 @@ namespace EugeneC.Singleton
 		protected virtual void Awake()
 		{
 			InitSingleton();
+		}
+
+		protected virtual void OnDisable()
+		{
+			CancelTask();
 		}
 
 		protected virtual void OnDestroy()

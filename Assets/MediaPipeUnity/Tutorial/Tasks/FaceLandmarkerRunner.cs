@@ -11,7 +11,7 @@ namespace Mediapipe.Unity.Tutorial
 		[SerializeField] private int height;
 		[SerializeField] private int fps;
 
-		private WebCamTexture webCamTexture;
+		private WebCamTexture _webCamTexture;
 
 		private IEnumerator Start()
 		{
@@ -21,22 +21,19 @@ namespace Mediapipe.Unity.Tutorial
 			}
 
 			var webCamDevice = WebCamTexture.devices[0];
-			webCamTexture = new WebCamTexture(webCamDevice.name, width, height, fps);
-			webCamTexture.Play();
+			_webCamTexture = new WebCamTexture(webCamDevice.name, width, height, fps);
+			_webCamTexture.Play();
 
 			// NOTE: On macOS, the contents of webCamTexture may not be readable immediately, so wait until it is readable
-			yield return new WaitUntil(() => webCamTexture.width > 16);
+			yield return new WaitUntil(() => _webCamTexture.width > 16);
 
 			screen.rectTransform.sizeDelta = new Vector2(width, height);
-			screen.texture = webCamTexture;
+			screen.texture = _webCamTexture;
 		}
 
 		private void OnDestroy()
 		{
-			if (webCamTexture != null)
-			{
-				webCamTexture.Stop();
-			}
+			_webCamTexture?.Stop();
 		}
 	}
 }

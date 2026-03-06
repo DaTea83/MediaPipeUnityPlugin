@@ -13,10 +13,10 @@ namespace Mediapipe.Unity.Sample.UI
 {
 	public class ImageSourceConfig : ModalContents
 	{
-		private const string _SourceTypePath = "Scroll View/Viewport/Contents/SourceType/Dropdown";
-		private const string _SourcePath = "Scroll View/Viewport/Contents/Source/Dropdown";
-		private const string _ResolutionPath = "Scroll View/Viewport/Contents/Resolution/Dropdown";
-		private const string _IsHorizontallyFlippedPath = "Scroll View/Viewport/Contents/IsHorizontallyFlipped/Toggle";
+		private const string SourceTypePath = "Scroll View/Viewport/Contents/SourceType/Dropdown";
+		private const string SourcePath = "Scroll View/Viewport/Contents/Source/Dropdown";
+		private const string ResolutionPath = "Scroll View/Viewport/Contents/Resolution/Dropdown";
+		private const string IsHorizontallyFlippedPath = "Scroll View/Viewport/Contents/IsHorizontallyFlipped/Toggle";
 
 		private Dropdown _sourceTypeInput;
 		private Dropdown _sourceInput;
@@ -45,11 +45,11 @@ namespace Mediapipe.Unity.Sample.UI
 
 		private void InitializeSourceType()
 		{
-			_sourceTypeInput = gameObject.transform.Find(_SourceTypePath).gameObject.GetComponent<Dropdown>();
+			_sourceTypeInput = gameObject.transform.Find(SourceTypePath).gameObject.GetComponent<Dropdown>();
 			_sourceTypeInput.ClearOptions();
 			_sourceTypeInput.onValueChanged.RemoveAllListeners();
 
-			var options = Enum.GetNames(typeof(ImageSourceType)).Where(x => x != ImageSourceType.Unknown.ToString())
+			var options = Enum.GetNames(typeof(ImageSourceType)).Where(x => x != nameof(ImageSourceType.Unknown))
 				.ToList();
 			_sourceTypeInput.AddOptions(options);
 
@@ -71,14 +71,14 @@ namespace Mediapipe.Unity.Sample.UI
 
 		private void InitializeSource()
 		{
-			_sourceInput = gameObject.transform.Find(_SourcePath).gameObject.GetComponent<Dropdown>();
+			_sourceInput = gameObject.transform.Find(SourcePath).gameObject.GetComponent<Dropdown>();
 			_sourceInput.ClearOptions();
 			_sourceInput.onValueChanged.RemoveAllListeners();
 
 			var imageSource = ImageSourceProvider.ImageSource;
 			var sourceNames = imageSource.sourceCandidateNames;
 
-			if (sourceNames == null)
+			if (sourceNames is null)
 			{
 				_sourceInput.enabled = false;
 				return;
@@ -105,7 +105,7 @@ namespace Mediapipe.Unity.Sample.UI
 
 		private void InitializeResolution()
 		{
-			_resolutionInput = gameObject.transform.Find(_ResolutionPath).gameObject.GetComponent<Dropdown>();
+			_resolutionInput = gameObject.transform.Find(ResolutionPath).gameObject.GetComponent<Dropdown>();
 			_resolutionInput.ClearOptions();
 			_resolutionInput.onValueChanged.RemoveAllListeners();
 
@@ -139,7 +139,7 @@ namespace Mediapipe.Unity.Sample.UI
 		private void InitializeIsHorizontallyFlipped()
 		{
 			_isHorizontallyFlippedInput =
-				gameObject.transform.Find(_IsHorizontallyFlippedPath).gameObject.GetComponent<Toggle>();
+				gameObject.transform.Find(IsHorizontallyFlippedPath).gameObject.GetComponent<Toggle>();
 
 			var imageSource = ImageSourceProvider.ImageSource;
 			_isHorizontallyFlippedInput.isOn = imageSource.isHorizontallyFlipped;
