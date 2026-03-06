@@ -93,8 +93,8 @@ namespace Mediapipe.Unity.CoordinateSystem
 		public static bool IsYReversed(RotationAngle rotationAngle, bool isMirrored = false)
 		{
 			return isMirrored
-				? rotationAngle == RotationAngle.Rotation0 || rotationAngle == RotationAngle.Rotation270
-				: rotationAngle == RotationAngle.Rotation0 || rotationAngle == RotationAngle.Rotation90;
+				? rotationAngle is RotationAngle.Rotation0 or RotationAngle.Rotation270
+				: rotationAngle is RotationAngle.Rotation0 or RotationAngle.Rotation90;
 		}
 
 		/// <summary>

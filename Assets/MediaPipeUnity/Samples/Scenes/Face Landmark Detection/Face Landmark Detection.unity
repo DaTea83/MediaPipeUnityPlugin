@@ -222,27 +222,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Multi FaceLandmarkList Annotation
       objectReference: {fileID: 0}
-    - target: {fileID: 5403310940259726731, guid: 2e1291ddc10af56d4be1551cc630d40b,
-        type: 3}
-      propertyPath: annotationPrefab
-      value: 
-      objectReference: {fileID: 5105739270100195704, guid: cd50999c161e69345953a2cb517dd339,
-        type: 3}
-    - target: {fileID: 5403310940259726731, guid: 2e1291ddc10af56d4be1551cc630d40b,
-        type: 3}
-      propertyPath: _faceLandmarkColor.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5403310940259726731, guid: 2e1291ddc10af56d4be1551cc630d40b,
-        type: 3}
-      propertyPath: _faceLandmarkColor.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5403310940259726731, guid: 2e1291ddc10af56d4be1551cc630d40b,
-        type: 3}
-      propertyPath: _faceLandmarkColor.r
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5403310940259726732, guid: 2e1291ddc10af56d4be1551cc630d40b,
         type: 3}
       propertyPath: m_LocalPosition.x
