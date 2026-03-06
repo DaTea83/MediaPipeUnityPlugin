@@ -7,7 +7,7 @@
 namespace Mediapipe.Unity
 {
 	[System.Serializable]
-	public enum InferenceMode : byte
+	public enum EInferenceMode : byte
 	{
 		GPU,
 		CPU,

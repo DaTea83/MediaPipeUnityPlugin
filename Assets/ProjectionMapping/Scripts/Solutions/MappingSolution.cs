@@ -2,11 +2,13 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using EugeneC.Singleton;
+using EugeneC.Utilities;
 using Mediapipe.Tasks.Vision.Core;
 using Mediapipe.Unity;
 using Mediapipe.Unity.Sample;
 using Unity.Mathematics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 using Screen = Mediapipe.Unity.Screen;
 
 namespace ProjectionMapping
@@ -18,21 +20,25 @@ namespace ProjectionMapping
     {
 	    [SerializeField] private Bootstrap prefab;
 	    [SerializeField] protected Screen screen;
-	    
-	    protected Bootstrap Bootstrap;
+
+	    private Bootstrap _bootstrap;
 	    protected bool IsPaused;
 	    private Coroutine _coroutine;
 	    private readonly Stopwatch _stopwatch = new();
 
 	    protected T TaskApi;
 
-	    protected virtual IEnumerator Start()
+	    protected virtual async void Start()
 	    {
-		    KeepSingleton(true);
-		    Bootstrap = Instantiate(prefab, transform);
-		    yield return new WaitUntil(() => Bootstrap.IsFinished);
+		    try
+		    {
+			    KeepSingleton(true);
+			    _bootstrap = Instantiate(prefab, transform);
+			    await Token.AwaitableUntil(() => _bootstrap.IsFinished);
 		    
-		    Play();
+			    Play();
+		    }
+		    catch(Exception e){ Debug.Log(e);}
 	    }
 	    
 	    /// <summary>

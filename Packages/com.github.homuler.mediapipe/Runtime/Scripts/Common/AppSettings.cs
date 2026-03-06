@@ -22,7 +22,7 @@ namespace Mediapipe.Unity.Sample
 		}
 
 		[SerializeField] private ImageSourceType _defaultImageSource;
-		[SerializeField] private InferenceMode _preferableInferenceMode;
+		[SerializeField] private EInferenceMode preferableEInferenceMode;
 		[SerializeField] private AssetLoaderType _assetLoaderType;
 		[SerializeField] private Logger.LogLevel _logLevel = Logger.LogLevel.Debug;
 
@@ -67,7 +67,7 @@ namespace Mediapipe.Unity.Sample
 		private VideoClip[] _availableVideoSources;
 
 		public ImageSourceType defaultImageSource => _defaultImageSource;
-		public InferenceMode preferableInferenceMode => _preferableInferenceMode;
+		public EInferenceMode PreferableEInferenceMode => preferableEInferenceMode;
 
 		public AssetLoaderType assetLoaderType
 		{

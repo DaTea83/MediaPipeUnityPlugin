@@ -74,14 +74,7 @@ namespace Mediapipe.Unity
 				// It should be taken into account that the image will be rotated later.
 				var rotation = _imageSource.rotation;
 
-				if (rotation == RotationAngle.Rotation0 || rotation == RotationAngle.Rotation180)
-				{
-					rect = FlipHorizontally(rect);
-				}
-				else
-				{
-					rect = FlipVertically(rect);
-				}
+				rect = rotation is RotationAngle.Rotation0 or RotationAngle.Rotation180 ? FlipHorizontally(rect) : FlipVertically(rect);
 			}
 
 			uvRect = rect;

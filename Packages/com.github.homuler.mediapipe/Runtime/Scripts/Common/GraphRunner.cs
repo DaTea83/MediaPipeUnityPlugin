@@ -47,7 +47,7 @@ namespace Mediapipe.Unity.Sample
 		protected RunningMode runningMode { get; private set; } = RunningMode.Async;
 		private bool _isRunning = false;
 
-		public InferenceMode inferenceMode => configType == ConfigType.CPU ? InferenceMode.CPU : InferenceMode.GPU;
+		public EInferenceMode EInferenceMode => configType == ConfigType.CPU ? EInferenceMode.CPU : EInferenceMode.GPU;
 
 		public virtual ConfigType configType
 		{
@@ -413,7 +413,7 @@ namespace Mediapipe.Unity.Sample
 
 			ConfigureCalculatorGraph(baseConfig);
 
-			if (inferenceMode != InferenceMode.CPU)
+			if (EInferenceMode != EInferenceMode.CPU)
 			{
 				calculatorGraph.SetGpuResources(GpuManager.GpuResources);
 			}
