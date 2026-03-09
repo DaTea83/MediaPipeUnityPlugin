@@ -12,6 +12,8 @@
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
 /[Cc]ode[Cc]overage/
+/[Rr]ecordings/
+
 *.csproj
 *.sln
 *.unitypackage
@@ -31,3 +33,4 @@ Assets/RTGame
 Assets/RTGame.meta
 
 # Packages/com.github.homuler.mediapipe/Runtime/Plugins/Protobuf/*.dll
+Recordings/Movie_001.mp4

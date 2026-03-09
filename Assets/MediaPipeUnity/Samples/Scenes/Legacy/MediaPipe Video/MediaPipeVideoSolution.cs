@@ -59,8 +59,8 @@ namespace Mediapipe.Unity.Sample.MediaPipeVideo
 					graphRunner.SetupOutputPacket(textureFrame, glContext);
 
 					// MediaPipe will write the result to the textureFrame
-					screen.texture = Texture2D.CreateExternalTexture(textureFrame.width, textureFrame.height,
-						textureFrame.format, false, false, textureFrame.GetNativeTexturePtr());
+					screen.texture = Texture2D.CreateExternalTexture(textureFrame.Width, textureFrame.Height,
+						textureFrame.Format, false, false, textureFrame.GetNativeTexturePtr());
 				}
 				else
 				{

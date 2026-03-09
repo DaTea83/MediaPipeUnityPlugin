@@ -37,7 +37,7 @@ namespace ProjectionMapping
 	}
 
 	[BurstCompile]
-	[UpdateInGroup(typeof(Eu_EffectSystemGroup), OrderFirst = true)]
+	[UpdateInGroup(typeof(Eu_PreTransformSystemGroup), OrderFirst = true)]
 	public partial struct HandPointISystem : ISystem
 	{
 		private const int Wrist = 0;

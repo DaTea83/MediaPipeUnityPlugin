@@ -26,11 +26,11 @@ namespace Mediapipe.Unity.Experimental
 		{
 		}
 
-		private const string _TAG = nameof(TextureFrame);
+		private const string Tag = nameof(TextureFrame);
 
 		internal const int MaxTotalCount = 100;
 
-		private static readonly GlobalInstanceTable<Guid, TextureFrame> _InstanceTable =
+		private static readonly GlobalInstanceTable<Guid, TextureFrame> InstanceTable =
 			new GlobalInstanceTable<Guid, TextureFrame>(MaxTotalCount);
 
 		/// <summary>
@@ -40,7 +40,7 @@ namespace Mediapipe.Unity.Experimental
 		///   Not all the <see cref="TextureFrame" /> instances are registered.
 		///   Texture names are queried only when necessary, and the corresponding data will be saved then.
 		/// </remarks>
-		private static readonly Dictionary<uint, Guid> _NameTable = new Dictionary<uint, Guid>();
+		private static readonly Dictionary<uint, Guid> NameTable = new Dictionary<uint, Guid>();
 
 		private readonly Texture2D _texture;
 		public Texture texture => _texture;
@@ -51,11 +51,11 @@ namespace Mediapipe.Unity.Experimental
 		private readonly Guid _instanceId;
 
 		// NOTE: width and height can be accessed from a thread other than Main Thread.
-		public readonly int width;
-		public readonly int height;
-		public readonly TextureFormat format;
+		public readonly int Width;
+		public readonly int Height;
+		public readonly TextureFormat Format;
 
-		public ImageFormat.Types.Format imageFormat => format.ToImageFormat();
+		public ImageFormat.Types.Format imageFormat => Format.ToImageFormat();
 
 		public bool isReadable => _texture.isReadable;
 
@@ -74,12 +74,12 @@ namespace Mediapipe.Unity.Experimental
 		private TextureFrame(Texture2D texture)
 		{
 			_texture = texture;
-			width = texture.width;
-			height = texture.height;
-			format = texture.format;
+			Width = texture.width;
+			Height = texture.height;
+			Format = texture.format;
 			OnRelease = new ReleaseEvent();
 			_instanceId = Guid.NewGuid();
-			_InstanceTable.Add(_instanceId, this);
+			InstanceTable.Add(_instanceId, this);
 			_onReadBackRenderTexture = OnReadBackRenderTexture;
 		}
 
@@ -98,14 +98,14 @@ namespace Mediapipe.Unity.Experimental
 			if (_nativeTexturePtr != IntPtr.Zero)
 			{
 				var name = (uint)_nativeTexturePtr;
-				lock (((ICollection)_NameTable).SyncRoot)
+				lock (((ICollection)NameTable).SyncRoot)
 				{
-					_ = _NameTable.Remove(name);
+					_ = NameTable.Remove(name);
 				}
 			}
 
 			_glSyncToken?.Dispose();
-			_ = _InstanceTable.Remove(_instanceId);
+			_ = InstanceTable.Remove(_instanceId);
 			UnityEngine.Object.Destroy(_texture);
 		}
 
@@ -173,7 +173,7 @@ namespace Mediapipe.Unity.Experimental
 
 		private void ReadTextureInternal(Texture src, bool flipHorizontally, bool flipVertically)
 		{
-			var graphicsFormat = GraphicsFormatUtility.GetGraphicsFormat(format, true);
+			var graphicsFormat = GraphicsFormatUtility.GetGraphicsFormat(Format, true);
 			_tmpRenderTexture = RenderTexture.GetTemporary(src.width, src.height, 32, graphicsFormat);
 			var currentRenderTexture = RenderTexture.active;
 			RenderTexture.active = _tmpRenderTexture;
@@ -237,7 +237,7 @@ namespace Mediapipe.Unity.Experimental
 				_nativeTexturePtr = _texture.GetNativeTexturePtr();
 				var name = (uint)_nativeTexturePtr;
 
-				lock (((ICollection)_NameTable).SyncRoot)
+				lock (((ICollection)NameTable).SyncRoot)
 				{
 					if (!AcquireName(name, _instanceId))
 					{
@@ -245,7 +245,7 @@ namespace Mediapipe.Unity.Experimental
 							$"Another instance (id={_instanceId}) is using the specified name ({name}) now");
 					}
 
-					_NameTable.Add(name, _instanceId);
+					NameTable.Add(name, _instanceId);
 				}
 			}
 
@@ -312,20 +312,20 @@ namespace Mediapipe.Unity.Experimental
 		[AOT.MonoPInvokeCallback(typeof(GlTextureBuffer.DeletionCallback))]
 		public static void OnReleaseTextureFrame(uint textureName, IntPtr syncTokenPtr)
 		{
-			var isIdFound = _NameTable.TryGetValue(textureName, out var _instanceId);
+			var isIdFound = NameTable.TryGetValue(textureName, out var _instanceId);
 
 			if (!isIdFound)
 			{
-				Logger.LogError(_TAG,
+				Logger.LogError(Tag,
 					$"nameof (name={textureName}) is released, but the owner TextureFrame is not found");
 				return;
 			}
 
-			var isTextureFrameFound = _InstanceTable.TryGetValue(_instanceId, out var textureFrame);
+			var isTextureFrameFound = InstanceTable.TryGetValue(_instanceId, out var textureFrame);
 
 			if (!isTextureFrameFound)
 			{
-				Logger.LogWarning(_TAG,
+				Logger.LogWarning(Tag,
 					$"nameof owner TextureFrame of the released texture (name={textureName}) is already garbage collected");
 				return;
 			}
@@ -335,8 +335,8 @@ namespace Mediapipe.Unity.Experimental
 		}
 
 		/// <summary>
-		///   Remove <paramref name="name" /> from <see cref="_NameTable" /> if it's stale.
-		///   If <paramref name="name" /> does not exist in <see cref="_NameTable" />, do nothing.
+		///   Remove <paramref name="name" /> from <see cref="NameTable" /> if it's stale.
+		///   If <paramref name="name" /> does not exist in <see cref="NameTable" />, do nothing.
 		/// </summary>
 		/// <remarks>
 		///   If the instance whose id is <paramref name="ownerId" /> owns <paramref name="name" /> now, it still removes <paramref name="name" />.
@@ -344,16 +344,16 @@ namespace Mediapipe.Unity.Experimental
 		/// <returns>Return if name is available</returns>
 		private static bool AcquireName(uint name, Guid ownerId)
 		{
-			if (_NameTable.TryGetValue(name, out var id))
+			if (NameTable.TryGetValue(name, out var id))
 			{
-				if (ownerId != id && _InstanceTable.TryGetValue(id, out var _))
+				if (ownerId != id && InstanceTable.TryGetValue(id, out var _))
 				{
 					// if instance is found, the instance is using the name.
 					Logger.LogVerbose($"{id} is using {name} now");
 					return false;
 				}
 
-				var _ = _NameTable.Remove(name);
+				var _ = NameTable.Remove(name);
 			}
 
 			return true;
@@ -363,7 +363,7 @@ namespace Mediapipe.Unity.Experimental
 			GraphicsFormatUtility.GetTextureFormat(texture.graphicsFormat);
 
 		/// <summary>
-		///   Remove the texture name from <see cref="_NameTable" /> and empty <see cref="_nativeTexturePtr" />.
+		///   Remove the texture name from <see cref="NameTable" /> and empty <see cref="_nativeTexturePtr" />.
 		///   This method needs to be called when an operation is performed that may change the internal texture.
 		/// </summary>
 		private bool RevokeNativeTexturePtr()
@@ -374,7 +374,7 @@ namespace Mediapipe.Unity.Experimental
 			}
 
 			var currentName = GetTextureName();
-			if (!_NameTable.Remove(currentName))
+			if (!NameTable.Remove(currentName))
 			{
 				return false;
 			}
