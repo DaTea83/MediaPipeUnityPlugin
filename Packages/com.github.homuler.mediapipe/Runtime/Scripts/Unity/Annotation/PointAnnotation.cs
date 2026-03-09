@@ -110,7 +110,7 @@ namespace Mediapipe.Unity
 
 		private void ApplyRadius(float radi) => transform.localScale = radi * Vector3.one;
 
-		private Color GetColor(float score, float threshold)
+		private static Color GetColor(float score, float threshold)
 		{
 			var t = (score - threshold) / (1 - threshold);
 			var h = math.lerp(90, 0, t) / 360; // from yellow-green to red

@@ -186,12 +186,6 @@ namespace Mediapipe.Tasks.Vision.HandLandmarker
 		/// <remarks>
 		///   When hands are not found, <paramref name="result"/> won't be overwritten.
 		/// </remarks>
-		/// <param name="result">
-		///   <see cref="HandLandmarkerResult"/> to which the result will be written.
-		/// </param>
-		/// <returns>
-		///   <see langword="true"/> if some hands are detected, <see langword="false"/> otherwise.
-		/// </returns>
 		public bool TryDetectForVideo(Image image, long timestampMillisec,
 			Core.ImageProcessingOptions? imageProcessingOptions, ref HandLandmarkerResult result)
 		{

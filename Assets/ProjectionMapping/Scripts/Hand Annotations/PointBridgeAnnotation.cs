@@ -1,5 +1,3 @@
-using System;
-using EugeneC.ECS;
 using Mediapipe.Tasks.Components.Containers;
 using Mediapipe.Unity;
 using Mediapipe.Unity.CoordinateSystem;

@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d433cdb024dfd584696eeb11efb71102, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  annotationPrefab: {fileID: 5105739270100195704, guid: cd50999c161e69345953a2cb517dd339,
+  annotationPrefab: {fileID: 9215842904284589815, guid: e260d2f5fb90a790385fcb2d815b23a6,
     type: 3}
   _lineWidth: 1
   _keypointRadius: 15
