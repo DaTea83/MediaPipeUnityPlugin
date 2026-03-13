@@ -32,5 +32,8 @@ bazel-*
 Assets/RTGame
 Assets/RTGame.meta
 
+Assets/OCBC
+Assets/OCBC.meta
+
 # Packages/com.github.homuler.mediapipe/Runtime/Plugins/Protobuf/*.dll
 *.mp4

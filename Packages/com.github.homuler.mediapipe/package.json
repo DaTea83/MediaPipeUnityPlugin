@@ -37,5 +37,6 @@
       "description": "Sample Scenes for Tutorial",
       "path": "Samples~/Tutorial"
     }
-  ]
+  ],
+  "hideInEditor": false
 }
