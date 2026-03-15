@@ -1,14 +1,12 @@
 ﻿using EugeneC.Utilities;
 using UnityEditor;
+
 // ReSharper disable CheckNamespace
 
-namespace EugeneC.Editor
-{
+namespace EugeneC.Editor {
     [CustomEditor(typeof(CameraController))]
-    public class CameraControllerEditor : UnityEditor.Editor
-    {
-        public override void OnInspectorGUI()
-        {
+    public class CameraControllerEditor : UnityEditor.Editor {
+        public override void OnInspectorGUI() {
             var instance = (CameraController)target;
             EditorGUILayout.HelpBox(
                 "Currently in ECS you can't just attach the camera to a subscene entity and called it a day",
