@@ -24,10 +24,16 @@ namespace EugeneC.Singleton {
         }
 
         [SerializeField] protected InitialPoolSerialize[] poolPrefabs;
-        [Tooltip("Determines if you want to spawn all prefabs as child on start")]
-        [SerializeField] protected bool initializeOnStart;
-        [SerializeField] protected bool collectionCheck = false;
         [SerializeField] protected byte poolCount = 32;
+        
+        /// <summary>
+        /// Determines if you want to spawn all prefabs as child on start
+        /// </summary>
+        protected abstract bool initializeOnStart { get; }
+        /// <summary>
+        /// Turn off collection checking reduce gc pressure, but not thread safe
+        /// </summary>
+        protected abstract bool collectionCheck { get; }
         
         protected ObjectPool<TObj>[] Pools;
         protected RuntimePoolSerialize[] RuntimePools;

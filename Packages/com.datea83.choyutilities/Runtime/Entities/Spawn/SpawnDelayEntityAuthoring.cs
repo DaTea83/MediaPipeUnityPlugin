@@ -1,11 +1,10 @@
-﻿using EugeneC.ECS;
-using Unity.Burst;
+﻿using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
-namespace ProjectionMapping
+namespace EugeneC.ECS
 {
 	[DisallowMultipleComponent]
 	public sealed class SpawnDelayEntityAuthoring : MonoBehaviour

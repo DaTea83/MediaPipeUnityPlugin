@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -81,14 +82,19 @@ namespace EugeneC.Singleton {
                 musicMixerGroup.mixer?.SetFloat(musicMixerGroup.mixerName, musicMixerGroup.defaultVolume);
             }
             catch (Exception e) {
-                Debug.Log(e);
+                Debug.LogError(e);
             }
         }
-        
+
+        protected override int GetPoolIndex(TEnum id) {
+	        if (!Enum.IsDefined(typeof(TEnum), id)) return -1;
+	        return Array.FindIndex(audioResource, i => EqualityComparer<TEnum>.Default.Equals(i.id, id));
+        }
+
         public virtual float PlayClipAtPos(TEnum id, float3 pos, byte audioPriority = (byte)EAudioPriority.Average) {
             
             var index = GetPoolIndex(id);
-            if (index == -1) return 0f;
+            if (index == -1) throw new Exception("Audio Resource not found");
 
             var resource = audioResource[index].audio;
             return PlayClipAtPos(resource, pos, masterAudioMixerGroup.mixer.outputAudioMixerGroup, audioPriority);
@@ -118,7 +124,7 @@ namespace EugeneC.Singleton {
             byte audioPriority = (byte)EAudioPriority.Average) {
             
             var index = GetPoolIndex(id);
-            if (index == -1) return 0f;
+            if (index == -1) throw new Exception("Audio Resource not found");
 
             var resource = audioResource[index].audio;
             return PlayClipAtPos(resource, pos, mixerType, audioPriority);

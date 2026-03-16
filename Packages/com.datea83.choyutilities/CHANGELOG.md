@@ -1,11 +1,25 @@
 # Changelog
 
+## [0.1.5] - 2026-03-16
+
+### Fixed
+* Fixed GenericAudioManager always return -1 when using GetPoolIndex()(Added an override);
+
+### Added
+* Added SpawnDelayEntityAuthoring
+
+## Removed
+* Removed old folders saves in FolderModificationData.json
+
+### Changed
+* GenericPoolingManager, field "initializeOnStart" and "collectionCheck" changed to abstract properties
+
 ## [0.1.4] - 2026-03-15
 
 ### Added
 
 * Added GenericPoolingManager
-* Added new GenericAudioManager, GenericParticleManager and GenericUIManager
+* Added new GenericAudioManager, GenericParticleManager and GenericUIManager that inherit from GenericPoolingManager
 * Added GenericSpawnManager
 * HelperCollection, added "RandomValue2" and "RandomValue3"
 
@@ -29,7 +43,7 @@
 
 ## [0.1.1] - 2026-03-13
 
-### Added
+### Fixed
 * LoadIconDisplayEditor now do extra checks when the gameobject has missing scripts
 
 ### Changed

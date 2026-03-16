@@ -11,90 +11,84 @@ using UnityEngine;
 using Debug = UnityEngine.Debug;
 using Screen = Mediapipe.Unity.Screen;
 
-namespace ProjectionMapping
-{
+namespace ProjectionMapping {
 	[DisallowMultipleComponent]
-    public abstract class MappingSolution<T, TU> : GenericSingleton<TU>
+	public abstract class MappingSolution<T, TU> : GenericSingleton<TU>
 		where T : BaseVisionTaskApi
-		where TU : MonoBehaviour
-    {
-	    [SerializeField] private Bootstrap prefab;
-	    [SerializeField] protected Screen screen;
+		where TU : MonoBehaviour {
+		[SerializeField] private Bootstrap prefab;
+		[SerializeField] protected Screen screen;
+		private readonly Stopwatch _stopwatch = new();
 
-	    private Bootstrap _bootstrap;
-	    protected bool IsPaused;
-	    private Coroutine _coroutine;
-	    private readonly Stopwatch _stopwatch = new();
+		private Bootstrap _bootstrap;
+		private Coroutine _coroutine;
+		protected bool IsPaused;
 
-	    protected T TaskApi;
+		protected T TaskApi;
 
-	    protected virtual async void Start()
-	    {
-		    try
-		    {
-			    KeepSingleton(true);
-			    _bootstrap = Instantiate(prefab, transform);
-			    await Token.AwaitableUntil(() => _bootstrap.IsFinished);
-		    
-			    Play();
-		    }
-		    catch(Exception e){ Debug.Log(e);}
-	    }
-	    
-	    /// <summary>
-	    ///   Start the main program from the beginning.
-	    /// </summary>
-	    public virtual void Play()
-	    {
-		    if (_coroutine != null) Stop();
-		    IsPaused = false;
-		    _stopwatch.Restart();
-		    _coroutine = StartCoroutine(Run());
-	    }
-	    
-	    protected abstract IEnumerator Run();
+		protected virtual async void Start() {
+			try {
+				KeepSingleton(true);
+				_bootstrap = Instantiate(prefab, transform);
+				await Token.AwaitableUntil(() => _bootstrap.IsFinished);
 
-	    /// <summary>
-	    ///   Pause the main program.
-	    /// </summary>
-	    public virtual void Pause()
-	    {
-		    IsPaused = true;
-		    ImageSourceProvider.ImageSource.Pause();
-	    }
+				Play();
+			}
+			catch (Exception e) {
+				Debug.Log(e);
+			}
+		}
 
-	    /// <summary>
-	    ///    Resume the main program.
-	    ///    If the main program has not begun, it'll do nothing.
-	    /// </summary>
-	    public virtual void Resume()
-	    {
-		    IsPaused = false;
-		    StartCoroutine(ImageSourceProvider.ImageSource.Resume());
-	    }
+		/// <summary>
+		///     Start the main program from the beginning.
+		/// </summary>
+		public virtual void Play() {
+			if (_coroutine != null) Stop();
+			IsPaused = false;
+			_stopwatch.Restart();
+			_coroutine = StartCoroutine(Run());
+		}
 
-	    /// <summary>
-	    ///   Stops the main program.
-	    /// </summary>
-	    public virtual void Stop()
-	    {
-		    IsPaused = true;
-		    _stopwatch.Stop();
-		    StopCoroutine(_coroutine);
-		    ImageSourceProvider.ImageSource.Stop();
-		    TaskApi?.Close();
-		    TaskApi = null;
-	    }
+		protected abstract IEnumerator Run();
 
-	    protected long GetCurrentTimestampMilliSec() =>
-		    _stopwatch.IsRunning ? _stopwatch.ElapsedTicks / TimeSpan.TicksPerMillisecond : -1;
-	    
-	    protected static void SetupAnnotationController<TA>(AnnotationController<TA> annotationController,
-		    ImageSource imageSource, bool expectedToBeMirrored = false)
-		    where TA : HierarchicalAnnotation
-	    {
-		    annotationController.isMirrored = expectedToBeMirrored;
-		    annotationController.imageSize = new int2(imageSource.textureWidth, imageSource.textureHeight);
-	    }
-    }
+		/// <summary>
+		///     Pause the main program.
+		/// </summary>
+		public virtual void Pause() {
+			IsPaused = true;
+			ImageSourceProvider.ImageSource.Pause();
+		}
+
+		/// <summary>
+		///     Resume the main program.
+		///     If the main program has not begun, it'll do nothing.
+		/// </summary>
+		public virtual void Resume() {
+			IsPaused = false;
+			StartCoroutine(ImageSourceProvider.ImageSource.Resume());
+		}
+
+		/// <summary>
+		///     Stops the main program.
+		/// </summary>
+		public virtual void Stop() {
+			IsPaused = true;
+			_stopwatch.Stop();
+			StopCoroutine(_coroutine);
+			ImageSourceProvider.ImageSource.Stop();
+			TaskApi?.Close();
+			TaskApi = null;
+		}
+
+		protected long GetCurrentTimestampMilliSec() {
+			return _stopwatch.IsRunning ? _stopwatch.ElapsedTicks / TimeSpan.TicksPerMillisecond : -1;
+		}
+
+		protected static void SetupAnnotationController<TA>(AnnotationController<TA> annotationController,
+			ImageSource imageSource, bool expectedToBeMirrored = false)
+			where TA : HierarchicalAnnotation {
+			annotationController.isMirrored = expectedToBeMirrored;
+			annotationController.imageSize = new int2(imageSource.textureWidth, imageSource.textureHeight);
+		}
+	}
 }

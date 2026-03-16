@@ -5,22 +5,18 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 
-namespace ProjectionMapping
-{
+namespace ProjectionMapping {
 	[UpdateInGroup(typeof(Eu_PostTransformSystemGroup))]
-	public partial class HandGrabAnyFollowSystemBase : SystemBase
-	{
+	public partial class HandGrabAnyFollowSystemBase : SystemBase {
 		private HandGrabAnyInputSystemBase _grabSystemBase;
 
-		protected override void OnCreate()
-		{
+		protected override void OnCreate() {
 			_grabSystemBase = World.GetOrCreateSystemManaged<HandGrabAnyInputSystemBase>();
 			RequireForUpdate<ColliderCastISingleton>();
 			RequireForUpdate<HandTrackingISingleton>();
 		}
 
-		protected override void OnUpdate()
-		{
+		protected override void OnUpdate() {
 			// Complete all scheduled pick jobs first, then read their results on the main thread.
 			var combined = Dependency;
 			foreach (var t in _grabSystemBase.PickJobHandles)
@@ -28,36 +24,30 @@ namespace ProjectionMapping
 
 			combined.Complete();
 
-			for (var i = 0; i < _grabSystemBase.PickJobHandles.Length; i++)
-			{
-				if (_grabSystemBase.PickJobHandles[i].Equals(default(JobHandle))) continue;
+			for (var i = 0; i < _grabSystemBase.PickJobHandles.Length; i++) {
+				if (_grabSystemBase.PickJobHandles[i].Equals(default)) continue;
 				_grabSystemBase.PickJobHandles[i] = default;
 			}
 
 			var cast = SystemAPI.GetSingleton<ColliderCastISingleton>();
 			var refs = _grabSystemBase.GrabRefs;
 
-			for (var i = 0; i < refs.Length; i++)
-			{
+			for (var i = 0; i < refs.Length; i++) {
 				if (!refs[i].Value.Valid) continue;
 				var entity = refs[i].Value.Target;
 				var destination = refs[i].Value.Origin;
 
-				if (cast.DeleteEntityOnClick)
-				{
+				if (cast.DeleteEntityOnClick) {
 					EntityManager.DestroyEntity(entity);
-					refs[i].Value = new GrabbableData
-					{
+					refs[i].Value = new GrabbableData {
 						Valid = false
 					};
 					continue;
 				}
 
-				if (cast.DeleteTagEntityOnClick && SystemAPI.HasComponent<DestroyIEnableableTag>(entity))
-				{
+				if (cast.DeleteTagEntityOnClick && SystemAPI.HasComponent<DestroyIEnableableTag>(entity)) {
 					SystemAPI.SetComponentEnabled<DestroyIEnableableTag>(entity, true);
-					refs[i].Value = new GrabbableData
-					{
+					refs[i].Value = new GrabbableData {
 						Valid = false
 					};
 					continue;
@@ -73,7 +63,7 @@ namespace ProjectionMapping
 				var lt = SystemAPI.GetComponent<LocalTransform>(entity);
 
 				if (mass.HasInfiniteMass ||
-				    massOverride.HasComponent(entity) && massOverride[entity].IsKinematic != 0) continue;
+				    (massOverride.HasComponent(entity) && massOverride[entity].IsKinematic != 0)) continue;
 				var worldFromBody = new Math.MTransform(lt.Rotation, lt.Position);
 
 				var bodyFromMotion = new Math.MTransform(mass.InertiaOrientation, mass.CenterOfMass);
@@ -103,7 +93,7 @@ namespace ProjectionMapping
 
 				float3x3 effectiveMassMatrix;
 				{
-					float3 arm = bodyCenterNPointWorldPos - worldFromMotion.Translation;
+					var arm = bodyCenterNPointWorldPos - worldFromMotion.Translation;
 					var skew = new float3x3(
 						new float3(0.0f, arm.z, -arm.y),
 						new float3(-arm.z, 0.0f, arm.x),
@@ -118,7 +108,7 @@ namespace ProjectionMapping
 					);
 					invInertiaWs = math.mul(invInertiaWs, math.transpose(worldFromMotion.Rotation));
 
-					float3x3 invEffMassMatrix = math.mul(math.mul(skew, invInertiaWs), skew);
+					var invEffMassMatrix = math.mul(math.mul(skew, invInertiaWs), skew);
 					invEffMassMatrix.c0 = new float3(mass.InverseMass, 0.0f, 0.0f) - invEffMassMatrix.c0;
 					invEffMassMatrix.c1 = new float3(0.0f, mass.InverseMass, 0.0f) - invEffMassMatrix.c1;
 					invEffMassMatrix.c2 = new float3(0.0f, 0.0f, mass.InverseMass) - invEffMassMatrix.c2;
@@ -131,13 +121,13 @@ namespace ProjectionMapping
 
 				// Clip the impulse
 				const float maxAcceleration = 250.0f;
-				float maxImpulse = math.rcp(mass.InverseMass) * SystemAPI.Time.DeltaTime * maxAcceleration;
-				impulse *= math.min(1.0f, math.sqrt((maxImpulse * maxImpulse) / math.lengthsq(impulse)));
+				var maxImpulse = math.rcp(mass.InverseMass) * SystemAPI.Time.DeltaTime * maxAcceleration;
+				impulse *= math.min(1.0f, math.sqrt(maxImpulse * maxImpulse / math.lengthsq(impulse)));
 				{
 					vel.Linear += impulse * mass.InverseMass;
 
-					float3 impulseLs = math.mul(math.transpose(worldFromMotion.Rotation), impulse);
-					float3 angularImpulseLs = math.cross(bodyCenterNPointLocalPos, impulseLs);
+					var impulseLs = math.mul(math.transpose(worldFromMotion.Rotation), impulse);
+					var angularImpulseLs = math.cross(bodyCenterNPointLocalPos, impulseLs);
 					vel.Angular += angularImpulseLs * mass.InverseInertia;
 				}
 
