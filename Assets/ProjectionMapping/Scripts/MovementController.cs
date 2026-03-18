@@ -6,6 +6,7 @@ using Unity.Mathematics;
 using UnityEngine;
 
 namespace ProjectionMapping {
+	
 	[DisallowMultipleComponent]
 	public class MovementController : GenericSingleton<MovementController> {
 		
@@ -14,37 +15,14 @@ namespace ProjectionMapping {
 		private EntityQuery _handSettingQuery;
 		private bool _hasHandSettings;
 
-		private World _world;
-
 		private async void Start() {
 			try {
 				await Token.AwaitableUntil(() => CameraController.Instance is not null && CameraController.Instance.IsCameraReady);
-				_world = World.DefaultGameObjectInjectionWorld;
 
-				if (_world == null) {
-					throw new Exception("World is null");
-				}
-
-				var system = _world.GetExistingSystemManaged<HandDataEventSystemBase>();
+				var system = World.GetExistingSystemManaged<HandDataEventSystemBase>();
 				system.OnScreenDeltaChanged += MoveCamera;
 
-				_handSettingQuery = _world.EntityManager.CreateEntityQuery(
-					ComponentType.ReadOnly<HandSettingISingleton>());
-
-				// Sometimes the game fails to get the singleton on first try
-				var frameCount = 0;
-				while (frameCount < 500) {
-					_hasHandSettings = _handSettingQuery.TryGetSingleton(out _handSetting);
-					Debug.Log($"Trying to get HandSettingISingleton at frame {frameCount}");
-					if (_hasHandSettings) break;
-
-					frameCount++;
-					await Awaitable.NextFrameAsync(Token);
-				}
-
-				if (!_hasHandSettings) {
-					Debug.LogError("MovementController: No HandSettingSingleton found after 500 frames");
-				}
+				_handSetting = await GetSingletonEntity<HandSettingISingleton>();
 			}
 			catch (Exception e) {
 				Debug.LogError($"MovementController: {e}");

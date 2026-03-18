@@ -17,8 +17,5 @@ namespace EugeneC.Utilities {
         public void SubOnResetGame(EventHandler sub) => OnResetGame += sub;
         public void UnsubOnResetGame(EventHandler unsub) => OnResetGame -= unsub;
         public void OnResetGameEvent() => OnResetGame?.Invoke(this, EventArgs.Empty);
-
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
-        void OnEnable() { KeepSingleton(true); }
     }
 }

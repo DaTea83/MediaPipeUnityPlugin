@@ -16,7 +16,6 @@ namespace EugeneC.Obsolete {
     [Obsolete]
     public class AsyncManager : GenericSingleton<AsyncManager> {
         // Start is called before the first frame update
-        void Start() { KeepSingleton(true); }
 
         public static async Task FadeScreenAsync(bool isFadein,
             Image fadeImage,

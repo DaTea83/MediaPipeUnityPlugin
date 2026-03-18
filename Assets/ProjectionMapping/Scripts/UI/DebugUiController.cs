@@ -11,14 +11,11 @@ namespace ProjectionMapping {
 
 		[SerializeField] private TMP_Text dataText;
 
-		private World _world;
-
 		private async void Start() {
 			try {
 				await Token.AwaitableUntil(() => CameraController.Instance is not null);
 
-				_world = World.DefaultGameObjectInjectionWorld;
-				var system = _world.GetExistingSystemManaged<HandDataEventSystemBase>();
+				var system = World.GetExistingSystemManaged<HandDataEventSystemBase>();
 				system.OnPoseChanged += OnGetHandPoses;
 				system.OnHandDataChanged += OnGetHandData;
 			}

@@ -4,7 +4,9 @@ using Unity.Transforms;
 using UnityEngine;
 
 namespace EugeneC.ECS {
+	
     public struct EntityTransformIData : IComponentData {
+	    
         public UnityObjectRef<Transform> Transform;
         public float3 Offset;
         public float SmoothFollowSpeed;

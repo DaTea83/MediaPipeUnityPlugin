@@ -8,8 +8,6 @@ using EugeneC.Singleton;
 namespace EugeneC.Obsolete {
     [Obsolete]
     public class CoroutineManager : GenericSingleton<CoroutineManager> {
-        // Start is called before the first frame update
-        void Start() { KeepSingleton(true); }
 
         public static IEnumerator FadeScreenCoroutine(bool isFadein,
             Image fadeImage,

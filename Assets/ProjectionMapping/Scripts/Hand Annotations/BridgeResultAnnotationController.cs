@@ -2,6 +2,7 @@ using Mediapipe.Tasks.Vision.HandLandmarker;
 using Mediapipe.Unity;
 
 namespace ProjectionMapping {
+	
 	public sealed class BridgeResultAnnotationController : AnnotationController<MultiPointBridgeListAnnotation> {
 		private HandLandmarkerResult _currentTarget;
 

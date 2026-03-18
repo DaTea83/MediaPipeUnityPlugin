@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using EugeneC.ECS;
 using EugeneC.Mono;
+using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
+using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.Pool;
+using BoxCollider = Unity.Physics.BoxCollider;
 
 namespace EugeneC.Singleton {
     
@@ -12,10 +17,12 @@ namespace EugeneC.Singleton {
         where TMono : MonoBehaviour{
         
         [SerializeField] protected Canvas canvasRef;
+        [SerializeField] protected bool spawnEcsCollider;
 
         protected RectTransform CanvasPos => canvasRef.transform as RectTransform;
         private List<UiHelper> _openedUi;
-        [HideInInspector] public bool isTransitioning;
+        [HideInInspector] 
+        public bool isTransitioning;
         
         public event Action OnOpenUi;
         public event Action OnCloseUi;
@@ -24,27 +31,30 @@ namespace EugeneC.Singleton {
             try {
                 await Awaitable.NextFrameAsync(Token);
                 if (canvasRef is null) throw new Exception("Canvas is not set");
-
+                CreateArchetype();
+                _uiHandleSystem = World.GetExistingSystemManaged<UiHandleSystemBase>();
+                
                 Pools = new ObjectPool<UiHelper>[poolPrefabs.Length];
                 RuntimePools = new RuntimePoolSerialize[poolPrefabs.Length];
 
-                for (var i = 0; i < Pools.Length; i++) {
+                for (byte i = 0; i < Pools.Length; i++) {
                     if (poolPrefabs[i].prefab is null) continue;
                     
-                    RuntimePools[i].spawn = new UiHelper[poolCount];
-                    var i1 = i;
+                    RuntimePools[i].spawn = new UiHelper[1];
+                    var id = i;
                     Pools[i] = InitPool(() => {
-                        var spawn = Instantiate(poolPrefabs[i1].prefab, CanvasPos);
+                        var spawn = Instantiate(poolPrefabs[id].prefab, CanvasPos);
                         spawn.OnSpawn();
-                        RuntimePools[i1].spawn[0] = spawn;
+                        spawn.SetId(id);
+                        spawn.SetAndSubSystem(_uiHandleSystem);
+                        CreateEntities(spawn.uiTransforms, id);
+                        RuntimePools[id].spawn[0] = spawn;
                         spawn.gameObject.SetActive(false);
                         return spawn;
                     });
                     
-                    for (var j = 0; j < poolCount; j++) {
-                        var spawnUi = Pools[0].Get();
-                        RuntimePools[0].spawn[j] = spawnUi;
-                    }
+                    var spawnUi = Pools[i].Get();
+                    RuntimePools[i].spawn[0] = spawnUi;
                 }
             }
             catch (Exception e) {
@@ -66,6 +76,87 @@ namespace EugeneC.Singleton {
                 print(e);
             }
         }
+
+        #region ECS
+        private EntityArchetype _archetype;
+        private UiHandleSystemBase _uiHandleSystem;
+        
+        private void CreateArchetype() {
+	        if (!spawnEcsCollider) return;
+	        
+	        _archetype = World.EntityManager.CreateArchetype(
+		        typeof(LocalTransform),
+		        typeof(PhysicsMass),
+		        typeof(PhysicsCollider),
+		        typeof(PhysicsVelocity),
+		        typeof(PhysicsGravityFactor),
+		        typeof(EntityTransformIData),
+		        typeof(UIData),
+		        typeof(UIBuffer));
+        }
+
+        private void CreateEntities(RectTransform[] uiTransforms, byte parentId) {
+	        if (!spawnEcsCollider) return;
+	        if (uiTransforms is null || uiTransforms.Length == 0) return;
+	        
+	        var manager = World.EntityManager;
+
+	        var gravity = new PhysicsGravityFactor() {
+		        Value = 0
+	        };
+
+	        var mass = new PhysicsMass() {
+		        InverseMass = 0,
+		        InverseInertia = float3.zero
+	        };
+
+	        for (var i = 0; i < uiTransforms.Length; i++) {
+		        var entity = manager.CreateEntity(_archetype);
+
+		        var rect = uiTransforms[i].rect;
+		        var lossyScale = uiTransforms[i].lossyScale;
+		        var size = new float3(
+			        rect.width * lossyScale.x,
+			        rect.height * lossyScale.y,
+			        0.1f
+		        );
+
+		        using var box = BoxCollider.Create(new BoxGeometry() {
+			        Center = float3.zero,
+			        Orientation = quaternion.identity,
+			        Size = size,
+			        BevelRadius = 0f
+		        });
+		        
+		        var col = new PhysicsCollider() {
+			        Value = box
+		        };
+		        
+		        var lt = new LocalTransform() {
+			        Position = uiTransforms[i].position,
+			        Rotation = uiTransforms[i].rotation,
+		        };
+
+		        var follow = new EntityTransformIData() {
+			        Transform = (Transform)uiTransforms[i],
+			        Offset = 0,
+			        SmoothFollowSpeed = 0
+		        };
+		        
+		        var ui = new UIData() {
+			        ParentId = parentId,
+			        OwnId = (byte)i,
+		        };
+		        
+		        manager.SetComponentData(entity, gravity);
+		        manager.SetComponentData(entity, mass);
+		        manager.SetComponentData(entity, col);
+		        manager.SetComponentData(entity, lt);
+		        manager.SetComponentData(entity, follow);
+		        manager.SetComponentData(entity, ui);
+	        }
+        }
+        #endregion
         
         public virtual async Awaitable<(UiHelper, bool)> Open(TEnum id) {
             var index = GetPoolIndex(id);

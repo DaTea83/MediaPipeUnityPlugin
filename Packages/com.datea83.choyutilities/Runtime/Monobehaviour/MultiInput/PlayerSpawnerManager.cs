@@ -12,7 +12,7 @@ namespace EugeneC.Utilities {
     public class PlayerSpawnerManager : GenericSpawnManager<PlayerSpawnerManager.PlayerTypeEnum>
 #pragma warning restore CS0612
     {
-        public enum PlayerTypeEnum {
+        public enum PlayerTypeEnum : byte {
             PlayerType1
         }
 
@@ -27,7 +27,7 @@ namespace EugeneC.Utilities {
         private Dictionary<MultiInputSystem, IControlBinder> _playerRegistry = new();
 
         private void OnEnable() {
-            KeepSingleton(true);
+	        
             InputSystem.onDeviceChange += OnDeviceChange;
             SceneManager.sceneLoaded += OnSceneLoaded;
 

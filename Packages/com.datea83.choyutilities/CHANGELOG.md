@@ -1,6 +1,23 @@
 # Changelog
 
-## [0.1.6]
+## [0.1.6] - 2026-03-18
+
+### Added
+* Added back the test folder
+* GenericSingleton, now comes with its own get ECS.World (GetWorld())
+* GenericSingleton, added GetSingletonEntity<TComponent>()
+* GenericSingleton, added regions for ECS related and Async related
+* GenericUIManager, poolCount is now ignored, spawn[] size is forced to 1, extra loop is removed
+* GenericUIManager, now add a toggle that spawn a PhysicsCollider on the UI element
+* GenericUIManager, added ECS region
+* UiHelper, added TransformRect validation
+* UiHelper, added id for tag
+* Added Entities/UI folder
+* Added UIData
+* Added UiHandleSystemBase
+
+### Removed
+* GenericSingleton, removed KeepSingleton() and all child classes that using the said method
 
 ## [0.1.5] - 2026-03-16
 

@@ -12,10 +12,12 @@ using Debug = UnityEngine.Debug;
 using Screen = Mediapipe.Unity.Screen;
 
 namespace ProjectionMapping {
+	
 	[DisallowMultipleComponent]
 	public abstract class MappingSolution<T, TU> : GenericSingleton<TU>
 		where T : BaseVisionTaskApi
 		where TU : MonoBehaviour {
+		
 		[SerializeField] private Bootstrap prefab;
 		[SerializeField] protected Screen screen;
 		private readonly Stopwatch _stopwatch = new();
@@ -28,7 +30,7 @@ namespace ProjectionMapping {
 
 		protected virtual async void Start() {
 			try {
-				KeepSingleton(true);
+				DontDestroyOnLoad(this);
 				_bootstrap = Instantiate(prefab, transform);
 				await Token.AwaitableUntil(() => _bootstrap.IsFinished);
 

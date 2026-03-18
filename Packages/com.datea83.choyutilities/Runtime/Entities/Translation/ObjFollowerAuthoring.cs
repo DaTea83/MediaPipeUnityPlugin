@@ -4,8 +4,10 @@ using Unity.Transforms;
 using UnityEngine;
 
 namespace EugeneC.ECS {
+	
     [DisallowMultipleComponent]
     public sealed class ObjFollowerAuthoring : MonoBehaviour {
+	    
         public Transform target;
         public float3 targetOffset;
         [Range(0f, 30f)] public float smoothFollowSpeed;
