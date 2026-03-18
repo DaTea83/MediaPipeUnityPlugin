@@ -8,6 +8,7 @@ using Unity.Mathematics;
 using Unity.Physics;
 
 namespace ProjectionMapping {
+	
 	[UpdateInGroup(typeof(Eu_PreTransformSystemGroup))]
 	public partial class HandGrabAnyInputSystemBase : SystemBase {
 		private const float CastMagnitude = 1000f;

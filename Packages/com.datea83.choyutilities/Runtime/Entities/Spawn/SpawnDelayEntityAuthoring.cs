@@ -36,8 +36,7 @@ namespace EugeneC.ECS
 		public Entity Prefab;
 		public float3 Offset;
 	}
-
-	[BurstCompile]
+	
 	[UpdateInGroup(typeof(Eu_InitializationSystemGroup))]
 	public partial struct SpawnDelayEntityISystem : ISystem
 	{

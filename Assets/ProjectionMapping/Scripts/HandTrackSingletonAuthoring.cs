@@ -20,29 +20,33 @@ namespace ProjectionMapping {
 
 	[DisallowMultipleComponent]
 	public sealed class HandTrackSingletonAuthoring : MonoBehaviour {
-		[Header("Threshold")] [SerializeField] [Range(0.01f, 10f)]
-		private float pinky2Thumb = 1.5f;
-
+		
+		[Header("Threshold")] 
+		[SerializeField] [Range(0.01f, 10f)] private float pinky2Thumb = 1.5f;
 		[SerializeField] [Range(0.01f, 10f)] private float wrist2Index = 1.8f,
 			wrist2Middle = 1.8f,
 			wrist2Ring = 1.8f,
 			wrist2Pinky = 1.8f,
 			thumb2Index = 1.1f;
 
-		[Space] [SerializeField] private bool useGrabAny;
-
+		[Space] 
+		[SerializeField] private bool useGrabAny;
 		[SerializeField] private bool useGesture;
 
-		[Space] [SerializeField] private EHandPose pickGesture = EHandPose.OkSign;
+		[Space] 
+		[SerializeField] private EHandPose pickGesture = EHandPose.OkSign;
 
-		[Space] [SerializeField] private EHandPose navigateHandPose = EHandPose.GunSign;
+		[Space] 
+		[SerializeField] private EHandPose navigateHandPose = EHandPose.GunSign;
 
 		[SerializeField] private ENavigationAxisType navigationAxisType = ENavigationAxisType.XY;
 		[SerializeField] private ENavigationTransformType xTransformType = ENavigationTransformType.Up;
 		[SerializeField] private ENavigationTransformType yTransformType = ENavigationTransformType.Up;
 		[SerializeField] private float2 navigationScale = new(1f, 1f);
 		[SerializeField] private float3 clampArea;
+		[Tooltip("This ignores Y delta and always move forward")]
 		[SerializeField] private bool alwaysForward;
+		[SerializeField] private bool usePhysics;
 
 		private void OnValidate() {
 			if (useGrabAny) useGesture = false;
@@ -71,7 +75,8 @@ namespace ProjectionMapping {
 					XTransformType = authoring.xTransformType,
 					YTransformType = authoring.yTransformType,
 					ClampSize = authoring.clampArea,
-					AlwaysForward = authoring.alwaysForward
+					AlwaysForward = authoring.alwaysForward,
+					UsePhysics = authoring.usePhysics,
 				});
 			}
 		}

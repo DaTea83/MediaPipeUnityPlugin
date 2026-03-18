@@ -7,11 +7,14 @@ using Unity.Mathematics;
 using Unity.Physics;
 
 namespace ProjectionMapping {
+	
 	[UpdateInGroup(typeof(Eu_PreTransformSystemGroup))]
 	public partial class HandGestureSystemGroup : ComponentSystemGroup { }
 
 	[UpdateInGroup(typeof(HandGestureSystemGroup), OrderFirst = true)]
 	public partial class HandGestureInteractSystemBase : SystemBase {
+		
+		private static readonly float2 ScreenSize = new(1600f, 1200f);
 		private const float CastMagnitude = 1000f;
 
 		public NativeReference<GestureData> LeftDataRef = new(Allocator.Persistent);
@@ -24,6 +27,7 @@ namespace ProjectionMapping {
 			RequireForUpdate<PhysicsWorldSingleton>();
 			RequireForUpdate<HandSettingISingleton>();
 			RequireForUpdate<HandPoseISingleton>();
+			RequireForUpdate<HandScreenISingleton>();
 		}
 
 		protected override void OnUpdate() {
@@ -31,6 +35,7 @@ namespace ProjectionMapping {
 
 			var settings = SystemAPI.GetSingleton<HandSettingISingleton>();
 			var pose = SystemAPI.GetSingleton<HandPoseISingleton>();
+			var screen = SystemAPI.GetSingleton<HandScreenISingleton>();
 
 			var physicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().PhysicsWorld;
 			var cast = SystemAPI.GetSingleton<ColliderCastISingleton>();

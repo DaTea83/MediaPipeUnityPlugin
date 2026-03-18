@@ -27,6 +27,7 @@ namespace ProjectionMapping {
 		public bool UseGesture;
 		public bool UseGrabAny;
 		public bool AlwaysForward;
+		public bool UsePhysics;
 	}
 
 	public struct HandPoseISingleton : IComponentData {

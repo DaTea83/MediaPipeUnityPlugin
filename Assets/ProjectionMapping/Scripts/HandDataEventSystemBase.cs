@@ -32,6 +32,7 @@ namespace ProjectionMapping {
 			OnHandDataChanged?.Invoke(tracking.LeftHand, tracking.RightHand);
 
 			if (settings.NavigateGesture == EHandPose.None) return;
+			if (settings.UsePhysics) return;
 			if (pose.LeftCurrentHandPose == settings.NavigateGesture ||
 			    pose.RightCurrentHandPose == settings.NavigateGesture)
 				OnScreenDeltaChanged?.Invoke(screen.LeftDeltaPosition, screen.RightDeltaPosition);

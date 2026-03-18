@@ -8,6 +8,7 @@ using UnityEngine;
 namespace ProjectionMapping {
 	[DisallowMultipleComponent]
 	public class MovementController : GenericSingleton<MovementController> {
+		
 		[SerializeField] private Transform cameraTransform;
 		private HandSettingISingleton _handSetting;
 		private EntityQuery _handSettingQuery;
@@ -17,18 +18,36 @@ namespace ProjectionMapping {
 
 		private async void Start() {
 			try {
-				await Awaitable.EndOfFrameAsync(Token);
+				await Token.AwaitableUntil(() => CameraController.Instance is not null && CameraController.Instance.IsCameraReady);
 				_world = World.DefaultGameObjectInjectionWorld;
+
+				if (_world == null) {
+					throw new Exception("World is null");
+				}
 
 				var system = _world.GetExistingSystemManaged<HandDataEventSystemBase>();
 				system.OnScreenDeltaChanged += MoveCamera;
 
 				_handSettingQuery = _world.EntityManager.CreateEntityQuery(
 					ComponentType.ReadOnly<HandSettingISingleton>());
-				_hasHandSettings = _handSettingQuery.TryGetSingleton(out _handSetting);
+
+				// Sometimes the game fails to get the singleton on first try
+				var frameCount = 0;
+				while (frameCount < 500) {
+					_hasHandSettings = _handSettingQuery.TryGetSingleton(out _handSetting);
+					Debug.Log($"Trying to get HandSettingISingleton at frame {frameCount}");
+					if (_hasHandSettings) break;
+
+					frameCount++;
+					await Awaitable.NextFrameAsync(Token);
+				}
+
+				if (!_hasHandSettings) {
+					Debug.LogError("MovementController: No HandSettingSingleton found after 500 frames");
+				}
 			}
 			catch (Exception e) {
-				Debug.Log(e);
+				Debug.LogError($"MovementController: {e}");
 			}
 		}
 
@@ -46,18 +65,28 @@ namespace ProjectionMapping {
 			var rotation = cameraTransform.eulerAngles;
 			var startPos = cameraTransform.transform.position;
 
+			if (_handSetting.AlwaysForward) {
+				var target = startPos + _handSetting.NavigationScale.y * cameraTransform.forward;
+				var clamp = _handSetting.ClampSize;
+				target = clamp is { x: <= 0, y: <= 0, z: <= 0 }
+					? target
+					: math.clamp(target, clamp, clamp);
+
+				cameraTransform.position = math.lerp(
+					startPos, target, Time.deltaTime.SmoothFactor());
+			}
+			
 			var absX = math.abs(scale.x);
 			var absY = math.abs(scale.y);
 
-			if ((int)absX == (int)absY) return;
-
-			var useX = absX > absY;
-			var input = useX ? scale.x : scale.y;
+			var useX = (absX > absY) || _handSetting.AlwaysForward;
+			var input = useX? scale.x : scale.y;
 			var inputScale = useX ? _handSetting.NavigationScale.x : _handSetting.NavigationScale.y;
 			var transformType = useX ? _handSetting.XTransformType : _handSetting.YTransformType;
 			var rotateScale = useX ? _handSetting.NavigationScale.x : _handSetting.NavigationScale.y;
-
+			
 			if (math.abs(input) <= 0.2f) return;
+			if ((int)absX == (int)absY) return;
 
 			switch (transformType) {
 				case ENavigationTransformType.Up:
@@ -99,7 +128,7 @@ namespace ProjectionMapping {
 				var clamp = _handSetting.ClampSize;
 				target = clamp is { x: <= 0, y: <= 0, z: <= 0 }
 					? target
-					: math.clamp(target, -clamp, clamp);
+					: math.clamp(target, clamp, clamp);
 
 				cameraTransform.position = math.lerp(
 					startPos, target, Time.deltaTime.SmoothFactor());

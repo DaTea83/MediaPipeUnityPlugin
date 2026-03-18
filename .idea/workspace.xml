@@ -10,9 +10,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="420d2e07-03eb-4171-90eb-daf9fbfef505" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/Settings/DefaultVolumeProfile.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/DefaultVolumeProfile.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/com.datea83.choyutilities/Editor/FolderColor/SaveSetUp/FolderModificationData.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/com.datea83.choyutilities/Editor/FolderColor/SaveSetUp/FolderModificationData.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/com.datea83.choyutilities/Resources/Materials/M_Lit_Scratch.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/com.datea83.choyutilities/Resources/Materials/M_Lit_Scratch.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MediaPipeUnity/Samples/Scenes/AppSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MediaPipeUnity/Samples/Scenes/AppSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ProjectionMapping/Scripts/GestureBased/HandGestureInteractSystemBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ProjectionMapping/Scripts/GestureBased/HandGestureInteractSystemBase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ProjectionMapping/Scripts/GrabAny/HandGrabAnyInputSystemBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ProjectionMapping/Scripts/GrabAny/HandGrabAnyInputSystemBase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ProjectionMapping/Scripts/HandDataEventSystemBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ProjectionMapping/Scripts/HandDataEventSystemBase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ProjectionMapping/Scripts/HandPointIData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ProjectionMapping/Scripts/HandPointIData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ProjectionMapping/Scripts/HandTrackSingletonAuthoring.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ProjectionMapping/Scripts/HandTrackSingletonAuthoring.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ProjectionMapping/Scripts/MovementController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ProjectionMapping/Scripts/MovementController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/SceneDependencyCache/a4bbe074b04c7f1c0554fe89ad5fed75.sceneWithBuildSettings" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/SceneDependencyCache/a4bbe074b04c7f1c0554fe89ad5fed75.sceneWithBuildSettings" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Settings/High_PipelineAsset.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/High_PipelineAsset.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/com.datea83.choyutilities/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/com.datea83.choyutilities/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/com.datea83.choyutilities/Runtime/Entities/Spawn/SpawnDelayEntityAuthoring.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/com.datea83.choyutilities/Runtime/Entities/Spawn/SpawnDelayEntityAuthoring.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/com.datea83.choyutilities/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/com.datea83.choyutilities/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/QualitySettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/QualitySettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,23 +51,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feature/ECS-Support&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.RadMigrateCodeStyle": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "feature/ECS-Support",
+    "ignore.virus.scanning.warn.message": "true",
+    "javascript.preferred.runtime.type.id": "node",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
+  <component name="RecapUselessUpdatesCounter">
+    <option name="suspendCountdown" value="9" />
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -70,6 +89,7 @@
       <updated>1772764650907</updated>
       <workItem from="1772764653370" duration="29000" />
       <workItem from="1773391779835" duration="24000" />
+      <workItem from="1773796839656" duration="126000" />
     </task>
     <servers />
   </component>
