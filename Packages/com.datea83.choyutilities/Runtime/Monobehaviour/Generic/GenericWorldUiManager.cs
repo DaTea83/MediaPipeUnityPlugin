@@ -12,7 +12,7 @@ using BoxCollider = Unity.Physics.BoxCollider;
 
 namespace EugeneC.Singleton {
     
-    public abstract class GenericUiManager<TEnum, TMono> : GenericPoolingManager<TEnum, UiHelper, TMono> 
+    public abstract class GenericWorldUiManager<TEnum, TMono> : GenericPoolingManager<TEnum, UiHelper, TMono> 
         where TEnum : Enum
         where TMono : MonoBehaviour{
         

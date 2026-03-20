@@ -1,0 +1,10 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Test_USS.uss?fileID=7433441132597879392&amp;guid=3be1e34c5e9c7144f8daaeeb10f2c36d&amp;type=3#Test_USS" />
+    <ui:VisualElement name="Panel" data-source-type="EugeneC.Utilities.AgentScriptable, EugeneC" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+        <ui:VisualElement name="Me" style="flex-grow: 1; position: absolute; height: 412px; width: 707px; top: 52px; left: 23px;">
+            <ui:Button text="Button" class="container" style="position: absolute; top: 52px; left: 23px; height: 148px; width: 381px;" />
+            <ui:Label text="Label" class="container" />
+            <ui:Scroller high-value="100" direction="Horizontal" value="42" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

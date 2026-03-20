@@ -17,7 +17,7 @@ namespace ProjectionMapping {
 
 		private async void Start() {
 			try {
-				await Token.AwaitableUntil(() => CameraController.Instance is not null && CameraController.Instance.IsCameraReady);
+				await Awaitable.NextFrameAsync(Token);
 
 				var system = World.GetExistingSystemManaged<HandDataEventSystemBase>();
 				system.OnScreenDeltaChanged += MoveCamera;

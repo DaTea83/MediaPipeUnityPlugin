@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.1.7] - 2026-03-20
+
+After testing I noticed that the GenericUIManager goes against on how UI was setup,
+
+and the discovery of UI toolkit changes how overlay UI are setuped.
+
+Any overlay UI from now on will gonna use the new UI Toolkit and world space canvas will be handled by GenericUIManager.
+
+### Added
+* Added GenericOverlayUIManager
+* Added InitialDestroyFollowerISystem, this adds DestroyIEnableableTag to all EntityTransformIData
+* EnumCollection, added EVisualElements
+* UiCollection, added GetVisualElement()
+
+### Changed
+* GenericUIManager changed name to GenericWorldUIManager
+* EntityFollowerISystem, Entities with EntityTransformIData will now be destroyed when the game object is null
+
+### Removed
+* Removed GenericEventManager
+* CameraController, removed IsCameraReady and RunFadeScreen()
+* CameraController, removed blackScreenImg and initialFadeOutTime
+
 ## [0.1.6] - 2026-03-18
 
 ### Added
