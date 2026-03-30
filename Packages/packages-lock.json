@@ -23,6 +23,20 @@
         "com.unity.localization": "1.5.9"
       }
     },
+    "com.datea83.mediapipefordots": {
+      "version": "file:com.datea83.mediapipefordots",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.test-framework": "1.6.0",
+        "com.unity.burst": "1.8.27",
+        "com.unity.collections": "2.6.5",
+        "com.unity.mathematics": "1.3.2",
+        "com.unity.entities": "1.4.5",
+        "com.unity.entities.graphics": "1.4.18",
+        "com.datea83.choyutilities": "0.1.8"
+      }
+    },
     "com.github.homuler.mediapipe": {
       "version": "file:com.github.homuler.mediapipe",
       "depth": 0,

@@ -1,0 +1,14 @@
+{
+  "name": "Datea83.Mediapipefordots.Editor.Tests",
+  "references": [
+    "Datea83.Mediapipefordots.Editor",
+    "Datea83.Mediapipefordots"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": []
+}
