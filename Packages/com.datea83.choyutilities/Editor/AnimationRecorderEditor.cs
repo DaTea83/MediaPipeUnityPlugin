@@ -2,54 +2,52 @@
 using EugeneC.Utilities;
 using UnityEditor.Animations;
 using UnityEngine;
+
 // ReSharper disable CheckNamespace
 // ReSharper disable Unity.PerformanceCriticalCodeInvocation
 
-namespace EugeneC.Editor
-{
-	[AddComponentMenu("Eugene/Animation Recorder")]
-	[RequireComponent(typeof(Animator))]
-	public class AnimationRecorderEditor : MonoBehaviour
-	{
-		[SerializeField] private AnimationClip animationClip;
-		[SerializeField] private float duration = 1.0f;
+namespace EugeneC.Editor {
 
-		[Header("Fire Event")] 
-		[SerializeField] private string className;
-		[SerializeField] private string methodName;
+    [AddComponentMenu("Eugene/Animation Recorder")]
+    [RequireComponent(typeof(Animator))]
+    public class AnimationRecorderEditor : MonoBehaviour {
 
-		private float _timer;
-		private bool _canRecord;
-		private GameObjectRecorder _recorder;
+        [SerializeField] private AnimationClip animationClip;
+        [SerializeField] private float duration = 1.0f;
 
-		// Start is called once before the first execution of Update after the MonoBehaviour is created
-		private void Start()
-		{
-			_recorder = new GameObjectRecorder(gameObject);
-			_recorder.BindComponentsOfType<Transform>(gameObject, true);
+        [Header("Fire Event")] [SerializeField]
+        private string className;
 
-			_timer = duration;
-		}
+        [SerializeField] private string methodName;
+        private bool _canRecord;
+        private GameObjectRecorder _recorder;
 
-		private void LateUpdate()
-		{
-			if (_canRecord)
-				RecordAnimation();
-		}
+        private float _timer;
 
-		private void OnGUI()
-		{
-			if (!GUI.Button(new Rect(0, 0, 200, 40), "Start Record")) return;
-			if (_canRecord) return;
-			UtilityMethods.CallGenericInstanceMethod(className, methodName);
-			_canRecord = true;
-		}
+        // Start is called once before the first execution of Update after the MonoBehaviour is created
+        private void Start() {
+            _recorder = new GameObjectRecorder(gameObject);
+            _recorder.BindComponentsOfType<Transform>(gameObject, true);
 
-		private void RecordAnimation()
-		{
-			_timer -= Time.unscaledDeltaTime;
-			if (_timer < 0)
-            {
+            _timer = duration;
+        }
+
+        private void LateUpdate() {
+            if (_canRecord)
+                RecordAnimation();
+        }
+
+        private void OnGUI() {
+            if (!GUI.Button(new Rect(0, 0, 200, 40), "Start Record")) return;
+            if (_canRecord) return;
+            UtilityMethods.CallGenericInstanceMethod(className, methodName);
+            _canRecord = true;
+        }
+
+        private void RecordAnimation() {
+            _timer -= Time.unscaledDeltaTime;
+
+            if (_timer < 0) {
                 if (!_recorder.isRecording) return;
                 _recorder.SaveToClip(animationClip);
                 print("End Recording");
@@ -57,11 +55,12 @@ namespace EugeneC.Editor
                 _canRecord = false;
                 _timer = duration;
             }
-			else
-			{
-				_recorder.TakeSnapshot(Time.unscaledDeltaTime);
-			}
-		}
-	}
+            else {
+                _recorder.TakeSnapshot(Time.unscaledDeltaTime);
+            }
+        }
+
+    }
+
 }
 #endif

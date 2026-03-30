@@ -4,94 +4,88 @@ using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
-using Unity.Mathematics;
 
-namespace EugeneC.Utilities
-{
-	public class ActivateWebcam : MonoBehaviour
-	{
-		[SerializeField] private RawImage screen;
-		[SerializeField] private int width = 1280;
-		[SerializeField] private int height = 720;
-		[SerializeField] private int fps = 30;
-		[Space]
-		[CanBeNull, SerializeField] private TMP_Dropdown dropdown;
+namespace EugeneC.Utilities {
 
-		private WebCamTexture _webCamTexture;
-		private readonly CancellationTokenSource _tokenSource = new();
+    public class ActivateWebcam : MonoBehaviour {
 
-		private List<WebCamDevice> _devices = new();
-		private int _switchVersion;
+        [SerializeField] private RawImage screen;
+        [SerializeField] private int width = 1280;
+        [SerializeField] private int height = 720;
+        [SerializeField] private int fps = 30;
+        [Space] [CanBeNull] [SerializeField] private TMP_Dropdown dropdown;
+        private readonly CancellationTokenSource _tokenSource = new();
 
-		private async void Start()
-		{
-			try
-			{
-				_devices = new List<WebCamDevice>(WebCamTexture.devices);
+        private List<WebCamDevice> _devices = new();
+        private int _switchVersion;
 
-				if (_devices.Count == 0)
-				{
-					throw new Exception("Web Camera devices are not found");
-				}
+        private WebCamTexture _webCamTexture;
 
-				InitializeDropdown(_devices);
+        private async void Start() {
+            try {
+                _devices = new List<WebCamDevice>(WebCamTexture.devices);
 
-				var initialIndex = math.clamp(dropdown?.value ?? 0, 0, _devices.Count - 1);
-				await SwitchToDevice(initialIndex);
-			}
-			catch (Exception e) { print(e); }
-		}
+                if (_devices.Count == 0) throw new Exception("Web Camera devices are not found");
 
-		private void InitializeDropdown(IReadOnlyList<WebCamDevice> devices)
-		{
-			if (dropdown is null) return;
+                InitializeDropdown(_devices);
 
-			dropdown.onValueChanged.RemoveListener(OnDropdownValueChanged);
-			dropdown.ClearOptions();
+                var initialIndex = math.clamp(dropdown?.value ?? 0, 0, _devices.Count - 1);
+                await SwitchToDevice(initialIndex);
+            }
+            catch (Exception e) {
+                print(e);
+            }
+        }
 
-			var options = new List<string>(devices.Count);
-			options.AddRange(devices.Select(t => t.name));
+        private void OnDestroy() {
+            dropdown?.onValueChanged.RemoveListener(OnDropdownValueChanged);
 
-			dropdown.AddOptions(options);
-			dropdown.value = math.clamp(dropdown.value, 0, devices.Count - 1);
-			dropdown.RefreshShownValue();
-			dropdown.onValueChanged.AddListener(OnDropdownValueChanged);
-		}
+            _webCamTexture?.Stop();
+            _tokenSource.Cancel();
+        }
 
-		private void OnDropdownValueChanged(int index)
-		{
-			if (index < 0 || index >= _devices.Count) return;
+        private void InitializeDropdown(IReadOnlyList<WebCamDevice> devices) {
+            if (dropdown is null) return;
 
-			_ = SwitchToDevice(index);
-		}
+            dropdown.onValueChanged.RemoveListener(OnDropdownValueChanged);
+            dropdown.ClearOptions();
 
-		private async Awaitable SwitchToDevice(int index)
-		{
-			var myVersion = ++_switchVersion;
+            var options = new List<string>(devices.Count);
+            options.AddRange(devices.Select(t => t.name));
 
-			_webCamTexture?.Stop();
+            dropdown.AddOptions(options);
+            dropdown.value = math.clamp(dropdown.value, 0, devices.Count - 1);
+            dropdown.RefreshShownValue();
+            dropdown.onValueChanged.AddListener(OnDropdownValueChanged);
+        }
 
-			var webCamDevice = _devices[index];
-			_webCamTexture = new WebCamTexture(webCamDevice.name, width, height, fps);
-			_webCamTexture.Play();
+        private void OnDropdownValueChanged(int index) {
+            if (index < 0 || index >= _devices.Count) return;
 
-			await _tokenSource.Token.AwaitableUntil(() => _webCamTexture is not null && _webCamTexture.width > 16);
+            _ = SwitchToDevice(index);
+        }
 
-			if (_tokenSource.IsCancellationRequested) return;
-			if (myVersion != _switchVersion) return;
+        private async Awaitable SwitchToDevice(int index) {
+            var myVersion = ++_switchVersion;
 
-			screen.rectTransform.sizeDelta = new float2(width, height);
-			screen.texture = _webCamTexture;
-		}
+            _webCamTexture?.Stop();
 
-		private void OnDestroy()
-		{
-			dropdown?.onValueChanged.RemoveListener(OnDropdownValueChanged);
+            var webCamDevice = _devices[index];
+            _webCamTexture = new WebCamTexture(webCamDevice.name, width, height, fps);
+            _webCamTexture.Play();
 
-			_webCamTexture?.Stop();
-			_tokenSource.Cancel();
-		}
-	}
+            await _tokenSource.Token.AwaitableUntil(() => _webCamTexture is not null && _webCamTexture.width > 16);
+
+            if (_tokenSource.IsCancellationRequested) return;
+            if (myVersion != _switchVersion) return;
+
+            screen.rectTransform.sizeDelta = new float2(width, height);
+            screen.texture = _webCamTexture;
+        }
+
+    }
+
 }

@@ -7,331 +7,318 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EugeneC.Utilities
-{
-	[AddComponentMenu("Eugene/Microphone Recorder")]
-	public sealed class MicrophoneRecorder : MonoBehaviour
-	{
-		public MicrophoneAttributes settings;
-		public float chunksLengthSec = 0.5f;
-		public bool replay;
+namespace EugeneC.Utilities {
 
-		public bool useVad = true;
-		public float vadUpdateRateSec = 0.1f;
-		public float vadContextSec = 30f;
-		public float vadLastSec = 1.25f;
-		public float vadThd = 1.0f;
-		public float vadFreqThd = 100.0f;
-		[CanBeNull] public Image vadIndicatorImage;
+    [AddComponentMenu("Eugene/Microphone Recorder")]
+    public sealed class MicrophoneRecorder : MonoBehaviour {
 
-		public bool vadStop;
-		public bool dropVadPart = true;
-		public float vadStopTime = 3f;
+        public MicrophoneAttributes settings;
+        public float chunksLengthSec = 0.5f;
+        public bool replay;
 
-		[CanBeNull] public TMP_Dropdown microphoneDropdown;
-		public string microphoneDefaultLabel = "Default microphone";
+        public bool useVad = true;
+        public float vadUpdateRateSec = 0.1f;
+        public float vadContextSec = 30f;
+        public float vadLastSec = 1.25f;
+        public float vadThd = 1.0f;
+        public float vadFreqThd = 100.0f;
+        [CanBeNull] public Image vadIndicatorImage;
 
-		public event Action<bool> OnVadChanged;
-		public event Action<AudioChunk> OnChunkReady;
-		public event Action<AudioChunk> OnRecordStop;
+        public bool vadStop;
+        public bool dropVadPart = true;
+        public float vadStopTime = 3f;
 
-		private int _lastVadPos;
-		private AudioClip _clip;
-		private float _length;
-		private int _lastChunkPos;
-		private int _chunksLength;
-		private float? _vadStopBegin;
-		private int _latestMicPos;
-		private bool _madeLoopLap;
+        [CanBeNull] public TMP_Dropdown microphoneDropdown;
+        public string microphoneDefaultLabel = "Default microphone";
+        private int _chunksLength;
+        private AudioClip _clip;
+        private int _lastChunkPos;
 
-		private string _selectedMicDevice;
+        private int _lastVadPos;
+        private int _latestMicPos;
+        private float _length;
+        private bool _madeLoopLap;
 
-		public string SelectedMicDevice
-		{
-			get => _selectedMicDevice;
-			set
-			{
-				if (value != null && !AvailableMicDevices.Contains(value))
-					throw new ArgumentException("Microphone device not found");
-				_selectedMicDevice = value;
-			}
-		}
+        private string _selectedMicDevice;
+        private float? _vadStopBegin;
 
-		public int ClipSamples => _clip.samples * _clip.channels;
+        public string SelectedMicDevice {
+            get => _selectedMicDevice;
+            set {
+                if (value != null && !AvailableMicDevices.Contains(value))
+                    throw new ArgumentException("Microphone device not found");
+                _selectedMicDevice = value;
+            }
+        }
 
-		public string RecordStartMicDevice { get; private set; }
-		public bool IsRecording { get; private set; }
-		public bool IsVoiceDetected { get; private set; }
+        public int ClipSamples => _clip.samples * _clip.channels;
 
-		public IEnumerable<string> AvailableMicDevices => Microphone.devices;
+        public string RecordStartMicDevice { get; private set; }
+        public bool IsRecording { get; private set; }
+        public bool IsVoiceDetected { get; private set; }
 
-		private void Start()
-		{
-			if (microphoneDropdown is null) return;
+        public IEnumerable<string> AvailableMicDevices => Microphone.devices;
 
-			microphoneDropdown.options = AvailableMicDevices
-				.Prepend(microphoneDefaultLabel)
-				.Select(text => new TMP_Dropdown.OptionData(text))
-				.ToList();
+        private void Start() {
+            if (microphoneDropdown is null) return;
 
-			microphoneDropdown.value = microphoneDropdown.options
-				.FindIndex(op => op.text == microphoneDefaultLabel);
+            microphoneDropdown.options = AvailableMicDevices
+                .Prepend(microphoneDefaultLabel)
+                .Select(text => new TMP_Dropdown.OptionData(text))
+                .ToList();
 
-			microphoneDropdown.onValueChanged.AddListener((i) =>
-			{
-				if (microphoneDropdown is null) return;
-				var opt = microphoneDropdown.options[i];
-				SelectedMicDevice = opt.text == microphoneDefaultLabel ? null : opt.text;
-			});
-		}
+            microphoneDropdown.value = microphoneDropdown.options
+                .FindIndex(op => op.text == microphoneDefaultLabel);
 
-		private void Update()
-		{
-			if (!IsRecording) return;
+            microphoneDropdown.onValueChanged.AddListener(i => {
+                if (microphoneDropdown is null) return;
+                var opt = microphoneDropdown.options[i];
+                SelectedMicDevice = opt.text == microphoneDefaultLabel ? null : opt.text;
+            });
+        }
 
-			//micPos, aka sample frames (sample rate * duration), increases during recording
-			//when it reaches the end of the buffer, it starts from the beginning again
-			//hence the condition is true
-			var micPos = Microphone.GetPosition(RecordStartMicDevice);
-			if (micPos < _latestMicPos)
-			{
-				//Announce that we made a full clip loop
-				_madeLoopLap = true;
-				if (!settings.loop)
-				{
+        private void Update() {
+            if (!IsRecording) return;
+
+            //micPos, aka sample frames (sample rate * duration), increases during recording
+            //when it reaches the end of the buffer, it starts from the beginning again
+            //hence the condition is true
+            var micPos = Microphone.GetPosition(RecordStartMicDevice);
+
+            if (micPos < _latestMicPos) {
+                //Announce that we made a full clip loop
+                _madeLoopLap = true;
+
+                if (!settings.loop) {
 #if UNITY_EDITOR
-					Debug.Log($"Stopping recording, mic pos returned back to {micPos}");
+                    Debug.Log($"Stopping recording, mic pos returned back to {micPos}");
 #endif
-					StopRecording();
-					return;
-				}
+                    StopRecording();
+
+                    return;
+                }
 
 #if UNITY_EDITOR
-				Debug.Log($"Mic made a new loop lap, continue recording.");
+                Debug.Log("Mic made a new loop lap, continue recording.");
 #endif
-			}
+            }
 
-			_latestMicPos = micPos;
+            _latestMicPos = micPos;
 
-			UpdateChunks(micPos);
-			UpdateVad(micPos);
-		}
+            UpdateChunks(micPos);
+            UpdateVad(micPos);
+        }
 
-		private void UpdateChunks(int micPos)
-		{
-			if (OnChunkReady is null) return;
-			// check if chunks length is valid
-			if (_chunksLength <= 0) return;
+        public event Action<bool> OnVadChanged;
+        public event Action<AudioChunk> OnChunkReady;
+        public event Action<AudioChunk> OnRecordStop;
 
-			// get current chunk length
-			var chunk = GetMicPosDist(_lastChunkPos, micPos);
+        private void UpdateChunks(int micPos) {
+            if (OnChunkReady is null) return;
 
-			// send new chunks while there has valid size
-			while (chunk > _chunksLength)
-			{
-				var origData = new float[_chunksLength];
-				_clip.GetData(origData, _lastChunkPos);
+            // check if chunks length is valid
+            if (_chunksLength <= 0) return;
 
-				var chunkStruct = new AudioChunk()
-				{
-					Data = origData,
-					Frequency = _clip.frequency,
-					Channels = _clip.channels,
-					Length = chunksLengthSec,
-					IsVoiceDetected = IsVoiceDetected
-				};
-				OnChunkReady(chunkStruct);
+            // get current chunk length
+            var chunk = GetMicPosDist(_lastChunkPos, micPos);
 
-				_lastChunkPos = (_lastChunkPos + _chunksLength) % ClipSamples;
-				chunk = GetMicPosDist(_lastChunkPos, micPos);
-			}
-		}
+            // send new chunks while there has valid size
+            while (chunk > _chunksLength) {
+                var origData = new float[_chunksLength];
+                _clip.GetData(origData, _lastChunkPos);
 
-		private void UpdateVad(int micPos)
-		{
-			if (!useVad) return;
+                var chunkStruct = new AudioChunk {
+                    Data = origData,
+                    Frequency = _clip.frequency,
+                    Channels = _clip.channels,
+                    Length = chunksLengthSec,
+                    IsVoiceDetected = IsVoiceDetected
+                };
+                OnChunkReady(chunkStruct);
 
-			// get current recorded clip length
-			var samplesCount = GetMicBufferLength(micPos);
-			if (samplesCount <= 0) return;
+                _lastChunkPos = (_lastChunkPos + _chunksLength) % ClipSamples;
+                chunk = GetMicPosDist(_lastChunkPos, micPos);
+            }
+        }
 
-			// check if it's time to update
-			var vadUpdateRateSamples = vadUpdateRateSec * _clip.frequency;
-			var dt = GetMicPosDist(_lastVadPos, micPos);
-			if (dt < vadUpdateRateSamples) return;
-			_lastVadPos = samplesCount;
+        private void UpdateVad(int micPos) {
+            if (!useVad) return;
 
-			// try to get sample for voice detection
-			var data = GetMicBufferLast(micPos, vadContextSec);
-			var vad = MicrophoneCollections.SimpleVad(data, _clip.frequency, vadLastSec, vadThd, vadFreqThd);
+            // get current recorded clip length
+            var samplesCount = GetMicBufferLength(micPos);
 
-			// raise event if vad has changed
-			if (vad != IsVoiceDetected)
-			{
-				_vadStopBegin = !vad ? Time.realtimeSinceStartup : null;
-				IsVoiceDetected = vad;
-				OnVadChanged?.Invoke(vad);
-			}
+            if (samplesCount <= 0) return;
 
-			// update vad indicator
-			if (vadIndicatorImage)
-			{
-				var color = vad ? Color.green : Color.red;
-				vadIndicatorImage.color = color;
-			}
+            // check if it's time to update
+            var vadUpdateRateSamples = vadUpdateRateSec * _clip.frequency;
+            var dt = GetMicPosDist(_lastVadPos, micPos);
 
-			UpdateVadStop();
-		}
+            if (dt < vadUpdateRateSamples) return;
+            _lastVadPos = samplesCount;
 
-		private float[] GetMicBufferLast(int mPos, float lastSec)
-		{
-			var len = GetMicBufferLength(mPos);
-			if (len == 0)
-				return Array.Empty<float>();
+            // try to get sample for voice detection
+            var data = GetMicBufferLast(micPos, vadContextSec);
+            var vad = MicrophoneCollections.SimpleVad(data, _clip.frequency, vadLastSec, vadThd, vadFreqThd);
 
-			var lastSamples = (int)(_clip.frequency * lastSec);
-			var dataLength = math.min(lastSamples, len);
-			var offset = mPos - dataLength;
-			if (offset < 0) offset = len + offset;
+            // raise event if vad has changed
+            if (vad != IsVoiceDetected) {
+                _vadStopBegin = !vad ? Time.realtimeSinceStartup : null;
+                IsVoiceDetected = vad;
+                OnVadChanged?.Invoke(vad);
+            }
 
-			var d = new float[dataLength];
-			_clip.GetData(d, offset);
-			return d;
-		}
+            // update vad indicator
+            if (vadIndicatorImage) {
+                var color = vad ? Color.green : Color.red;
+                vadIndicatorImage.color = color;
+            }
 
-		private void UpdateVadStop()
-		{
-			if (!vadStop || _vadStopBegin == null) return;
-			var passedTime = Time.realtimeSinceStartup - _vadStopBegin;
+            UpdateVadStop();
+        }
 
-			if (!(passedTime > vadStopTime)) return;
-			var dropTime = dropVadPart ? vadStopTime : 0f;
-			StopRecording(dropTime);
-		}
+        private float[] GetMicBufferLast(int mPos, float lastSec) {
+            var len = GetMicBufferLength(mPos);
 
-		public void StartRecording()
-		{
-			if (IsRecording) return;
+            if (len == 0)
+                return Array.Empty<float>();
 
-			RecordStartMicDevice = SelectedMicDevice;
-			_clip = Microphone.Start(RecordStartMicDevice, settings.loop, settings.recMaxLength, settings.frequency);
-			IsRecording = true;
+            var lastSamples = (int)(_clip.frequency * lastSec);
+            var dataLength = math.min(lastSamples, len);
+            var offset = mPos - dataLength;
+            if (offset < 0) offset = len + offset;
 
-			_latestMicPos = 0;
-			_madeLoopLap = false;
-			_lastChunkPos = 0;
-			_lastVadPos = 0;
-			_vadStopBegin = null;
-			_chunksLength = (int)(_clip.frequency * _clip.channels * chunksLengthSec);
-		}
+            var d = new float[dataLength];
+            _clip.GetData(d, offset);
 
-		public void StopRecording(float dropTimeSec = 0f)
-		{
-			if (!IsRecording)
-				return;
+            return d;
+        }
 
-			// get all data from mic audio clip
-			var data = GetMicBuffer(dropTimeSec);
-			var finalAudio = new AudioChunk()
-			{
-				Data = data,
-				Channels = _clip.channels,
-				Frequency = _clip.frequency,
-				IsVoiceDetected = IsVoiceDetected,
-				Length = (float)data.Length / (_clip.frequency * _clip.channels)
-			};
+        private void UpdateVadStop() {
+            if (!vadStop || _vadStopBegin == null) return;
+            var passedTime = Time.realtimeSinceStartup - _vadStopBegin;
 
-			// play echo sound
-			if (replay)
-			{
-				var echoClip = AudioClip.Create("echo", data.Length,
-					_clip.channels, _clip.frequency, false);
-				echoClip.SetData(data, 0);
-				PlayClip(echoClip);
-			}
+            if (!(passedTime > vadStopTime)) return;
+            var dropTime = dropVadPart ? vadStopTime : 0f;
+            StopRecording(dropTime);
+        }
 
-			// stop mic audio recording
-			Microphone.End(RecordStartMicDevice);
-			IsRecording = false;
-			Destroy(_clip);
+        public void StartRecording() {
+            if (IsRecording) return;
+
+            RecordStartMicDevice = SelectedMicDevice;
+            _clip = Microphone.Start(RecordStartMicDevice, settings.loop, settings.recMaxLength, settings.frequency);
+            IsRecording = true;
+
+            _latestMicPos = 0;
+            _madeLoopLap = false;
+            _lastChunkPos = 0;
+            _lastVadPos = 0;
+            _vadStopBegin = null;
+            _chunksLength = (int)(_clip.frequency * _clip.channels * chunksLengthSec);
+        }
+
+        public void StopRecording(float dropTimeSec = 0f) {
+            if (!IsRecording)
+                return;
+
+            // get all data from mic audio clip
+            var data = GetMicBuffer(dropTimeSec);
+
+            var finalAudio = new AudioChunk {
+                Data = data,
+                Channels = _clip.channels,
+                Frequency = _clip.frequency,
+                IsVoiceDetected = IsVoiceDetected,
+                Length = (float)data.Length / (_clip.frequency * _clip.channels)
+            };
+
+            // play echo sound
+            if (replay) {
+                var echoClip = AudioClip.Create("echo", data.Length,
+                    _clip.channels, _clip.frequency, false);
+                echoClip.SetData(data, 0);
+                PlayClip(echoClip);
+            }
+
+            // stop mic audio recording
+            Microphone.End(RecordStartMicDevice);
+            IsRecording = false;
+            Destroy(_clip);
 #if UNITY_EDITOR
-			Debug.Log($"Stopped microphone recording. Final audio length " +
-			          $"{finalAudio.Length} ({finalAudio.Data.Length} samples)");
+            Debug.Log("Stopped microphone recording. Final audio length " +
+                      $"{finalAudio.Length} ({finalAudio.Data.Length} samples)");
 #endif
-			// update VAD, no speech with disabled mic
-			if (IsVoiceDetected)
-			{
-				IsVoiceDetected = false;
-				OnVadChanged?.Invoke(false);
-			}
+            // update VAD, no speech with disabled mic
+            if (IsVoiceDetected) {
+                IsVoiceDetected = false;
+                OnVadChanged?.Invoke(false);
+            }
 
-			// finally, fire event
-			OnRecordStop?.Invoke(finalAudio);
-		}
+            // finally, fire event
+            OnRecordStop?.Invoke(finalAudio);
+        }
 
-		//Can optimize
-		private static void PlayClip(AudioClip clip)
-		{
-			var go = new GameObject("One shot audio")
-			{
-				transform =
-				{
-					position = float3.zero
-				}
-			};
-			var source = go.AddComponent<AudioSource>();
-			source.clip = clip;
-			source.spatialBlend = 1.0f;
-			source.volume = 1;
-			source.Play();
-			Destroy(go, clip.length);
-		}
+        //Can optimize
+        private static void PlayClip(AudioClip clip) {
+            var go = new GameObject("One shot audio") {
+                transform = {
+                    position = float3.zero
+                }
+            };
+            var source = go.AddComponent<AudioSource>();
+            source.clip = clip;
+            source.spatialBlend = 1.0f;
+            source.volume = 1;
+            source.Play();
+            Destroy(go, clip.length);
+        }
 
-		private float[] GetMicBuffer(float dropSec = 0f)
-		{
-			var micPos = Microphone.GetPosition(RecordStartMicDevice);
-			var len = GetMicBufferLength(micPos);
-			if (len == 0) return Array.Empty<float>();
+        private float[] GetMicBuffer(float dropSec = 0f) {
+            var micPos = Microphone.GetPosition(RecordStartMicDevice);
+            var len = GetMicBufferLength(micPos);
 
-			// drop last samples from length if necessary
-			var dropTimeSamples = (int)(_clip.frequency * dropSec);
-			len = math.max(0, len - dropTimeSamples);
+            if (len == 0) return Array.Empty<float>();
 
-			// get last len samples from recorded audio
-			// offset used to get audio from previous circular buffer lap
-			var d = new float[len];
-			var offset = _madeLoopLap ? micPos : 0;
-			_clip.GetData(d, offset);
+            // drop last samples from length if necessary
+            var dropTimeSamples = (int)(_clip.frequency * dropSec);
+            len = math.max(0, len - dropTimeSamples);
 
-			return d;
-		}
+            // get last len samples from recorded audio
+            // offset used to get audio from previous circular buffer lap
+            var d = new float[len];
+            var offset = _madeLoopLap ? micPos : 0;
+            _clip.GetData(d, offset);
 
-		/// <summary>
-		/// Get mic buffer length that was actually recorded.
-		/// </summary>
-		private int GetMicBufferLength(int micPos)
-		{
-			// looks like we just started recording and stopped it immediately
-			// nothing was actually recorded
-			if (micPos == 0 && !_madeLoopLap) return 0;
+            return d;
+        }
 
-			// get length of the mic buffer that we want to return
-			// this need to account circular loop buffer
-			var len = _madeLoopLap ? ClipSamples : micPos;
-			return len;
-		}
+        /// <summary>
+        ///     Get mic buffer length that was actually recorded.
+        /// </summary>
+        private int GetMicBufferLength(int micPos) {
+            // looks like we just started recording and stopped it immediately
+            // nothing was actually recorded
+            if (micPos == 0 && !_madeLoopLap) return 0;
 
-		/// <summary>
-		/// Calculate distance between two mic positions.
-		/// It takes circular buffer into account.
-		/// </summary>
-		private int GetMicPosDist(int prevPos, int newPos)
-		{
-			if (newPos >= prevPos)
-				return newPos - prevPos;
+            // get length of the mic buffer that we want to return
+            // this need to account circular loop buffer
+            var len = _madeLoopLap ? ClipSamples : micPos;
 
-			// circular buffer case
-			return ClipSamples - prevPos + newPos;
-		}
-	}
+            return len;
+        }
+
+        /// <summary>
+        ///     Calculate distance between two mic positions.
+        ///     It takes circular buffer into account.
+        /// </summary>
+        private int GetMicPosDist(int prevPos, int newPos) {
+            if (newPos >= prevPos)
+                return newPos - prevPos;
+
+            // circular buffer case
+            return ClipSamples - prevPos + newPos;
+        }
+
+    }
+
 }

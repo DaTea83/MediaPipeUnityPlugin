@@ -6,18 +6,15 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-namespace ProjectionMapping
-{
-	public struct PointData
-	{
+namespace ProjectionMapping {
+	public struct PointData {
 		public float CurrentInput;
 		public float PreviousInput;
 		public float3 LocalPosition;
 		public float3 ScreenPosition;
 	}
 
-	public struct HandData
-	{
+	public struct HandData {
 		public PointData Wrist2Thumb;
 		public PointData Wrist2Index;
 		public PointData Wrist2Middle;
@@ -30,16 +27,14 @@ namespace ProjectionMapping
 		public PointData Pinky2Thumb;
 	}
 
-	public struct HandTrackingISingleton : IComponentData
-	{
+	public struct HandTrackingISingleton : IComponentData {
 		public HandData LeftHand;
 		public HandData RightHand;
 	}
 
 	[BurstCompile]
 	[UpdateInGroup(typeof(Eu_PreTransformSystemGroup), OrderFirst = true)]
-	public partial struct HandPointISystem : ISystem
-	{
+	public partial struct HandPointISystem : ISystem {
 		private const int Wrist = 0;
 		private const int Thumb = 4;
 		private const int Index = 8;
@@ -47,8 +42,7 @@ namespace ProjectionMapping
 		private const int Ring = 16;
 		private const int Pinky = 20;
 
-		public void OnCreate(ref SystemState state)
-		{
+		public void OnCreate(ref SystemState state) {
 			state.RequireForUpdate<HandTrackingISingleton>();
 			state.RequireForUpdate<HandSettingISingleton>();
 			state.RequireForUpdate<HandPoseISingleton>();
@@ -56,8 +50,7 @@ namespace ProjectionMapping
 		}
 
 		[BurstCompile]
-		public void OnUpdate(ref SystemState state)
-		{
+		public void OnUpdate(ref SystemState state) {
 			var tracking = SystemAPI.GetSingleton<HandTrackingISingleton>();
 			var pose = SystemAPI.GetSingleton<HandPoseISingleton>();
 			var settings = SystemAPI.GetSingleton<HandSettingISingleton>();
@@ -73,8 +66,7 @@ namespace ProjectionMapping
 			var rightId = new NativeArray<byte>(21, Allocator.Temp);
 
 			foreach (var (point, lt, _)
-			         in SystemAPI.Query<RefRO<HandPointIData>, RefRO<LocalTransform>>().WithEntityAccess())
-			{
+			         in SystemAPI.Query<RefRO<HandPointIData>, RefRO<LocalTransform>>().WithEntityAccess()) {
 				if (point.ValueRO.EHand == EHand.None) continue;
 				if (!point.ValueRO.IsTracked) continue;
 
@@ -82,8 +74,7 @@ namespace ProjectionMapping
 				var id = point.ValueRO.ID;
 				if (id >= 21) continue;
 
-				switch (point.ValueRO.EHand)
-				{
+				switch (point.ValueRO.EHand) {
 					case EHand.Left:
 						leftPos[id] = pos;
 						leftScreenPos[id] = point.ValueRO.ScreenPosition;
@@ -215,16 +206,15 @@ namespace ProjectionMapping
 
 			screen.LeftPreviousScreenPosition = screen.LeftCurrentScreenPosition;
 			screen.RightPreviousScreenPosition = screen.RightCurrentScreenPosition;
-			
+
 			screen.LeftCurrentScreenPosition = HandCollection.GetScreenPosition(tracking.LeftHand, settings);
 			screen.RightCurrentScreenPosition = HandCollection.GetScreenPosition(tracking.RightHand, settings);
-			
+
 			SystemAPI.SetSingleton(screen);
 		}
 
 		private (float, float3, float3) DistanceBetween(NativeArray<float3> pos, NativeArray<byte> id,
-			NativeArray<float3> screen, int id1, int id2)
-		{
+			NativeArray<float3> screen, int id1, int id2) {
 			if (id[id1] != id1 || id[id2] != id2) return (-1f, float3.zero, float3.zero);
 			return (math.distance(pos[id1], pos[id2]), math.lerp(pos[id1], pos[id2], 0.5f),
 				math.lerp(screen[id1], screen[id2], 0.5f));

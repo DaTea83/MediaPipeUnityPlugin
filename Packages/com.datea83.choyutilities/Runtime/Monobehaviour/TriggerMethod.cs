@@ -1,34 +1,35 @@
 using EugeneC.Utilities;
 using UnityEngine;
 
-namespace EugeneC.Mono
-{
-	[RequireComponent(typeof(BoxCollider))]
-	public class TriggerMethod : MonoBehaviour
-	{
-		[SerializeField] private LayerMask layer;
-		[SerializeField] private string objectTag;
+namespace EugeneC.Mono {
 
-		[SerializeField] private string instanceClassName;
-		[SerializeField] private string methodName;
-		[SerializeField] private bool turnOffAfter;
+    [RequireComponent(typeof(BoxCollider))]
+    public class TriggerMethod : MonoBehaviour {
 
-		private BoxCollider _collider;
+        [SerializeField] private LayerMask layer;
+        [SerializeField] private string objectTag;
 
-		// Start is called before the first frame update
-		private void Start()
-		{
-			_collider = GetComponent<BoxCollider>();
-			_collider.isTrigger = true;
-		}
+        [SerializeField] private string instanceClassName;
+        [SerializeField] private string methodName;
+        [SerializeField] private bool turnOffAfter;
 
-		private void OnTriggerEnter(Collider other)
-		{
-			if (other.gameObject.layer != layer && !other.gameObject.CompareTag(objectTag)) return;
+        private BoxCollider _collider;
 
-			UtilityMethods.CallGenericInstanceMethod(instanceClassName, methodName);
-			if (turnOffAfter)
-				gameObject.SetActive(false);
-		}
-	}
+        // Start is called before the first frame update
+        private void Start() {
+            _collider = GetComponent<BoxCollider>();
+            _collider.isTrigger = true;
+        }
+
+        private void OnTriggerEnter(Collider other) {
+            if (other.gameObject.layer != layer && !other.gameObject.CompareTag(objectTag)) return;
+
+            UtilityMethods.CallGenericInstanceMethod(instanceClassName, methodName);
+
+            if (turnOffAfter)
+                gameObject.SetActive(false);
+        }
+
+    }
+
 }

@@ -5,198 +5,191 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-namespace EugeneC.Utilities
-{
+namespace EugeneC.Utilities {
+
 // Combination of input manager and spawn manager
-	
+
 #pragma warning disable CS0612
-	public class PlayerSpawnerManager : GenericSpawnManager<PlayerSpawnerManager.PlayerTypeEnum>
+    public class PlayerSpawnerManager : GenericSpawnManager<PlayerSpawnerManager.PlayerTypeEnum>
 #pragma warning restore CS0612
-	{
-		public enum PlayerTypeEnum
-		{
-			PlayerType1
-		}
+    {
 
-		[SerializeField] InputActionAsset actionAsset;
-		[SerializeField] PlayerTypeEnum playerType;
-		[SerializeField] Transform defaultSpawnLocation;
-		[SerializeField] int playerLimitCount = 3;
-		[SerializeField] bool allowNewJoin = true;
-		[SerializeField] bool allowKeyboard;
+        public enum PlayerTypeEnum : byte {
 
-		private Dictionary<InputDevice, MultiInputSystem> _deviceRegistry = new();
-		private Dictionary<MultiInputSystem, IControlBinder> _playerRegistry = new();
+            PlayerType1
 
-		private void OnEnable()
-		{
-			KeepSingleton(true);
-			InputSystem.onDeviceChange += OnDeviceChange;
-			SceneManager.sceneLoaded += OnSceneLoaded;
+        }
 
-			PlayerSpawnController.Instance.SubOnAllowNewPlayers(OnAllowNewJoinChange);
-			PlayerSpawnController.Instance.SubOnAbleControls(AllInputControl);
-			PlayerSpawnController.Instance.SubOnResetGame(ResetGame);
+        [SerializeField] private InputActionAsset actionAsset;
+        [SerializeField] private PlayerTypeEnum playerType;
+        [SerializeField] private Transform defaultSpawnLocation;
+        [SerializeField] private int playerLimitCount = 3;
+        [SerializeField] private bool allowNewJoin = true;
+        [SerializeField] private bool allowKeyboard;
 
-			CheckForExistingDevices();
-		}
+        private readonly Dictionary<InputDevice, MultiInputSystem> _deviceRegistry = new();
+        private readonly Dictionary<MultiInputSystem, IControlBinder> _playerRegistry = new();
 
-		protected override void OnDisable()
-		{
-			base.OnDisable();
-			InputSystem.onDeviceChange -= OnDeviceChange;
-			SceneManager.sceneLoaded -= OnSceneLoaded;
+        private void OnEnable() {
+            InputSystem.onDeviceChange += OnDeviceChange;
+            SceneManager.sceneLoaded += OnSceneLoaded;
 
-			PlayerSpawnController.Instance.UnsubOnAllowNewPlayers(OnAllowNewJoinChange);
-			PlayerSpawnController.Instance.UnsubOnAbleControls(AllInputControl);
-			PlayerSpawnController.Instance.UnsubOnResetGame(ResetGame);
-		}
+            PlayerSpawnController.Instance.SubOnAllowNewPlayers(OnAllowNewJoinChange);
+            PlayerSpawnController.Instance.SubOnAbleControls(AllInputControl);
+            PlayerSpawnController.Instance.SubOnResetGame(ResetGame);
 
-		private void OnAllowNewJoinChange(bool change) => allowNewJoin = change;
+            CheckForExistingDevices();
+        }
 
-		private void OnDeviceChange(InputDevice device, InputDeviceChange change)
-		{
-			if (change == InputDeviceChange.Added)
-			{
-				Debug.Log($"Device added: {device.displayName}");
-				TryRegisterDevice(device);
-			}
-			else if (change == InputDeviceChange.Removed)
-			{
-				Debug.Log($"Device removed: {device.displayName}");
-				UnregisterDevice(device);
-			}
-		}
+        protected override void OnDisable() {
+            base.OnDisable();
+            InputSystem.onDeviceChange -= OnDeviceChange;
+            SceneManager.sceneLoaded -= OnSceneLoaded;
 
-		private void CheckForExistingDevices()
-		{
-			foreach (var device in InputSystem.devices)
-			{
-				TryRegisterDevice(device);
-			}
-		}
+            PlayerSpawnController.Instance.UnsubOnAllowNewPlayers(OnAllowNewJoinChange);
+            PlayerSpawnController.Instance.UnsubOnAbleControls(AllInputControl);
+            PlayerSpawnController.Instance.UnsubOnResetGame(ResetGame);
+        }
 
-		private void TryRegisterDevice(InputDevice device)
-		{
-			if (!allowNewJoin) return;
-			if (device is not Gamepad && (device is not Keyboard || !allowKeyboard)) return;
-			if (_deviceRegistry.ContainsKey(device)) return;
-			if (_playerRegistry.Count < playerLimitCount)
-			{
-				var playerObj = SpawnObject(playerType, defaultSpawnLocation.position,
-					Quaternion.identity);
-				if (playerObj is null) return;
-				var controlBinder = playerObj.GetComponent<IControlBinder>();
+        private void OnAllowNewJoinChange(bool change) {
+            allowNewJoin = change;
+        }
 
-				if (controlBinder != null)
-					RegisterPlayer(controlBinder, device);
-				else
-					Debug.LogError(
-						"Spawned object does not have a component that implements IControlBinder.");
-			}
-			else
-				Debug.Log("Player limit reached. Cannot register new player.");
-		}
+        private void OnDeviceChange(InputDevice device, InputDeviceChange change) {
+            if (change == InputDeviceChange.Added) {
+                Debug.Log($"Device added: {device.displayName}");
+                TryRegisterDevice(device);
+            }
+            else if (change == InputDeviceChange.Removed) {
+                Debug.Log($"Device removed: {device.displayName}");
+                UnregisterDevice(device);
+            }
+        }
 
-		private void RegisterPlayer(IControlBinder playerBinder, InputDevice device)
-		{
-			var controlScheme = UtilityMethods.GetDeviceType(device);
-			var registry = new MultiInputSystem(device, actionAsset, controlScheme);
+        private void CheckForExistingDevices() {
+            foreach (var device in InputSystem.devices) TryRegisterDevice(device);
+        }
 
-			_deviceRegistry.Add(device, registry);
-			_playerRegistry.Add(registry, playerBinder);
+        private void TryRegisterDevice(InputDevice device) {
+            if (!allowNewJoin) return;
+            if (device is not Gamepad && (device is not Keyboard || !allowKeyboard)) return;
+            if (_deviceRegistry.ContainsKey(device)) return;
 
-			registry.BindObject(playerBinder);
-		}
+            if (_playerRegistry.Count < playerLimitCount) {
+                var playerObj = SpawnObject(playerType, defaultSpawnLocation.position,
+                    Quaternion.identity);
 
-		private void UnregisterDevice(InputDevice device)
-		{
-			if (!_deviceRegistry.TryGetValue(device, out var registry)) return;
-			if (!_playerRegistry.TryGetValue(registry, out var playerBinder)) return;
-			registry.UnbindObject();
+                if (playerObj is null) return;
+                var controlBinder = playerObj.GetComponent<IControlBinder>();
 
-			var binderBehaviour = playerBinder as MonoBehaviour;
-			if (binderBehaviour is not null)
-			{
-				DespawnObject(binderBehaviour.gameObject);
-				_playerRegistry.Remove(registry);
-				_deviceRegistry.Remove(device);
+                if (controlBinder != null)
+                    RegisterPlayer(controlBinder, device);
+                else
+                    Debug.LogError(
+                        "Spawned object does not have a component that implements IControlBinder.");
+            }
+            else {
+                Debug.Log("Player limit reached. Cannot register new player.");
+            }
+        }
 
-				Debug.Log(
-					$"Unregistered player {playerBinder.GetType().Name} and removed device {device.displayName}");
-			}
-			else
-				Debug.LogError($"{playerBinder.GetType().Name} is not a MonoBehaviour. Cannot despawn object.");
-		}
+        private void RegisterPlayer(IControlBinder playerBinder, InputDevice device) {
+            var controlScheme = UtilityMethods.GetDeviceType(device);
+            var registry = new MultiInputSystem(device, actionAsset, controlScheme);
 
-		private void UnregisterAll()
-		{
-			foreach (var registry in _playerRegistry.Keys)
-				registry.UnbindObject();
+            _deviceRegistry.Add(device, registry);
+            _playerRegistry.Add(registry, playerBinder);
 
-			foreach (var playerBinder in _playerRegistry.Values)
-			{
-				var binderBehaviour = playerBinder as MonoBehaviour;
-				if (binderBehaviour is not null)
-					DespawnObject(binderBehaviour.gameObject);
-			}
+            registry.BindObject(playerBinder);
+        }
 
-			_playerRegistry.Clear();
-			_deviceRegistry.Clear();
+        private void UnregisterDevice(InputDevice device) {
+            if (!_deviceRegistry.TryGetValue(device, out var registry)) return;
+            if (!_playerRegistry.TryGetValue(registry, out var playerBinder)) return;
+            registry.UnbindObject();
 
-			Debug.Log("All players have been unregistered.");
-		}
+            var binderBehaviour = playerBinder as MonoBehaviour;
 
-		private void ResetGame(object sender, EventArgs e)
-		{
-			UnregisterAll();
-			CheckForExistingDevices();
-		}
+            if (binderBehaviour is not null) {
+                DespawnObject(binderBehaviour.gameObject);
+                _playerRegistry.Remove(registry);
+                _deviceRegistry.Remove(device);
 
-		private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-		{
-			Debug.Log($"Scene loaded: {scene.name}");
-			ReinstantiatePlayers();
-		}
+                Debug.Log(
+                    $"Unregistered player {playerBinder.GetType().Name} and removed device {device.displayName}");
+            }
+            else {
+                Debug.LogError($"{playerBinder.GetType().Name} is not a MonoBehaviour. Cannot despawn object.");
+            }
+        }
 
-		private void ReinstantiatePlayers()
-		{
-			List<MultiInputSystem> registries = new List<MultiInputSystem>(_playerRegistry.Keys);
-			_playerRegistry.Clear();
+        private void UnregisterAll() {
+            foreach (var registry in _playerRegistry.Keys)
+                registry.UnbindObject();
 
-			foreach (var registry in registries)
-			{
-				GameObject playerObj = SpawnObject(PlayerTypeEnum.PlayerType1, Vector3.zero, Quaternion.identity);
-				if (playerObj is not null)
-				{
-					IControlBinder controlBinder = playerObj.GetComponent<IControlBinder>();
-					if (controlBinder != null)
-					{
-						registry.BindObject(controlBinder);
-						_playerRegistry.Add(registry, controlBinder);
+            foreach (var playerBinder in _playerRegistry.Values) {
+                var binderBehaviour = playerBinder as MonoBehaviour;
 
-						Debug.Log(
-							$"Reinstantiated player {controlBinder.GetType().Name} and bound to device {registry.Device.displayName}");
-					}
-					else
-						Debug.LogError("Spawned object does not have a component that implements IControlBinder.");
-				}
-				else
-					Debug.LogError("Failed to spawn player object.");
-			}
-		}
+                if (binderBehaviour is not null)
+                    DespawnObject(binderBehaviour.gameObject);
+            }
 
-		private void AllInputControl(bool able)
-		{
-			foreach (var players in spawnedObjects)
-			{
-				var controlBinder = players.GetComponent<IControlBinder>();
-				if (controlBinder == null) continue;
-				if (able)
-					controlBinder.Registry.EnableInput();
-				else
-					controlBinder.Registry.DisableInput();
-			}
-		}
-	}
+            _playerRegistry.Clear();
+            _deviceRegistry.Clear();
+
+            Debug.Log("All players have been unregistered.");
+        }
+
+        private void ResetGame(object sender, EventArgs e) {
+            UnregisterAll();
+            CheckForExistingDevices();
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+            Debug.Log($"Scene loaded: {scene.name}");
+            ReinstantiatePlayers();
+        }
+
+        private void ReinstantiatePlayers() {
+            var registries = new List<MultiInputSystem>(_playerRegistry.Keys);
+            _playerRegistry.Clear();
+
+            foreach (var registry in registries) {
+                var playerObj = SpawnObject(PlayerTypeEnum.PlayerType1, Vector3.zero, Quaternion.identity);
+
+                if (playerObj is not null) {
+                    var controlBinder = playerObj.GetComponent<IControlBinder>();
+
+                    if (controlBinder != null) {
+                        registry.BindObject(controlBinder);
+                        _playerRegistry.Add(registry, controlBinder);
+
+                        Debug.Log(
+                            $"Reinstantiated player {controlBinder.GetType().Name} and bound to device {registry.Device.displayName}");
+                    }
+                    else {
+                        Debug.LogError("Spawned object does not have a component that implements IControlBinder.");
+                    }
+                }
+                else {
+                    Debug.LogError("Failed to spawn player object.");
+                }
+            }
+        }
+
+        private void AllInputControl(bool able) {
+            foreach (var players in spawnedObjects) {
+                var controlBinder = players.GetComponent<IControlBinder>();
+
+                if (controlBinder == null) continue;
+
+                if (able)
+                    controlBinder.Registry.EnableInput();
+                else
+                    controlBinder.Registry.DisableInput();
+            }
+        }
+
+    }
+
 }

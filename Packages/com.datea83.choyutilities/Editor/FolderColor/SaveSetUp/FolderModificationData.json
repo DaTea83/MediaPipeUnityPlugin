@@ -1,1 +1,8 @@
-{"assetModified":["Assets/Utils","Assets/Players","Assets/Level & Terrains","Assets/Props","Assets/Eugene Utilities","Assets/Synchrotron","Assets/Assignment","Assets/WeatherSystem","Assets/Main","Assets/Chess","Packages/com.datea83.choyutilities","Assets/MediaPipeUnity","Assets/ProjectionMapping","Assets/OCBC","Assets/RTGame"],"assetModifiedTexturePath":["Assets/Utils/Scripts/Editor/FolderColor/FolderCyan.png","Assets/Utils/Scripts/Editor/FolderColor/RedFolder.png","Assets/Utils/Scripts/Editor/FolderColor/BlueishGreenFolder.png","Assets/Utils/Scripts/Editor/FolderColor/FolderPurple.png","Assets/Eugene Utilities/Scripts/Editor/FolderColor/FolderBlue.png","Assets/Eugene Utilities/Scripts/Editor/FolderColor/RedFolder.png","Assets/ChoyUtilities/Scripts/Editor/FolderColor/RedFolder.png","Assets/ChoyUtilities/Scripts/Editor/FolderColor/RedFolder.png","Assets/ChoyEugene/ChoyUtilities/Scripts/Editor/FolderColor/RedFolder.png","Assets/ChoyUtilities/Scripts/Editor/FolderColor/BlueishGreenFolder.png","Packages/com.datea83.choyutilities/Editor/FolderColor/BlueishGreenFolder.png","Packages/com.datea83.choyutilities/Editor/FolderColor/FolderPurple.png","Packages/com.datea83.choyutilities/Editor/FolderColor/RedFolder.png","Packages/com.datea83.choyutilities/Editor/FolderColor/FolderBlue.png","Packages/com.datea83.choyutilities/Editor/FolderColor/FolderCyan.png"]}
+{
+  "assetModified": [
+    "Packages/com.datea83.choyutilities"
+  ],
+  "assetModifiedTexturePath": [
+    "Packages/com.datea83.choyutilities/Editor/FolderColor/FolderBlue.png"
+  ]
+}

@@ -1,84 +1,89 @@
-using UnityEngine;
-
 #if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem.Users;
-using UnityEngine.InputSystem;
 using System;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Users;
+using Object = UnityEngine.Object;
 
-namespace EugeneC.Utilities
-{
-	public class MultiInputSystem
-	{
-		public MultiInputSystem(InputDevice device, InputActionAsset asset, EControlSchemeEnum controltype)
-		{
-			User = InputUser.PerformPairingWithDevice(device);
-			Device = device;
-			Asset = UnityEngine.Object.Instantiate(asset);
-			_controlScheme = controltype.GetControlType();
-		}
+namespace EugeneC.Utilities {
 
-		public InputUser User;
-		public InputDevice Device;
-		public InputActionAsset Asset;
+    public class MultiInputSystem {
 
-		string _controlScheme;
-		InputActionMap _actionMap;
-		IControlBinder _binder;
+        private readonly string _controlScheme;
+        private InputActionMap _actionMap;
+        private IControlBinder _binder;
+        public InputActionAsset Asset;
+        public InputDevice Device;
 
-		public event Action<InputDevice, InputDeviceChange> OnBindObject;
-		public event Action<InputDevice, InputDeviceChange> OnUnbindObject;
+        public InputUser User;
 
-		public void EnableInput() => _actionMap.Enable();
-		public void DisableInput() => _actionMap.Disable();
+        public MultiInputSystem(InputDevice device, InputActionAsset asset, EControlSchemeEnum controltype) {
+            User = InputUser.PerformPairingWithDevice(device);
+            Device = device;
+            Asset = Object.Instantiate(asset);
+            _controlScheme = controltype.GetControlType();
+        }
 
-		public void BindObject<T>(T bindobject)
-			where T : IControlBinder
-		{
-			if (_binder != null)
-				UnbindObject();
+        public event Action<InputDevice, InputDeviceChange> OnBindObject;
+        public event Action<InputDevice, InputDeviceChange> OnUnbindObject;
 
-			_binder = bindobject;
-			_binder.Registry = this;
+        public void EnableInput() {
+            _actionMap.Enable();
+        }
 
-			string actionmapname =
-				UtilityMethods.InterfaceToStringName(bindobject.InputInterface, "Actions", string.Empty);
-			Debug.Log($"Finding action map name of {actionmapname}");
-			_actionMap = Asset.FindActionMap(actionmapname);
+        public void DisableInput() {
+            _actionMap.Disable();
+        }
 
-			if (_actionMap == null)
-			{
-				Debug.LogError($"InputActionMap '{actionmapname}' not found in the InputActionAsset.");
-				return;
-			}
+        public void BindObject<T>(T bindobject)
+            where T : IControlBinder {
+            if (_binder != null)
+                UnbindObject();
 
-			User.AssociateActionsWithUser(_actionMap);
-			User.ActivateControlScheme(_controlScheme);
+            _binder = bindobject;
+            _binder.Registry = this;
 
-			UtilityMethods.BindPlayerAction(_binder, _actionMap);
-			EnableInput();
+            var actionmapname =
+                UtilityMethods.InterfaceToStringName(bindobject.InputInterface, "Actions", string.Empty);
+            Debug.Log($"Finding action map name of {actionmapname}");
+            _actionMap = Asset.FindActionMap(actionmapname);
 
-			OnBindObject?.Invoke(Device, InputDeviceChange.Added);
-			_binder.OnBind();
-		}
+            if (_actionMap == null) {
+                Debug.LogError($"InputActionMap '{actionmapname}' not found in the InputActionAsset.");
 
-		public void UnbindObject()
-		{
-			_binder.Registry = null;
-			_binder = null;
+                return;
+            }
 
-			foreach (var action in _actionMap)
-				action.Reset();
+            User.AssociateActionsWithUser(_actionMap);
+            User.ActivateControlScheme(_controlScheme);
 
-			OnUnbindObject?.Invoke(Device, InputDeviceChange.Removed);
-			DisableInput();
-		}
-	}
+            UtilityMethods.BindPlayerAction(_binder, _actionMap);
+            EnableInput();
 
-	public interface IControlBinder
-	{
-		public Type InputInterface { get; }
-		MultiInputSystem Registry { get; set; }
-		void OnBind();
-	}
+            OnBindObject?.Invoke(Device, InputDeviceChange.Added);
+            _binder.OnBind();
+        }
+
+        public void UnbindObject() {
+            _binder.Registry = null;
+            _binder = null;
+
+            foreach (var action in _actionMap)
+                action.Reset();
+
+            OnUnbindObject?.Invoke(Device, InputDeviceChange.Removed);
+            DisableInput();
+        }
+
+    }
+
+    public interface IControlBinder {
+
+        public Type InputInterface { get; }
+        MultiInputSystem Registry { get; set; }
+        void OnBind();
+
+    }
+
 }
 #endif

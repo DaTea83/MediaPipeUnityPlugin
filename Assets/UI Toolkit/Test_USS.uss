@@ -1,0 +1,6 @@
+.container {
+}
+
+.container:hover {
+    opacity: 0.35;
+}

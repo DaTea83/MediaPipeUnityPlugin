@@ -2,92 +2,77 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace EugeneC.Utilities
-{
-	public abstract class GenericFsm<T, TEnum> : MonoBehaviour
-		where T : GenericFsm<T, TEnum>
-		where TEnum : Enum
-	{
-		public abstract class State : MonoBehaviour
-		{
-			public abstract TEnum StateEnum { get; }
+namespace EugeneC.Utilities {
 
-			protected T StateMachine;
+    public abstract class GenericFsm<T, TEnum> : MonoBehaviour
+        where T : GenericFsm<T, TEnum>
+        where TEnum : Enum {
 
-			protected T Parent
-			{
-				get
-				{
-					StateMachine ??= GetComponentInParent<T>();
-					return StateMachine;
-				}
-			}
+        public State currentState;
+        [SerializeField] private State previousState;
 
-			public virtual void Init(T stateMachine)
-			{
-				StateMachine = stateMachine;
-			}
+        public Animator characterAnimator;
+        private readonly Dictionary<TEnum, State> _allStates = new();
 
-			public virtual void OnEnter()
-			{
-			}
+        private void Awake() {
+            characterAnimator ??= GetComponentInChildren<Animator>();
 
-			public virtual void OnExit()
-			{
-			}
+            foreach (var state in GetComponentsInChildren<State>()) {
+                _allStates.Add(state.StateEnum, state);
+                state.Init((T)this);
+            }
 
-			public virtual void Run()
-			{
-			}
+            currentState?.OnEnter();
+        }
 
-			public virtual bool CanTransitionTo(TEnum newStateID)
-			{
-				return true;
-			}
-		}
+        protected virtual void Update() {
+            currentState?.Run();
+        }
 
-		public State currentState;
-		[SerializeField] private State previousState;
-		private readonly Dictionary<TEnum, State> _allStates = new Dictionary<TEnum, State>();
+        public void ChangeState(TEnum newStateID) {
+            var newState = _allStates[newStateID];
 
-		public Animator characterAnimator;
+            if (newState == currentState) return;
+            if (currentState is not null && !currentState.CanTransitionTo(newStateID)) return;
+            currentState?.OnExit();
+            previousState = currentState;
+            currentState = newState;
+            currentState.OnEnter();
+        }
 
-		private void Awake()
-		{
-			characterAnimator ??= GetComponentInChildren<Animator>();
+        public void BacktoPreviousState() {
+            if (previousState is not null) ChangeState(previousState.StateEnum);
+        }
 
-			foreach (var state in GetComponentsInChildren<State>())
-			{
-				_allStates.Add(state.StateEnum, state);
-				state.Init((T)this);
-			}
+        public abstract class State : MonoBehaviour {
 
-			currentState?.OnEnter();
-		}
+            protected T StateMachine;
+            public abstract TEnum StateEnum { get; }
 
-		protected virtual void Update()
-		{
-			currentState?.Run();
-		}
+            protected T Parent {
+                get {
+                    StateMachine ??= GetComponentInParent<T>();
 
-		public void ChangeState(TEnum newStateID)
-		{
-			var newState = _allStates[newStateID];
+                    return StateMachine;
+                }
+            }
 
-			if (newState == currentState) return;
-			else if (currentState is not null && !currentState.CanTransitionTo(newStateID)) return;
-			else
-			{
-				currentState?.OnExit();
-				previousState = currentState;
-				currentState = newState;
-				currentState.OnEnter();
-			}
-		}
+            public virtual void Init(T stateMachine) {
+                StateMachine = stateMachine;
+            }
 
-		public void BacktoPreviousState()
-		{
-			if (previousState is not null) ChangeState(previousState.StateEnum);
-		}
-	}
+            public virtual void OnEnter() { }
+
+            public virtual void OnExit() { }
+
+            public virtual void Run() { }
+
+            public virtual bool CanTransitionTo(TEnum newStateID) {
+                return true;
+            }
+
+        }
+
+    }
+
 }

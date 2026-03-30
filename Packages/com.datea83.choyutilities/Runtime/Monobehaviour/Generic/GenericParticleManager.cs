@@ -1,107 +1,65 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Pool;
 
-namespace EugeneC.Singleton
-{
-	public abstract class GenericParticleManager<TEnum, TMono> : GenericSingleton<TMono>
-		where TEnum : Enum
-		where TMono : MonoBehaviour
-	{
-		[Serializable]
-		public struct ParticleSerialize
-		{
-			public TEnum id;
-			public ParticleSystem particle;
-		}
+namespace EugeneC.Singleton {
 
-		[Serializable]
-		protected struct SystemSerialize
-		{
-			public ParticleSystem[] particles;
-			public int currentIndex;
-			public int previousIndex;
-		}
+    public abstract class GenericParticleManager<TEnum, TMono> : GenericPoolingManager<TEnum, ParticleSystem, TMono>
+        where TEnum : Enum
+        where TMono : MonoBehaviour {
 
-		[SerializeField] protected ParticleSerialize[] particleEffects;
+        protected override void Awake() {
+            base.Awake();
 
-		[Tooltip("The pool count meant each particle serialize, meaning total = poolCount * particleEffects.Length")]
-		[SerializeField]
-		protected byte poolCount = 16;
+            foreach (var p in poolPrefabs) {
+                var particle = p.prefab;
+                var particleMain = particle.main;
+                particleMain.playOnAwake = false;
+            }
+        }
 
-		protected SystemSerialize[] ParticleSystems;
-		protected List<int> PauseIndexes;
-		
-		protected virtual async void Start()
-		{
-			try
-			{
-				await Awaitable.WaitForSecondsAsync(.1f, Token);
+        public virtual void PlayEffectAtPosition(TEnum id, float3 position) {
+            var index = GetPoolIndex(id);
 
-				ParticleSystems = new SystemSerialize[particleEffects.Length];
-				var currentSystem = 0;
+            if (index == -1) return;
 
-				foreach (var particle in particleEffects)
-				{
-					ParticleSystems[currentSystem].particles = new ParticleSystem[poolCount];
-					for (var i = 0; i < poolCount; i++)
-					{
-						if (particle.particle is null) continue;
-						var spawn = Instantiate(particle.particle, transform);
-						ParticleSystems[currentSystem].particles[i] = spawn;
-					}
+            var particle = RuntimePools[index].spawn[RuntimePools[index].currentIndex];
+            particle.transform.position = position;
+            particle.Play();
 
-					currentSystem++;
-				}
-			}
-			catch (Exception e) { Debug.LogException(e); }
-		}
-		
-		public virtual void PlayEffectAtPosition(TEnum id, float3 position)
-		{
-			if (!Enum.IsDefined(typeof(TEnum), id)) return;
-			var index = Array.FindIndex(particleEffects, i => EqualityComparer<TEnum>.Default.Equals(i.id, id));
+            RuntimePools[index].previousIndex = RuntimePools[index].currentIndex;
+            RuntimePools[index].currentIndex++;
+            RuntimePools[index].currentIndex %= RuntimePools[index].spawn.Length;
+        }
 
-			var particle = ParticleSystems[index].particles[ParticleSystems[index].currentIndex];
-			particle.transform.position = position;
-			particle.Play();
+        public virtual void PauseAllEffects() {
+            PauseIndexes = ListPool<int>.Get();
 
-			ParticleSystems[index].previousIndex = ParticleSystems[index].currentIndex;
-			ParticleSystems[index].currentIndex++;
-			ParticleSystems[index].currentIndex %= ParticleSystems[index].particles.Length;
-		}
+            for (var i = 0; i < RuntimePools.Length; i++) {
+                var system = RuntimePools[i];
 
-		public virtual void PauseAllEffects()
-		{
-			PauseIndexes = new List<int>();
-			for (var i = 0; i < ParticleSystems.Length; i++)
-			{
-				var system = ParticleSystems[i];
-				foreach (var p in system.particles)
-				{
-					if (p.isPlaying)
-						p.Pause();
-				}
+                foreach (var p in system.spawn)
+                    if (p.isPlaying)
+                        p.Pause();
+                PauseIndexes.Add(i);
+            }
+        }
 
-				PauseIndexes.Add(i);
-			}
-		}
+        public virtual void ResumeAllEffects() {
+            if (PauseIndexes is null) return;
 
-		public virtual void ResumeAllEffects()
-		{
-			if (PauseIndexes is null) return;
-			foreach (var i in PauseIndexes)
-			{
-				var system = ParticleSystems[i];
-				foreach (var p in system.particles)
-				{
-					if (p.isPaused)
-						p.Play();
-				}
-			}
+            foreach (var i in PauseIndexes) {
+                var system = RuntimePools[i];
 
-			PauseIndexes.Clear();
-		}
-	}
+                foreach (var p in system.spawn)
+                    if (p.isPaused)
+                        p.Play();
+            }
+
+            ListPool<int>.Release(PauseIndexes);
+        }
+
+    }
+
 }

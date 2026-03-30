@@ -1,108 +1,112 @@
 using Unity.Entities;
 using Unity.Physics;
 
-namespace EugeneC.Utilities
-{
-	public static partial class HelperCollection
-	{
-		public static (Entity, Entity) GetSimulationEntities<T, TU>(this TriggerEvent triggerEvent,
-			ComponentLookup<T> aLookup, ComponentLookup<TU> bLookup)
-			where T : unmanaged, IComponentData
-			where TU : unmanaged, IComponentData
-		{
-			Entity aEntity, bEntity;
+namespace EugeneC.Utilities {
 
-			if (aLookup.HasComponent(triggerEvent.EntityA) &&
-			    bLookup.HasComponent(triggerEvent.EntityB))
-			{
-				aEntity = triggerEvent.EntityA;
-				bEntity = triggerEvent.EntityB;
+    public static partial class HelperCollection {
 
-				return (aEntity, bEntity);
-			}
-			else if (aLookup.HasComponent(triggerEvent.EntityB) &&
-			         bLookup.HasComponent(triggerEvent.EntityA))
-			{
-				aEntity = triggerEvent.EntityB;
-				bEntity = triggerEvent.EntityA;
+        public static (Entity, Entity) GetSimulationEntities<T, TU>(this TriggerEvent triggerEvent,
+            ComponentLookup<T> aLookup,
+            ComponentLookup<TU> bLookup)
+            where T : unmanaged, IComponentData
+            where TU : unmanaged, IComponentData {
+            Entity aEntity, bEntity;
 
-				return (aEntity, bEntity);
-			}
-			else
-			{
-				aEntity = Entity.Null;
-				bEntity = Entity.Null;
-				return (aEntity, bEntity);
-			}
-		}
+            if (aLookup.HasComponent(triggerEvent.EntityA) &&
+                bLookup.HasComponent(triggerEvent.EntityB)) {
+                aEntity = triggerEvent.EntityA;
+                bEntity = triggerEvent.EntityB;
 
-		public static (Entity, Entity, int) GetSimulationEntities<T, U, V>(this TriggerEvent triggerEvent,
-			ComponentLookup<T> aLookup, ComponentLookup<U> bLookup, ComponentLookup<V> cLookup)
-			where T : unmanaged, IComponentData
-			where U : unmanaged, IComponentData
-			where V : unmanaged, IComponentData
-		{
-			var (aEntity, bEntity) = triggerEvent.GetSimulationEntities(aLookup, bLookup);
+                return (aEntity, bEntity);
+            }
 
-			if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 1);
+            if (aLookup.HasComponent(triggerEvent.EntityB) &&
+                bLookup.HasComponent(triggerEvent.EntityA)) {
+                aEntity = triggerEvent.EntityB;
+                bEntity = triggerEvent.EntityA;
 
-			(aEntity, bEntity) = triggerEvent.GetSimulationEntities(bLookup, cLookup);
-			if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 2);
+                return (aEntity, bEntity);
+            }
 
-			(aEntity, bEntity) = triggerEvent.GetSimulationEntities(aLookup, cLookup);
-			if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 3);
+            aEntity = Entity.Null;
+            bEntity = Entity.Null;
 
-			return (aEntity, bEntity, -1);
-		}
+            return (aEntity, bEntity);
+        }
 
-		public static (Entity, Entity) GetSimulationEntities<T, U>(this CollisionEvent collisionEvent,
-			ComponentLookup<U> aLookup, ComponentLookup<T> bLookup)
-			where U : unmanaged, IComponentData
-			where T : unmanaged, IComponentData
-		{
-			Entity aEntity, bEntity;
+        public static (Entity, Entity, int) GetSimulationEntities<T, U, V>(this TriggerEvent triggerEvent,
+            ComponentLookup<T> aLookup,
+            ComponentLookup<U> bLookup,
+            ComponentLookup<V> cLookup)
+            where T : unmanaged, IComponentData
+            where U : unmanaged, IComponentData
+            where V : unmanaged, IComponentData {
+            var (aEntity, bEntity) = triggerEvent.GetSimulationEntities(aLookup, bLookup);
 
-			if (aLookup.HasComponent(collisionEvent.EntityA) &&
-			    bLookup.HasComponent(collisionEvent.EntityB))
-			{
-				aEntity = collisionEvent.EntityA;
-				bEntity = collisionEvent.EntityB;
+            if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 1);
 
-				return (aEntity, bEntity);
-			}
-			else if (aLookup.HasComponent(collisionEvent.EntityB) &&
-			         bLookup.HasComponent(collisionEvent.EntityA))
-			{
-				aEntity = collisionEvent.EntityB;
-				bEntity = collisionEvent.EntityA;
+            (aEntity, bEntity) = triggerEvent.GetSimulationEntities(bLookup, cLookup);
 
-				return (aEntity, bEntity);
-			}
-			else
-			{
-				aEntity = Entity.Null;
-				bEntity = Entity.Null;
-				return (aEntity, bEntity);
-			}
-		}
+            if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 2);
 
-		public static (Entity, Entity, int) GetSimulationEntities<T, U, V>(this CollisionEvent collisionEvent,
-			ComponentLookup<T> aLookup, ComponentLookup<U> bLookup, ComponentLookup<V> cLookup)
-			where T : unmanaged, IComponentData
-			where U : unmanaged, IComponentData
-			where V : unmanaged, IComponentData
-		{
-			var (aEntity, bEntity) = collisionEvent.GetSimulationEntities(aLookup, bLookup);
+            (aEntity, bEntity) = triggerEvent.GetSimulationEntities(aLookup, cLookup);
 
-			if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 1);
+            if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 3);
 
-			(aEntity, bEntity) = collisionEvent.GetSimulationEntities(bLookup, cLookup);
-			if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 2);
+            return (aEntity, bEntity, -1);
+        }
 
-			(aEntity, bEntity) = collisionEvent.GetSimulationEntities(aLookup, cLookup);
-			if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 3);
+        public static (Entity, Entity) GetSimulationEntities<T, U>(this CollisionEvent collisionEvent,
+            ComponentLookup<U> aLookup,
+            ComponentLookup<T> bLookup)
+            where U : unmanaged, IComponentData
+            where T : unmanaged, IComponentData {
+            Entity aEntity, bEntity;
 
-			return (aEntity, bEntity, -1);
-		}
-	}
+            if (aLookup.HasComponent(collisionEvent.EntityA) &&
+                bLookup.HasComponent(collisionEvent.EntityB)) {
+                aEntity = collisionEvent.EntityA;
+                bEntity = collisionEvent.EntityB;
+
+                return (aEntity, bEntity);
+            }
+
+            if (aLookup.HasComponent(collisionEvent.EntityB) &&
+                bLookup.HasComponent(collisionEvent.EntityA)) {
+                aEntity = collisionEvent.EntityB;
+                bEntity = collisionEvent.EntityA;
+
+                return (aEntity, bEntity);
+            }
+
+            aEntity = Entity.Null;
+            bEntity = Entity.Null;
+
+            return (aEntity, bEntity);
+        }
+
+        public static (Entity, Entity, int) GetSimulationEntities<T, U, V>(this CollisionEvent collisionEvent,
+            ComponentLookup<T> aLookup,
+            ComponentLookup<U> bLookup,
+            ComponentLookup<V> cLookup)
+            where T : unmanaged, IComponentData
+            where U : unmanaged, IComponentData
+            where V : unmanaged, IComponentData {
+            var (aEntity, bEntity) = collisionEvent.GetSimulationEntities(aLookup, bLookup);
+
+            if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 1);
+
+            (aEntity, bEntity) = collisionEvent.GetSimulationEntities(bLookup, cLookup);
+
+            if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 2);
+
+            (aEntity, bEntity) = collisionEvent.GetSimulationEntities(aLookup, cLookup);
+
+            if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 3);
+
+            return (aEntity, bEntity, -1);
+        }
+
+    }
+
 }
