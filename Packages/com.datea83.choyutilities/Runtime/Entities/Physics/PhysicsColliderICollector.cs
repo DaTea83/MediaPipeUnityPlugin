@@ -9,8 +9,10 @@ using static Unity.Physics.Math;
 using RaycastHit = Unity.Physics.RaycastHit;
 
 namespace EugeneC.ECS {
+
     [BurstCompile]
     public struct PhysicsColliderICollector : ICollector<RaycastHit> {
+
         public PhysicsColliderICollector(int dynamicCount, float maxFraction = 1f) {
             Hit = default;
             IgnoreTriggers = true;
@@ -34,21 +36,27 @@ namespace EugeneC.ECS {
             Assert.IsTrue(hit.Fraction <= MaxFraction);
 
             var passed = true;
+
             if (IgnoreStatic)
                 passed &= hit.RigidBodyIndex >= 0 && hit.RigidBodyIndex < _numDynamicBodies;
+
             if (IgnoreTriggers)
                 passed &= hit.Material.CollisionResponse != CollisionResponsePolicy.RaiseTriggerEvents;
+
             if (!passed) return false;
 
             Hit = hit;
             MaxFraction = hit.Fraction;
             NumHits = 1;
+
             return true;
         }
+
     }
 
     [BurstCompile]
     public struct CastIJob : IJob {
+
         [ReadOnly] public CollisionWorld CollisionWorld;
         [ReadOnly] public bool IgnoreTriggers;
         [ReadOnly] public bool IgnoreStatic;
@@ -71,6 +79,7 @@ namespace EugeneC.ECS {
 
                 //Grab that specific point on the body instead of the center
                 float3 pointOnBody;
+
                 {
                     //Convert world transform to local transform
                     var localTrans = Inverse(new MTransform(hitBody.WorldFromBody));
@@ -78,6 +87,7 @@ namespace EugeneC.ECS {
                 }
 
                 float rayDot;
+
                 {
                     var rayDir = math.normalize(RayInput.End - RayInput.Start);
                     rayDot = math.dot(rayDir, Forward);
@@ -96,12 +106,16 @@ namespace EugeneC.ECS {
                 };
             }
         }
+
     }
 
     public struct SpringData {
+
         public Entity Entity;
         public bool Picked;
         public float3 PointOnBody;
         public float Depth;
+
     }
+
 }

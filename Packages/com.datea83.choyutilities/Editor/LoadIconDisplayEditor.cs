@@ -11,10 +11,12 @@ using UnityEngine;
 //After finish debugging uncomment back
 
 namespace EugeneC.Editor {
+
 #if UNITY_EDITOR
 
     [InitializeOnLoad]
     internal static class LoadIconDisplayEditor {
+
         private static bool _hierarchyHasFocus;
         private static EditorWindow _window;
 
@@ -32,7 +34,7 @@ namespace EugeneC.Editor {
 
         private static void OnHierarchyWindowItemOnGUI(int instanceID, Rect selectionRect) {
 #if UNITY_6000_3_OR_NEWER
-			if (EditorUtility.EntityIdToObject(instanceID) is not GameObject obj) return;
+            if (EditorUtility.EntityIdToObject(instanceID) is not GameObject obj) return;
 #else
             if (EditorUtility.InstanceIDToObject(instanceID) is not GameObject obj) return;
 #endif
@@ -42,10 +44,12 @@ namespace EugeneC.Editor {
 
             //Check if the game object has any component, if null return
             var components = obj.GetComponents<Component>();
+
             if (components is null || components.Length == 0) return;
 
             // Filter out missing scripts
             components = components.Where(c => c is not null).ToArray();
+
             if (components.Length == 0) return;
 
             var component = components.Length > 1 ? components[1] : components[0];
@@ -77,7 +81,9 @@ namespace EugeneC.Editor {
 
             EditorGUI.LabelField(selectionRect, content);
         }
+
     }
 
 #endif
+
 }

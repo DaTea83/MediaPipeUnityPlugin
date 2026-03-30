@@ -1,16 +1,13 @@
 using UnityEngine;
 
 namespace EugeneC.Utilities {
+
     [RequireComponent(typeof(RectTransform))]
     public sealed class AutoResize : MonoBehaviour {
-        [SerializeField] private EFitMode eFitMode;
-        private RectTransform _rectTransform;
-        private RectTransform _parentRectTransform;
 
-        private void OnEnable() {
-            _rectTransform = GetComponent<RectTransform>();
-            _parentRectTransform = transform.parent?.GetComponent<RectTransform>();
-        }
+        [SerializeField] private EFitMode eFitMode;
+        private RectTransform _parentRectTransform;
+        private RectTransform _rectTransform;
 
         private void LateUpdate() {
             if (_parentRectTransform is null) return;
@@ -24,6 +21,7 @@ namespace EugeneC.Utilities {
                 (eFitMode == EFitMode.Shrink && newHeight <= _parentRectTransform.rect.height)) {
                 _rectTransform.offsetMin *= ratio;
                 _rectTransform.offsetMax *= ratio;
+
                 return;
             }
 
@@ -32,5 +30,12 @@ namespace EugeneC.Utilities {
             _rectTransform.offsetMin *= ratio;
             _rectTransform.offsetMax *= ratio;
         }
+
+        private void OnEnable() {
+            _rectTransform = GetComponent<RectTransform>();
+            _parentRectTransform = transform.parent?.GetComponent<RectTransform>();
+        }
+
     }
+
 }

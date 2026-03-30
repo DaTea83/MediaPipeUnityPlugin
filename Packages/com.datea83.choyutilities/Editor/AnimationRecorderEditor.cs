@@ -7,9 +7,11 @@ using UnityEngine;
 // ReSharper disable Unity.PerformanceCriticalCodeInvocation
 
 namespace EugeneC.Editor {
+
     [AddComponentMenu("Eugene/Animation Recorder")]
     [RequireComponent(typeof(Animator))]
     public class AnimationRecorderEditor : MonoBehaviour {
+
         [SerializeField] private AnimationClip animationClip;
         [SerializeField] private float duration = 1.0f;
 
@@ -17,10 +19,10 @@ namespace EugeneC.Editor {
         private string className;
 
         [SerializeField] private string methodName;
-
-        private float _timer;
         private bool _canRecord;
         private GameObjectRecorder _recorder;
+
+        private float _timer;
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         private void Start() {
@@ -44,6 +46,7 @@ namespace EugeneC.Editor {
 
         private void RecordAnimation() {
             _timer -= Time.unscaledDeltaTime;
+
             if (_timer < 0) {
                 if (!_recorder.isRecording) return;
                 _recorder.SaveToClip(animationClip);
@@ -56,6 +59,8 @@ namespace EugeneC.Editor {
                 _recorder.TakeSnapshot(Time.unscaledDeltaTime);
             }
         }
+
     }
+
 }
 #endif

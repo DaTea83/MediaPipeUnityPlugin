@@ -6,7 +6,9 @@ using Unity.Transforms;
 using UnityEngine;
 
 namespace EugeneC.ECS {
+
     public class FlatPlaneAuthoring : MonoBehaviour {
+
         public GameObject planePrefab;
 
         [Tooltip("Scale up the prefab to value + 100")]
@@ -27,16 +29,19 @@ namespace EugeneC.ECS {
             _prevSeed = seed;
             var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             var query = entityManager.CreateEntityQuery(typeof(PlaneGenerationIData));
+
             if (!query.HasSingleton<PlaneGenerationIData>()) return;
             var levelEntity = query.GetSingletonEntity();
             entityManager.SetComponentEnabled<RegenerateLevelIFlag>(levelEntity, true);
         }
 
         private class FlatPlaneBaker : Baker<FlatPlaneAuthoring> {
+
             public override void Bake(FlatPlaneAuthoring authoring) {
                 if (authoring.planePrefab is null) return;
 
                 var entity = GetEntity(TransformUsageFlags.None);
+
                 AddComponent(entity, new PlaneGenerationIData {
                     PlanePrefab = GetEntity(authoring.planePrefab, TransformUsageFlags.Dynamic),
                     PlaneSize = math.abs(authoring.planeSize),
@@ -45,27 +50,33 @@ namespace EugeneC.ECS {
                 });
                 AddComponent<RegenerateLevelIFlag>(entity);
             }
+
         }
+
     }
 
     public struct PlaneGenerationIData : IComponentData {
+
         public Entity PlanePrefab;
         public float PlaneSize;
         public float UnitsPerPlane;
         public float3 PlaneOffset;
+
     }
 
     /// <summary>
-    /// Enableable component to inform the <see cref="PlaneGenerationSystemBase"/> that the level should be regenerated.
+    ///     Enableable component to inform the <see cref="PlaneGenerationSystemBase" /> that the level should be regenerated.
     /// </summary>
     public struct RegenerateLevelIFlag : IComponentData, IEnableableComponent { }
 
     /// <summary>
-    /// Material property override to set the tile scale
+    ///     Material property override to set the tile scale
     /// </summary>
     [MaterialProperty("_Tile_Scale")]
     public struct TilingOverrideIData : IComponentData {
+
         public float Value;
+
     }
 
     [BurstCompile]
@@ -73,6 +84,7 @@ namespace EugeneC.ECS {
                        WorldSystemFilterFlags.Default)]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     public partial class PlaneGenerationSystemBase : SystemBase {
+
         [BurstCompile]
         protected override void OnUpdate() {
             var ecb = new EntityCommandBuffer(WorldUpdateAllocator);
@@ -87,6 +99,7 @@ namespace EugeneC.ECS {
                 ecb.SetComponent(instance,
                     LocalTransform.FromPositionRotationScale(planeGeneration.PlaneOffset, quaternion.identity,
                         instScale));
+
                 ecb.AddComponent(instance,
                     new TilingOverrideIData { Value = instScale / planeGeneration.UnitsPerPlane });
 
@@ -95,5 +108,7 @@ namespace EugeneC.ECS {
 
             ecb.Playback(EntityManager);
         }
+
     }
+
 }

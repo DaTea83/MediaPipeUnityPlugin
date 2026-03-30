@@ -2,7 +2,9 @@ using Unity.Entities;
 using Unity.Physics;
 
 namespace EugeneC.Utilities {
+
     public static partial class HelperCollection {
+
         public static (Entity, Entity) GetSimulationEntities<T, TU>(this TriggerEvent triggerEvent,
             ComponentLookup<T> aLookup,
             ComponentLookup<TU> bLookup)
@@ -17,18 +19,19 @@ namespace EugeneC.Utilities {
 
                 return (aEntity, bEntity);
             }
-            else if (aLookup.HasComponent(triggerEvent.EntityB) &&
-                     bLookup.HasComponent(triggerEvent.EntityA)) {
+
+            if (aLookup.HasComponent(triggerEvent.EntityB) &&
+                bLookup.HasComponent(triggerEvent.EntityA)) {
                 aEntity = triggerEvent.EntityB;
                 bEntity = triggerEvent.EntityA;
 
                 return (aEntity, bEntity);
             }
-            else {
-                aEntity = Entity.Null;
-                bEntity = Entity.Null;
-                return (aEntity, bEntity);
-            }
+
+            aEntity = Entity.Null;
+            bEntity = Entity.Null;
+
+            return (aEntity, bEntity);
         }
 
         public static (Entity, Entity, int) GetSimulationEntities<T, U, V>(this TriggerEvent triggerEvent,
@@ -43,9 +46,11 @@ namespace EugeneC.Utilities {
             if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 1);
 
             (aEntity, bEntity) = triggerEvent.GetSimulationEntities(bLookup, cLookup);
+
             if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 2);
 
             (aEntity, bEntity) = triggerEvent.GetSimulationEntities(aLookup, cLookup);
+
             if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 3);
 
             return (aEntity, bEntity, -1);
@@ -65,18 +70,19 @@ namespace EugeneC.Utilities {
 
                 return (aEntity, bEntity);
             }
-            else if (aLookup.HasComponent(collisionEvent.EntityB) &&
-                     bLookup.HasComponent(collisionEvent.EntityA)) {
+
+            if (aLookup.HasComponent(collisionEvent.EntityB) &&
+                bLookup.HasComponent(collisionEvent.EntityA)) {
                 aEntity = collisionEvent.EntityB;
                 bEntity = collisionEvent.EntityA;
 
                 return (aEntity, bEntity);
             }
-            else {
-                aEntity = Entity.Null;
-                bEntity = Entity.Null;
-                return (aEntity, bEntity);
-            }
+
+            aEntity = Entity.Null;
+            bEntity = Entity.Null;
+
+            return (aEntity, bEntity);
         }
 
         public static (Entity, Entity, int) GetSimulationEntities<T, U, V>(this CollisionEvent collisionEvent,
@@ -91,12 +97,16 @@ namespace EugeneC.Utilities {
             if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 1);
 
             (aEntity, bEntity) = collisionEvent.GetSimulationEntities(bLookup, cLookup);
+
             if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 2);
 
             (aEntity, bEntity) = collisionEvent.GetSimulationEntities(aLookup, cLookup);
+
             if (aEntity != Entity.Null && bEntity != Entity.Null) return (aEntity, bEntity, 3);
 
             return (aEntity, bEntity, -1);
         }
+
     }
+
 }

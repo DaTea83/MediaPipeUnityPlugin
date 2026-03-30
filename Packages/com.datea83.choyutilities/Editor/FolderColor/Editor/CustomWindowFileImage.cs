@@ -1,17 +1,13 @@
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace FolderColor {
+
 #if UNITY_EDITOR
 
     public class CustomWindowFileImage : EditorWindow {
-        private string _assetPath;
 
-        public static void ShowWindow(string assetPathGive) {
-            var window = GetWindow<CustomWindowFileImage>("Custom Folder");
-            window._assetPath = assetPathGive;
-            window.Show();
-        }
+        private string _assetPath;
 
         private void OnGUI() {
             if (GUI.Button(new Rect(0, 0, 100, 100), "None")) {
@@ -23,30 +19,31 @@ namespace FolderColor {
                 Close();
             }
 
-            string path = ProjectAssetViewerCustomisation.FindScriptPathByName("CustomWindowFileImage");
+            var path = ProjectAssetViewerCustomisation.FindScriptPathByName("CustomWindowFileImage");
             path = path.Replace("/Editor/CustomWindowFileImage.cs", "");
 
-            string[] texturesPath = AssetDatabase.FindAssets("t:texture2D", new[] { path });
+            var texturesPath = AssetDatabase.FindAssets("t:texture2D", new[] { path });
 
-            int buttonsPerRow = 4;
-            float buttonPadding = 10f;
+            var buttonsPerRow = 4;
+            var buttonPadding = 10f;
 
-            for (int i = 0; i < texturesPath.Length; i++) {
-                Texture2D texture =
+            for (var i = 0; i < texturesPath.Length; i++) {
+                var texture =
                     (Texture2D)AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(texturesPath[i]),
                         typeof(Texture2D));
 
-                float buttonWidth = (position.width - (buttonsPerRow + 1) * buttonPadding) / buttonsPerRow;
-                float buttonHeight = 100f;
+                var buttonWidth = (position.width - (buttonsPerRow + 1) * buttonPadding) / buttonsPerRow;
+                var buttonHeight = 100f;
 
-                float x = (i % buttonsPerRow) * (buttonWidth + buttonPadding) + buttonPadding;
-                float y = Mathf.Floor(i / buttonsPerRow) * (buttonHeight + buttonPadding) + buttonPadding + 100;
+                var x = i % buttonsPerRow * (buttonWidth + buttonPadding) + buttonPadding;
+                var y = Mathf.Floor(i / buttonsPerRow) * (buttonHeight + buttonPadding) + buttonPadding + 100;
 
                 if (GUI.Button(new Rect(x, y, buttonWidth, buttonHeight), texture)) {
                     if (ProjectAssetViewerCustomisation.ModificationData.assetModified.Contains(_assetPath))
                         RemoveReference(_assetPath);
 
                     ProjectAssetViewerCustomisation.ModificationData.assetModified.Add(_assetPath);
+
                     ProjectAssetViewerCustomisation.ModificationData.assetModifiedTexturePath.Add(
                         AssetDatabase.GUIDToAssetPath(texturesPath[i]));
                     ProjectAssetViewerCustomisation.SaveData();
@@ -56,11 +53,19 @@ namespace FolderColor {
             }
         }
 
+        public static void ShowWindow(string assetPathGive) {
+            var window = GetWindow<CustomWindowFileImage>("Custom Folder");
+            window._assetPath = assetPathGive;
+            window.Show();
+        }
+
         private static void RemoveReference(string assetPath) {
-            int i = ProjectAssetViewerCustomisation.ModificationData.assetModified.IndexOf(assetPath);
+            var i = ProjectAssetViewerCustomisation.ModificationData.assetModified.IndexOf(assetPath);
             ProjectAssetViewerCustomisation.ModificationData.assetModified.RemoveAt(i);
             ProjectAssetViewerCustomisation.ModificationData.assetModifiedTexturePath.RemoveAt(i);
         }
+
     }
 #endif
+
 }

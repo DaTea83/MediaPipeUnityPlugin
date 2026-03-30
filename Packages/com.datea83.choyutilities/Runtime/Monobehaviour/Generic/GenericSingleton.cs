@@ -4,75 +4,29 @@ using Unity.Entities;
 using UnityEngine;
 
 namespace EugeneC.Singleton {
-    
+
     public abstract class GenericSingleton<T> : MonoBehaviour
         where T : MonoBehaviour {
-	    
+
         public static T Instance { get; private set; }
-        
-		#region ECS        
-        private const ushort MAX_FRAME = 200;
-        protected World World { get; private set; }
 
-        private async void GetWorld() {
-	        try {
-		        var frame = 0;
-		        while (frame < MAX_FRAME) {
-		        
-			        World = World.DefaultGameObjectInjectionWorld;
-		        
-			        if(World is not null) break;
-			        frame++;
-			        Debug.Log($"{gameObject.name} is waiting for World at frame at {frame}");
-			        await Awaitable.NextFrameAsync(Token);
-		        }
-		        
-		        if (World is null) 
-			        Debug.LogError("World is null, did you forget to add a subscene to the scene?");
-	        }
-	        catch (Exception e) {
-		        Debug.LogError(e);
-	        }
+        protected virtual void Awake() {
+            InitSingleton();
+            GetWorld();
         }
 
-        protected async Awaitable<TComponent> GetSingletonEntity<TComponent>() 
-	        where TComponent : unmanaged, IComponentData {
-	        
-	        var query = World.EntityManager.CreateEntityQuery(
-		        ComponentType.ReadOnly<TComponent>());
-
-	        TComponent singleton = default;
-	        var validSingleton = false;
-	        var frame = 0;
-	        while (frame < MAX_FRAME) {
-		        validSingleton = query.TryGetSingleton(out singleton);
-		        
-		        if (validSingleton) break;
-		        Debug.Log($"{gameObject.name} is waiting for Singleton at frame at {frame}");
-		        frame++;
-		        await Awaitable.NextFrameAsync(Token);
-	        }
-	        
-	        return !validSingleton ? throw new Exception("Singleton not found") : singleton;
+        protected virtual void OnDisable() {
+            CancelTask();
         }
-		#endregion        
 
-		#region AsyncCancellation
-        private CancellationTokenSource _cts = new();
-        protected CancellationToken Token => _cts.Token;
-        protected event Action OnCancelTask;
-
-        protected void CancelTask() {
-            _cts?.Cancel();
-            _cts?.Dispose();
-            _cts = new CancellationTokenSource();
-            OnCancelTask?.Invoke();
+        protected virtual void OnDestroy() {
+            UnInitSingleton();
         }
-        #endregion       
 
         protected virtual void InitSingleton() {
             if (Instance is not null && Instance != this) {
                 Destroy(gameObject);
+
                 return;
             }
 
@@ -84,13 +38,70 @@ namespace EugeneC.Singleton {
                 Instance = null;
         }
 
-        protected virtual void Awake() {
-	        InitSingleton();
-	        GetWorld();
+        #region ECS
+
+        private const ushort MAX_FRAME = 200;
+        protected World World { get; private set; }
+
+        private async void GetWorld() {
+            try {
+                var frame = 0;
+
+                while (frame < MAX_FRAME) {
+                    World = World.DefaultGameObjectInjectionWorld;
+
+                    if (World is not null) break;
+                    frame++;
+                    Debug.Log($"{gameObject.name} is waiting for World at frame at {frame}");
+                    await Awaitable.NextFrameAsync(Token);
+                }
+
+                if (World is null)
+                    Debug.LogError("World is null, did you forget to add a subscene to the scene?");
+            }
+            catch (Exception e) {
+                Debug.LogError(e);
+            }
         }
 
-        protected virtual void OnDisable() { CancelTask(); }
+        protected async Awaitable<TComponent> GetSingletonEntity<TComponent>()
+            where TComponent : unmanaged, IComponentData {
+            var query = World.EntityManager.CreateEntityQuery(
+                ComponentType.ReadOnly<TComponent>());
 
-        protected virtual void OnDestroy() { UnInitSingleton(); }
+            TComponent singleton = default;
+            var validSingleton = false;
+            var frame = 0;
+
+            while (frame < MAX_FRAME) {
+                validSingleton = query.TryGetSingleton(out singleton);
+
+                if (validSingleton) break;
+                Debug.Log($"{gameObject.name} is waiting for Singleton at frame at {frame}");
+                frame++;
+                await Awaitable.NextFrameAsync(Token);
+            }
+
+            return !validSingleton ? throw new Exception("Singleton not found") : singleton;
+        }
+
+        #endregion
+
+        #region AsyncCancellation
+
+        private CancellationTokenSource _cts = new();
+        protected CancellationToken Token => _cts.Token;
+        protected event Action OnCancelTask;
+
+        protected void CancelTask() {
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _cts = new CancellationTokenSource();
+            OnCancelTask?.Invoke();
+        }
+
+        #endregion
+
     }
+
 }

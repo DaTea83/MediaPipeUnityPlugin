@@ -8,8 +8,10 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace EugeneC.Utilities {
+
     [AddComponentMenu("Eugene/Microphone Recorder")]
     public sealed class MicrophoneRecorder : MonoBehaviour {
+
         public MicrophoneAttributes settings;
         public float chunksLengthSec = 0.5f;
         public bool replay;
@@ -28,21 +30,17 @@ namespace EugeneC.Utilities {
 
         [CanBeNull] public TMP_Dropdown microphoneDropdown;
         public string microphoneDefaultLabel = "Default microphone";
-
-        public event Action<bool> OnVadChanged;
-        public event Action<AudioChunk> OnChunkReady;
-        public event Action<AudioChunk> OnRecordStop;
+        private int _chunksLength;
+        private AudioClip _clip;
+        private int _lastChunkPos;
 
         private int _lastVadPos;
-        private AudioClip _clip;
-        private float _length;
-        private int _lastChunkPos;
-        private int _chunksLength;
-        private float? _vadStopBegin;
         private int _latestMicPos;
+        private float _length;
         private bool _madeLoopLap;
 
         private string _selectedMicDevice;
+        private float? _vadStopBegin;
 
         public string SelectedMicDevice {
             get => _selectedMicDevice;
@@ -72,7 +70,7 @@ namespace EugeneC.Utilities {
             microphoneDropdown.value = microphoneDropdown.options
                 .FindIndex(op => op.text == microphoneDefaultLabel);
 
-            microphoneDropdown.onValueChanged.AddListener((i) => {
+            microphoneDropdown.onValueChanged.AddListener(i => {
                 if (microphoneDropdown is null) return;
                 var opt = microphoneDropdown.options[i];
                 SelectedMicDevice = opt.text == microphoneDefaultLabel ? null : opt.text;
@@ -86,19 +84,22 @@ namespace EugeneC.Utilities {
             //when it reaches the end of the buffer, it starts from the beginning again
             //hence the condition is true
             var micPos = Microphone.GetPosition(RecordStartMicDevice);
+
             if (micPos < _latestMicPos) {
                 //Announce that we made a full clip loop
                 _madeLoopLap = true;
+
                 if (!settings.loop) {
 #if UNITY_EDITOR
                     Debug.Log($"Stopping recording, mic pos returned back to {micPos}");
 #endif
                     StopRecording();
+
                     return;
                 }
 
 #if UNITY_EDITOR
-                Debug.Log($"Mic made a new loop lap, continue recording.");
+                Debug.Log("Mic made a new loop lap, continue recording.");
 #endif
             }
 
@@ -108,8 +109,13 @@ namespace EugeneC.Utilities {
             UpdateVad(micPos);
         }
 
+        public event Action<bool> OnVadChanged;
+        public event Action<AudioChunk> OnChunkReady;
+        public event Action<AudioChunk> OnRecordStop;
+
         private void UpdateChunks(int micPos) {
             if (OnChunkReady is null) return;
+
             // check if chunks length is valid
             if (_chunksLength <= 0) return;
 
@@ -121,7 +127,7 @@ namespace EugeneC.Utilities {
                 var origData = new float[_chunksLength];
                 _clip.GetData(origData, _lastChunkPos);
 
-                var chunkStruct = new AudioChunk() {
+                var chunkStruct = new AudioChunk {
                     Data = origData,
                     Frequency = _clip.frequency,
                     Channels = _clip.channels,
@@ -140,11 +146,13 @@ namespace EugeneC.Utilities {
 
             // get current recorded clip length
             var samplesCount = GetMicBufferLength(micPos);
+
             if (samplesCount <= 0) return;
 
             // check if it's time to update
             var vadUpdateRateSamples = vadUpdateRateSec * _clip.frequency;
             var dt = GetMicPosDist(_lastVadPos, micPos);
+
             if (dt < vadUpdateRateSamples) return;
             _lastVadPos = samplesCount;
 
@@ -170,6 +178,7 @@ namespace EugeneC.Utilities {
 
         private float[] GetMicBufferLast(int mPos, float lastSec) {
             var len = GetMicBufferLength(mPos);
+
             if (len == 0)
                 return Array.Empty<float>();
 
@@ -180,6 +189,7 @@ namespace EugeneC.Utilities {
 
             var d = new float[dataLength];
             _clip.GetData(d, offset);
+
             return d;
         }
 
@@ -213,7 +223,8 @@ namespace EugeneC.Utilities {
 
             // get all data from mic audio clip
             var data = GetMicBuffer(dropTimeSec);
-            var finalAudio = new AudioChunk() {
+
+            var finalAudio = new AudioChunk {
                 Data = data,
                 Channels = _clip.channels,
                 Frequency = _clip.frequency,
@@ -234,7 +245,7 @@ namespace EugeneC.Utilities {
             IsRecording = false;
             Destroy(_clip);
 #if UNITY_EDITOR
-            Debug.Log($"Stopped microphone recording. Final audio length " +
+            Debug.Log("Stopped microphone recording. Final audio length " +
                       $"{finalAudio.Length} ({finalAudio.Data.Length} samples)");
 #endif
             // update VAD, no speech with disabled mic
@@ -265,6 +276,7 @@ namespace EugeneC.Utilities {
         private float[] GetMicBuffer(float dropSec = 0f) {
             var micPos = Microphone.GetPosition(RecordStartMicDevice);
             var len = GetMicBufferLength(micPos);
+
             if (len == 0) return Array.Empty<float>();
 
             // drop last samples from length if necessary
@@ -281,7 +293,7 @@ namespace EugeneC.Utilities {
         }
 
         /// <summary>
-        /// Get mic buffer length that was actually recorded.
+        ///     Get mic buffer length that was actually recorded.
         /// </summary>
         private int GetMicBufferLength(int micPos) {
             // looks like we just started recording and stopped it immediately
@@ -291,12 +303,13 @@ namespace EugeneC.Utilities {
             // get length of the mic buffer that we want to return
             // this need to account circular loop buffer
             var len = _madeLoopLap ? ClipSamples : micPos;
+
             return len;
         }
 
         /// <summary>
-        /// Calculate distance between two mic positions.
-        /// It takes circular buffer into account.
+        ///     Calculate distance between two mic positions.
+        ///     It takes circular buffer into account.
         /// </summary>
         private int GetMicPosDist(int prevPos, int newPos) {
             if (newPos >= prevPos)
@@ -305,5 +318,7 @@ namespace EugeneC.Utilities {
             // circular buffer case
             return ClipSamples - prevPos + newPos;
         }
+
     }
+
 }

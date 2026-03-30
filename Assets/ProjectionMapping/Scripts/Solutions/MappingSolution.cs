@@ -30,7 +30,7 @@ namespace ProjectionMapping {
 
 		protected virtual async void Start() {
 			try {
-				DontDestroyOnLoad(this);
+				//DontDestroyOnLoad(this);
 				_bootstrap = Instantiate(prefab, transform);
 				await Token.AwaitableUntil(() => _bootstrap.IsFinished);
 
@@ -89,6 +89,7 @@ namespace ProjectionMapping {
 		protected static void SetupAnnotationController<TA>(AnnotationController<TA> annotationController,
 			ImageSource imageSource, bool expectedToBeMirrored = false)
 			where TA : HierarchicalAnnotation {
+			
 			annotationController.isMirrored = expectedToBeMirrored;
 			annotationController.imageSize = new int2(imageSource.textureWidth, imageSource.textureHeight);
 		}

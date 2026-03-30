@@ -1,8 +1,68 @@
 # Changelog
 
+## [0.1.11] - 2026-03-28/29
+
+### Added
+* Added AgentSpawnISingleton
+* HelperCollection, added GetDistanceAndDot() extensions
+* Added GameObjectAuthoring
+* Added InitializeAnimatorAuthoring
+* Added AnimatorTransformICleanup
+* Added AgentStatsAuthoring
+
+### Changed
+* AgentSpawnISystem, now tracks how many agents are spawned with AgentSpawnISingleton
+* AgentMoveISystem, now before moving towards the target agent it first rotate towards the target
+
+### Removed
+* Removed the IDispoable from ObjTransformIData, destroying gameobject will be handled by ICleanupComponent
+* Removed AnimationController
+* Removed AgentMoveISingleton
+
+## [0.1.10] - 2026-03-27
+
+### Added
+* Added AnimationController
+* Added FlatPlaneAuthoring.prefab
+
+### Changed
+* ObjTransformIData, now implements IDisposable, the gameobject will be destroyed when the entity is destroyed
+* (Whether EntityTransformIData should also implement IDispoable is on the radar)
+* Renamed AgentMoveIData to AgentMoveIEnableable and implemented IEnableableComponent
+
+## [0.1.9] - 2026-03-25/26
+
+### Added
+* Added Runtime/Obsolete
+* Added AgentMoveIData
+* Added AgentMoveISystem
+* Added AgentMoveNodeAuthoring
+* Added AgentSpawnNodeAuthoring
+* Added AgentMoveSystemAuthoring
+* Added InitializeAgentMoveISystem
+* Added UrpRandomColorAuthoring
+* Two new overload for RandomValue()
+
+### Changed
+* Current Obsolete and ObsoleteV2 folder are now moved into Runtime/Obsolete
+* Old Obsolete folder now renamed to ObsoleteV1 
+* All scripts in Entities/Agents moved to ObsoleteV2 and marked obsolete
+* BasicProperties renamed to BasicAttributes
+* AgentScriptable renamed to AgentAttributes
+
+### Deleted
+* HelperCollection, deleted PositionRotationBlob and EntityBlob
+* Deleted DemoAgent prefab
+
+## [0.1.8] - 2026-03-24
+
+### Changed
+* Done a coding style cleanup
+* GenericOverlayUIManager, TObj field moved from serializable to script itself 
+
 ## [0.1.7] - 2026-03-20
 
-After testing I noticed that the GenericUIManager goes against on how UI was setup,
+After testing I noticed that the GenericUIManager goes against on how previously UI was setup,
 
 and the discovery of UI toolkit changes how overlay UI are setuped.
 

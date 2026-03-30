@@ -7,10 +7,14 @@ using Unity.Transforms;
 using UnityEngine;
 
 namespace EugeneC.ECS {
+
     [BurstCompile(CompileSynchronously = true)]
     [UpdateInGroup(typeof(Eu_PreTransformSystemGroup))]
     public partial struct VoxelTransformISystem : ISystem {
-        public void OnCreate(ref SystemState state) { state.RequireForUpdate<VoxelizerISingleton>(); }
+
+        public void OnCreate(ref SystemState state) {
+            state.RequireForUpdate<VoxelizerISingleton>();
+        }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state) {
@@ -25,6 +29,7 @@ namespace EugeneC.ECS {
 
         [BurstCompile(CompileSynchronously = true)]
         private partial struct Job : IJobEntity {
+
             [NativeDisableParallelForRestriction] public BufferLookup<DestroyBufferEntryIBuffer> DestroyLookup;
             public VoxelizerISingleton Voxelizer;
             public float ElapsedTime;
@@ -35,6 +40,7 @@ namespace EugeneC.ECS {
                 ref BoxIData box,
                 ref URPMaterialPropertyBaseColor urp) {
                 box.ExistTime += DeltaTime;
+
                 if (box.ExistTime >= Voxelizer.VoxelLife) {
                     var d = DestroyLookup[entity];
                     d.Add(new DestroyBufferEntryIBuffer { Value = 1 });
@@ -56,6 +62,9 @@ namespace EugeneC.ECS {
                 hue = math.frac(hue + ElapsedTime * Voxelizer.ColorSpeed);
                 urp.Value = (Vector4)Color.HSVToRGB(hue, 1, 1);
             }
+
         }
+
     }
+
 }

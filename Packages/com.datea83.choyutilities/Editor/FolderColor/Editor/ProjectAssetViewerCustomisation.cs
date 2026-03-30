@@ -1,17 +1,14 @@
-using UnityEngine;
-using UnityEditor;
-using System.IO;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
+using UnityEngine;
 
 namespace FolderColor {
+
 #if UNITY_EDITOR
 
     public abstract class ProjectAssetViewerCustomisation {
-        [System.Serializable]
-        public class AssetModificationData {
-            public List<string> assetModified = new List<string>();
-            public List<string> assetModifiedTexturePath = new List<string>();
-        }
 
         // Reference to the data
         public static AssetModificationData ModificationData = new();
@@ -25,19 +22,20 @@ namespace FolderColor {
         }
 
         private static void OnProjectWindowItemGUI(string guid, Rect selectionRect) {
-            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
 
             // Ensure assetType is not null before accessing it
             if (ModificationData.assetModified != null && ModificationData.assetModified.Contains(assetPath)) {
-                int t = ModificationData.assetModified.IndexOf(assetPath);
+                var t = ModificationData.assetModified.IndexOf(assetPath);
 
-                Texture2D tex = (Texture2D)AssetDatabase.LoadAssetAtPath(ModificationData.assetModifiedTexturePath[t],
+                var tex = (Texture2D)AssetDatabase.LoadAssetAtPath(ModificationData.assetModifiedTexturePath[t],
                     typeof(Texture2D));
 
                 if (tex == null) {
                     ModificationData.assetModified.RemoveAt(t);
                     ModificationData.assetModifiedTexturePath.RemoveAt(t);
                     SaveData();
+
                     return;
                 }
 
@@ -55,11 +53,14 @@ namespace FolderColor {
         // Add a menu item in the Unity Editor to open the custom modification window
         [MenuItem("Assets/Custom Folder", false, 100)]
         private static void CustomModificationMenuItem() {
-            string[] guids = Selection.assetGUIDs;
+            var guids = Selection.assetGUIDs;
+
             foreach (var guid in guids) {
-                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+
                 if (AssetDatabase.IsValidFolder(assetPath)) {
                     CustomWindowFileImage.ShowWindow(assetPath);
+
                     break;
                 }
             }
@@ -68,9 +69,11 @@ namespace FolderColor {
         // Validate function to enable/disable the menu item
         [MenuItem("Assets/Custom Folder", true)]
         private static bool ValidateCustomModificationMenuItem() {
-            string[] guids = Selection.assetGUIDs;
+            var guids = Selection.assetGUIDs;
+
             foreach (var guid in guids) {
-                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+
                 if (AssetDatabase.IsValidFolder(assetPath)) return true;
             }
 
@@ -82,38 +85,51 @@ namespace FolderColor {
             ModificationData ??= new AssetModificationData();
 
             // Convert to JSON
-            string jsonData = JsonUtility.ToJson(ModificationData);
+            var jsonData = JsonUtility.ToJson(ModificationData);
 
-            string path = FindScriptPathByName("ProjectAssetViewerCustomisation");
+            var path = FindScriptPathByName("ProjectAssetViewerCustomisation");
             path = path.Replace("Editor/ProjectAssetViewerCustomisation.cs", "SaveSetUp/FolderModificationData.json");
 
             File.WriteAllText(path, jsonData);
         }
 
         private static void LoadData() {
-            string filePath = FindScriptPathByName("ProjectAssetViewerCustomisation");
+            var filePath = FindScriptPathByName("ProjectAssetViewerCustomisation");
+
             filePath = filePath.Replace("Editor/ProjectAssetViewerCustomisation.cs",
                 "SaveSetUp/FolderModificationData.json");
 
             if (File.Exists(filePath)) {
-                string jsonData = File.ReadAllText(filePath);
+                var jsonData = File.ReadAllText(filePath);
 
                 ModificationData = JsonUtility.FromJson<AssetModificationData>(jsonData);
             }
         }
 
         public static string FindScriptPathByName(string scriptName) {
-            string[] guids = AssetDatabase.FindAssets($"{scriptName} t:script");
+            var guids = AssetDatabase.FindAssets($"{scriptName} t:script");
 
             if (guids.Length == 0) {
                 Debug.LogError($"Script with name '{scriptName}' not found!");
+
                 return null;
             }
 
-            string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+            var path = AssetDatabase.GUIDToAssetPath(guids[0]);
+
             return path;
         }
+
+        [Serializable]
+        public class AssetModificationData {
+
+            public List<string> assetModified = new();
+            public List<string> assetModifiedTexturePath = new();
+
+        }
+
     }
 
 #endif
+
 }

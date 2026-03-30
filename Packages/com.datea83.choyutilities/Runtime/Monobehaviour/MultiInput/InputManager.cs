@@ -1,13 +1,14 @@
+#if ENABLE_INPUT_SYSTEM
 using System.Collections.Generic;
 using EugeneC.Singleton;
-
-#if ENABLE_INPUT_SYSTEM
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace EugeneC.Utilities {
+
 // For objects that already existed
     public class InputManager : GenericSingleton<InputManager> {
+
         [SerializeField] private InputActionAsset actionAsset;
         [SerializeField] private int playerLimitCount = 3;
         [SerializeField] private bool allowNewJoin = true;
@@ -16,21 +17,26 @@ namespace EugeneC.Utilities {
         private readonly Dictionary<InputDevice, MultiInputSystem> _deviceRegistry = new();
         private readonly Dictionary<MultiInputSystem, IControlBinder> _playerRegistry = new();
 
-        public bool GetAllowKeyboard() => allowKeyboard;
+        public bool GetAllowKeyboard() {
+            return allowKeyboard;
+        }
 
         public bool RegisterPlayer(IControlBinder playerObject, InputDevice device) {
             if (!allowNewJoin) {
                 Debug.LogWarning("New players are not allowed to join at this time.");
+
                 return false;
             }
 
             if (_playerRegistry.Count > playerLimitCount) {
                 Debug.LogWarning("Player limit reached. Cannot register new player.");
+
                 return false;
             }
 
             if (_deviceRegistry.ContainsKey(device)) {
                 Debug.LogWarning($"{device.displayName} is already registered.");
+
                 return false;
             }
 
@@ -42,6 +48,7 @@ namespace EugeneC.Utilities {
 
             registry.BindObject(playerObject);
             Debug.Log($"Current player count: {_playerRegistry.Count}");
+
             return true;
         }
 
@@ -51,6 +58,7 @@ namespace EugeneC.Utilities {
             foreach (var entry in _playerRegistry) {
                 if (entry.Value != playerObject) continue;
                 registry = entry.Key;
+
                 break;
             }
 
@@ -60,8 +68,9 @@ namespace EugeneC.Utilities {
                 _deviceRegistry.Remove(registry.Device);
                 Debug.Log($"Player with device {registry.Device} has been unregistered.");
             }
-            else
+            else {
                 Debug.LogWarning("Attempted to unregister a player that is not registered.");
+            }
         }
 
         public void UnregisterAll() {
@@ -73,6 +82,8 @@ namespace EugeneC.Utilities {
 
             Debug.Log("All players have been unregistered.");
         }
+
     }
+
 }
 #endif

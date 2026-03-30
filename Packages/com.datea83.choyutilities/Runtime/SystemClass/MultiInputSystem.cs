@@ -1,32 +1,39 @@
-using UnityEngine;
-
 #if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem.Users;
-using UnityEngine.InputSystem;
 using System;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Users;
+using Object = UnityEngine.Object;
 
 namespace EugeneC.Utilities {
+
     public class MultiInputSystem {
+
+        private readonly string _controlScheme;
+        private InputActionMap _actionMap;
+        private IControlBinder _binder;
+        public InputActionAsset Asset;
+        public InputDevice Device;
+
+        public InputUser User;
+
         public MultiInputSystem(InputDevice device, InputActionAsset asset, EControlSchemeEnum controltype) {
             User = InputUser.PerformPairingWithDevice(device);
             Device = device;
-            Asset = UnityEngine.Object.Instantiate(asset);
+            Asset = Object.Instantiate(asset);
             _controlScheme = controltype.GetControlType();
         }
-
-        public InputUser User;
-        public InputDevice Device;
-        public InputActionAsset Asset;
-
-        string _controlScheme;
-        InputActionMap _actionMap;
-        IControlBinder _binder;
 
         public event Action<InputDevice, InputDeviceChange> OnBindObject;
         public event Action<InputDevice, InputDeviceChange> OnUnbindObject;
 
-        public void EnableInput() => _actionMap.Enable();
-        public void DisableInput() => _actionMap.Disable();
+        public void EnableInput() {
+            _actionMap.Enable();
+        }
+
+        public void DisableInput() {
+            _actionMap.Disable();
+        }
 
         public void BindObject<T>(T bindobject)
             where T : IControlBinder {
@@ -36,13 +43,14 @@ namespace EugeneC.Utilities {
             _binder = bindobject;
             _binder.Registry = this;
 
-            string actionmapname =
+            var actionmapname =
                 UtilityMethods.InterfaceToStringName(bindobject.InputInterface, "Actions", string.Empty);
             Debug.Log($"Finding action map name of {actionmapname}");
             _actionMap = Asset.FindActionMap(actionmapname);
 
             if (_actionMap == null) {
                 Debug.LogError($"InputActionMap '{actionmapname}' not found in the InputActionAsset.");
+
                 return;
             }
 
@@ -66,12 +74,16 @@ namespace EugeneC.Utilities {
             OnUnbindObject?.Invoke(Device, InputDeviceChange.Removed);
             DisableInput();
         }
+
     }
 
     public interface IControlBinder {
+
         public Type InputInterface { get; }
         MultiInputSystem Registry { get; set; }
         void OnBind();
+
     }
+
 }
 #endif

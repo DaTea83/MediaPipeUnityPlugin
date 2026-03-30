@@ -5,9 +5,11 @@ using Unity.Transforms;
 using UnityEngine;
 
 namespace EugeneC.ECS {
+
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RandomAuthoring))]
     public class SphereSpawnAuthoring : MonoBehaviour {
+
         public GameObject prefab;
         public float radius = 10f;
         public byte amount = 10;
@@ -20,6 +22,7 @@ namespace EugeneC.ECS {
         }
 
         public class Baker : Baker<SphereSpawnAuthoring> {
+
             public override void Bake(SphereSpawnAuthoring authoring) {
                 if (authoring.prefab is null || authoring.radius <= 0) return;
 
@@ -31,24 +34,29 @@ namespace EugeneC.ECS {
                     Radius = authoring.radius,
                     Amount = authoring.amount,
                     Height = authoring.height,
-                    Speed = authoring.speed,
+                    Speed = authoring.speed
                 });
             }
+
         }
+
     }
 
     public struct SphereSpawnIData : IComponentData {
+
         public Entity Prefab;
         public float Radius;
         public byte Amount;
         public float Height;
         public float Speed;
+
     }
 
     [BurstCompile]
     [UpdateInGroup(typeof(Eu_InitializationSystemGroup), OrderFirst = true)]
     [UpdateAfter(typeof(InitializeRandomISystem))]
     public partial struct SpawnInSphereISystem : ISystem {
+
         [BurstCompile]
         public void OnUpdate(ref SystemState state) {
             var ecb = new EntityCommandBuffer(state.WorldUpdateAllocator);
@@ -74,7 +82,7 @@ namespace EugeneC.ECS {
                     ecb.AddComponent(instances[i], new WaveMoveIData {
                         YOffset = newPos.y,
                         Height = sphere.ValueRO.Height,
-                        Speed = sphere.ValueRO.Speed,
+                        Speed = sphere.ValueRO.Speed
                     });
                 }
 
@@ -83,5 +91,7 @@ namespace EugeneC.ECS {
 
             ecb.Playback(em);
         }
+
     }
+
 }

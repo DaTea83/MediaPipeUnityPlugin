@@ -4,31 +4,31 @@ using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
-using Unity.Mathematics;
 
 namespace EugeneC.Utilities {
+
     public class ActivateWebcam : MonoBehaviour {
+
         [SerializeField] private RawImage screen;
         [SerializeField] private int width = 1280;
         [SerializeField] private int height = 720;
         [SerializeField] private int fps = 30;
-        [Space] [CanBeNull, SerializeField] private TMP_Dropdown dropdown;
-
-        private WebCamTexture _webCamTexture;
+        [Space] [CanBeNull] [SerializeField] private TMP_Dropdown dropdown;
         private readonly CancellationTokenSource _tokenSource = new();
 
         private List<WebCamDevice> _devices = new();
         private int _switchVersion;
 
+        private WebCamTexture _webCamTexture;
+
         private async void Start() {
             try {
                 _devices = new List<WebCamDevice>(WebCamTexture.devices);
 
-                if (_devices.Count == 0) {
-                    throw new Exception("Web Camera devices are not found");
-                }
+                if (_devices.Count == 0) throw new Exception("Web Camera devices are not found");
 
                 InitializeDropdown(_devices);
 
@@ -38,6 +38,13 @@ namespace EugeneC.Utilities {
             catch (Exception e) {
                 print(e);
             }
+        }
+
+        private void OnDestroy() {
+            dropdown?.onValueChanged.RemoveListener(OnDropdownValueChanged);
+
+            _webCamTexture?.Stop();
+            _tokenSource.Cancel();
         }
 
         private void InitializeDropdown(IReadOnlyList<WebCamDevice> devices) {
@@ -79,11 +86,6 @@ namespace EugeneC.Utilities {
             screen.texture = _webCamTexture;
         }
 
-        private void OnDestroy() {
-            dropdown?.onValueChanged.RemoveListener(OnDropdownValueChanged);
-
-            _webCamTexture?.Stop();
-            _tokenSource.Cancel();
-        }
     }
+
 }

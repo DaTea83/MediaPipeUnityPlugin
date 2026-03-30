@@ -1,24 +1,27 @@
 using Unity.Mathematics;
 
 namespace EugeneC.Utilities {
+
     public struct AudioChunk {
+
         public float[] Data;
         public int Frequency;
         public int Channels;
         public float Length;
         public bool IsVoiceDetected;
+
     }
 
-    public static partial class MicrophoneCollections {
+    public static class MicrophoneCollections {
+
         public static bool SimpleVad(float[] data, int sampleRate, float lastSec, float vadThd, float freqThd) {
             // https://github.com/ggerganov/whisper.cpp/blob/a792c4079ce61358134da4c9bc589c15a03b04ad/examples/common.cpp#L697
             var nSamples = data.Length;
             var nSamplesLast = (int)(sampleRate * lastSec);
 
-            if (nSamplesLast >= nSamples) {
+            if (nSamplesLast >= nSamples)
                 // not enough samples - assume no speech
                 return false;
-            }
 
             if (freqThd > 0.0f)
                 HighPassFilter(data, freqThd, sampleRate);
@@ -49,10 +52,13 @@ namespace EugeneC.Utilities {
             var alpha = dt / (rc + dt);
 
             var y = data[0];
+
             for (var i = 1; i < data.Length; i++) {
                 y = alpha * (y + data[i] - data[i - 1]);
                 data[i] = y;
             }
         }
+
     }
+
 }

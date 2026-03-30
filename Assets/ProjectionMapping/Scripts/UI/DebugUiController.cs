@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace ProjectionMapping {
 	public class DebugUiController : GenericSingleton<DebugUiController> {
+		
 		[Header("Debug")] [SerializeField] private TMP_Text poseText;
 
 		[SerializeField] private TMP_Text dataText;

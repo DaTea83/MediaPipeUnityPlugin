@@ -4,19 +4,24 @@ using EugeneC.Singleton;
 using UnityEngine;
 
 namespace EugeneC.Utilities {
+
     public static partial class UtilityMethods {
+
         // Can be non-static but the use case is rare, usually do interface instead
         public static void CallStaticMethod(string className, string methodName) {
             var classType = Type.GetType(className);
+
             if (classType is not null) {
                 var method = classType.GetMethod(methodName);
+
                 if (method is not null)
                     method.Invoke(className, null);
                 else
                     Debug.LogWarning($"Method '{methodName}' not found on {className}.");
             }
-            else
+            else {
                 Debug.LogWarning($"Class '{className}' not found.");
+            }
         }
 
         // Use this if the singleton is self-declared
@@ -25,23 +30,29 @@ namespace EugeneC.Utilities {
 
             if (classType is not null) {
                 var property = classType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
+
                 if (property is not null) {
                     var classInstance = property.GetValue(null);
+
                     if (classInstance is not null) {
                         var method = classType.GetMethod(methodName);
+
                         if (method is not null)
                             method.Invoke(classInstance, null);
                         else
                             Debug.LogWarning($"Method '{methodName}' not found on {instanceClassName}.");
                     }
-                    else
+                    else {
                         Debug.LogWarning($"Instance of class '{instanceClassName}' not found.");
+                    }
                 }
-                else
+                else {
                     Debug.LogWarning($"Static 'Instance' is not found in {instanceClassName}");
+                }
             }
-            else
+            else {
                 Debug.LogWarning($"Class '{instanceClassName}' not found.");
+            }
         }
 
         // For any singleton inherited from generic singleton
@@ -56,21 +67,28 @@ namespace EugeneC.Utilities {
 
                 if (instanceProperty is not null) {
                     var classInstance = instanceProperty.GetValue(null);
+
                     if (classInstance != null) {
                         var method = classType.GetMethod(methodName);
+
                         if (method is not null)
                             method.Invoke(classInstance, null);
                         else
                             Debug.LogWarning($"Method '{methodName}' not found on {instanceClassName}.");
                     }
-                    else
+                    else {
                         Debug.LogWarning($"Instance of class '{instanceClassName}' is null.");
+                    }
                 }
-                else
+                else {
                     Debug.LogWarning($"Static 'Instance' property not found on class '{instanceClassName}'.");
+                }
             }
-            else
+            else {
                 Debug.LogWarning($"Class '{instanceClassName}' not found or does not inherit from MonoBehaviour.");
+            }
         }
+
     }
+
 }

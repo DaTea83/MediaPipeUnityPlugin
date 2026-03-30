@@ -12,9 +12,11 @@ using static Unity.Physics.Math;
 // This script is taken from the Unity Physics Samples repository
 // Changes: Added pre process for old input system
 namespace Unity.Physics.Extensions {
+
     // A mouse pick collector which stores every hit. Based off the ClosestHitCollector
     [BurstCompile]
     public struct MousePickCollector : ICollector<RaycastHit> {
+
         public bool IgnoreTriggers;
         public bool IgnoreStatic;
         public int NumDynamicBodies;
@@ -40,103 +42,62 @@ namespace Unity.Physics.Extensions {
             Assert.IsTrue(hit.Fraction <= MaxFraction);
 
             var isAcceptable = true;
-            if (IgnoreStatic) {
-                isAcceptable &= hit.RigidBodyIndex >= 0 && hit.RigidBodyIndex < NumDynamicBodies;
-            }
+            if (IgnoreStatic) isAcceptable &= hit.RigidBodyIndex >= 0 && hit.RigidBodyIndex < NumDynamicBodies;
 
-            if (IgnoreTriggers) {
+            if (IgnoreTriggers)
                 isAcceptable &= hit.Material.CollisionResponse != CollisionResponsePolicy.RaiseTriggerEvents;
-            }
 
-            if (!isAcceptable) {
-                return false;
-            }
+            if (!isAcceptable) return false;
 
             MaxFraction = hit.Fraction;
             Hit = hit;
             NumHits = 1;
+
             return true;
         }
 
         #endregion
+
     }
 
     public struct MousePick : IComponentData {
+
         public bool IgnoreTriggers;
         public bool IgnoreStatic;
         public bool DeleteEntityOnClick;
+
     }
 
     [DisallowMultipleComponent]
     public class LegacyMousePickAuthoring : MonoBehaviour {
+
         public bool IgnoreTriggers = true;
         public bool IgnoreStatic = true;
-        public bool DeleteEntityOnClick = false;
+        public bool DeleteEntityOnClick;
+
     }
 
-    class MousePickBaker : Baker<LegacyMousePickAuthoring> {
+    internal class MousePickBaker : Baker<LegacyMousePickAuthoring> {
+
         public override void Bake(LegacyMousePickAuthoring authoring) {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
-            AddComponent(entity, new MousePick() {
+
+            AddComponent(entity, new MousePick {
                 IgnoreTriggers = authoring.IgnoreTriggers,
                 IgnoreStatic = authoring.IgnoreStatic,
                 DeleteEntityOnClick = authoring.DeleteEntityOnClick
             });
         }
+
     }
 
     // Attaches a virtual spring to the picked entity
     [UpdateInGroup(typeof(AfterPhysicsSystemGroup))]
     public partial class MousePickSystem : SystemBase {
+
         public const float k_MaxDistance = 100.0f;
-        public NativeReference<SpringData> SpringDataRef;
         public JobHandle? PickJobHandle;
-
-        public struct SpringData {
-            public Entity Entity;
-            public bool Picked;
-            public float3 PointOnBody;
-            public float MouseDepth;
-        }
-
-        [BurstCompile]
-        struct Pick : IJob {
-            [ReadOnly] public CollisionWorld CollisionWorld;
-            public NativeReference<SpringData> SpringDataRef;
-            public RaycastInput RayInput;
-            public float Near;
-            public float3 Forward;
-            [ReadOnly] public bool IgnoreTriggers;
-            [ReadOnly] public bool IgnoreStatic;
-
-            public void Execute() {
-                var mousePickCollector = new MousePickCollector(CollisionWorld.NumDynamicBodies) {
-                    IgnoreTriggers = IgnoreTriggers,
-                    IgnoreStatic = IgnoreStatic
-                };
-
-                if (CollisionWorld.CastRay(RayInput, ref mousePickCollector)) {
-                    float fraction = mousePickCollector.Hit.Fraction;
-                    var hitBody = CollisionWorld.Bodies[mousePickCollector.Hit.RigidBodyIndex];
-
-                    MTransform bodyFromWorld = Inverse(new MTransform(hitBody.WorldFromBody));
-                    float3 pointOnBody = Mul(bodyFromWorld, mousePickCollector.Hit.Position);
-
-                    SpringDataRef.Value = new SpringData {
-                        Entity = hitBody.Entity,
-                        Picked = true,
-                        PointOnBody = pointOnBody,
-                        MouseDepth = Near + math.dot(math.normalize(RayInput.End - RayInput.Start), Forward) *
-                            fraction * k_MaxDistance,
-                    };
-                }
-                else {
-                    SpringDataRef.Value = new SpringData {
-                        Picked = false
-                    };
-                }
-            }
-        }
+        public NativeReference<SpringData> SpringDataRef;
 
         public MousePickSystem() {
             SpringDataRef =
@@ -144,9 +105,13 @@ namespace Unity.Physics.Extensions {
             SpringDataRef.Value = new SpringData();
         }
 
-        protected override void OnCreate() { RequireForUpdate<MousePick>(); }
+        protected override void OnCreate() {
+            RequireForUpdate<MousePick>();
+        }
 
-        protected override void OnDestroy() { SpringDataRef.Dispose(); }
+        protected override void OnDestroy() {
+            SpringDataRef.Dispose();
+        }
 
         protected override void OnUpdate() {
 #if ENABLE_LEGACY_INPUT_MANAGER
@@ -183,12 +148,64 @@ namespace Unity.Physics.Extensions {
             }
 #endif
         }
+
+        public struct SpringData {
+
+            public Entity Entity;
+            public bool Picked;
+            public float3 PointOnBody;
+            public float MouseDepth;
+
+        }
+
+        [BurstCompile]
+        private struct Pick : IJob {
+
+            [ReadOnly] public CollisionWorld CollisionWorld;
+            public NativeReference<SpringData> SpringDataRef;
+            public RaycastInput RayInput;
+            public float Near;
+            public float3 Forward;
+            [ReadOnly] public bool IgnoreTriggers;
+            [ReadOnly] public bool IgnoreStatic;
+
+            public void Execute() {
+                var mousePickCollector = new MousePickCollector(CollisionWorld.NumDynamicBodies) {
+                    IgnoreTriggers = IgnoreTriggers,
+                    IgnoreStatic = IgnoreStatic
+                };
+
+                if (CollisionWorld.CastRay(RayInput, ref mousePickCollector)) {
+                    var fraction = mousePickCollector.Hit.Fraction;
+                    var hitBody = CollisionWorld.Bodies[mousePickCollector.Hit.RigidBodyIndex];
+
+                    var bodyFromWorld = Inverse(new MTransform(hitBody.WorldFromBody));
+                    var pointOnBody = Mul(bodyFromWorld, mousePickCollector.Hit.Position);
+
+                    SpringDataRef.Value = new SpringData {
+                        Entity = hitBody.Entity,
+                        Picked = true,
+                        PointOnBody = pointOnBody,
+                        MouseDepth = Near + math.dot(math.normalize(RayInput.End - RayInput.Start), Forward) *
+                            fraction * k_MaxDistance
+                    };
+                }
+                else {
+                    SpringDataRef.Value = new SpringData {
+                        Picked = false
+                    };
+                }
+            }
+
+        }
+
     }
 
     // Applies any mouse spring as a change in velocity on the entity's motion component
     [UpdateInGroup(typeof(BeforePhysicsSystemGroup))]
     public partial class MouseSpringSystem : SystemBase {
-        MousePickSystem m_PickSystem;
+
+        private MousePickSystem m_PickSystem;
 
         protected override void OnCreate() {
             m_PickSystem = World.GetOrCreateSystemManaged<MousePickSystem>();
@@ -196,44 +213,44 @@ namespace Unity.Physics.Extensions {
         }
 
         protected override void OnUpdate() {
-            ComponentLookup<LocalTransform> LocalTransforms = GetComponentLookup<LocalTransform>(true);
+            var LocalTransforms = GetComponentLookup<LocalTransform>(true);
 
-            ComponentLookup<PhysicsVelocity> Velocities = GetComponentLookup<PhysicsVelocity>();
-            ComponentLookup<PhysicsMass> Masses = GetComponentLookup<PhysicsMass>(true);
-            ComponentLookup<PhysicsMassOverride> MassOverrides = GetComponentLookup<PhysicsMassOverride>(true);
+            var Velocities = GetComponentLookup<PhysicsVelocity>();
+            var Masses = GetComponentLookup<PhysicsMass>(true);
+            var MassOverrides = GetComponentLookup<PhysicsMassOverride>(true);
 
             // If there's a pick job, wait for it to finish
-            if (m_PickSystem.PickJobHandle != null) {
+            if (m_PickSystem.PickJobHandle != null)
                 JobHandle.CombineDependencies(Dependency, m_PickSystem.PickJobHandle.Value).Complete();
-            }
 
             // If there's a picked entity, drag it
-            MousePickSystem.SpringData springData = m_PickSystem.SpringDataRef.Value;
+            var springData = m_PickSystem.SpringDataRef.Value;
+
             if (springData.Picked) {
                 var mousePick = SystemAPI.GetSingleton<MousePick>();
+
                 if (mousePick.DeleteEntityOnClick) {
                     EntityManager.DestroyEntity(springData.Entity);
 
                     // reset spring data
                     m_PickSystem.SpringDataRef.Value = new MousePickSystem.SpringData();
+
                     return;
                 }
                 // else:
 
-                Entity entity = springData.Entity;
-                if (!Masses.HasComponent(entity)) {
-                    return;
-                }
+                var entity = springData.Entity;
 
-                PhysicsMass massComponent = Masses[entity];
-                PhysicsVelocity velocityComponent = Velocities[entity];
+                if (!Masses.HasComponent(entity)) return;
+
+                var massComponent = Masses[entity];
+                var velocityComponent = Velocities[entity];
 
                 // if body is kinematic
                 // TODO: you should be able to rotate a body with infinite mass but finite inertia
                 if (massComponent.HasInfiniteMass ||
-                    MassOverrides.HasComponent(entity) && MassOverrides[entity].IsKinematic != 0) {
+                    (MassOverrides.HasComponent(entity) && MassOverrides[entity].IsKinematic != 0))
                     return;
-                }
 
 
                 var worldFromBody = new MTransform(LocalTransforms[entity].Rotation, LocalTransforms[entity].Position);
@@ -241,7 +258,7 @@ namespace Unity.Physics.Extensions {
 
                 // Body to motion transform
                 var bodyFromMotion = new MTransform(Masses[entity].InertiaOrientation, Masses[entity].CenterOfMass);
-                MTransform worldFromMotion = Mul(worldFromBody, bodyFromMotion);
+                var worldFromMotion = Mul(worldFromBody, bodyFromMotion);
 
                 // TODO: shouldn't damp where inertia mass or inertia
                 // Damp the current velocity
@@ -250,20 +267,24 @@ namespace Unity.Physics.Extensions {
                 velocityComponent.Angular *= gain;
 
                 // Get the body and mouse points in world space
-                float3 pointBodyWs = Mul(worldFromBody, springData.PointOnBody);
+                var pointBodyWs = Mul(worldFromBody, springData.PointOnBody);
+
                 float3 pointSpringWs = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x,
                     Input.mousePosition.y, springData.MouseDepth));
 
                 // Calculate the required change in velocity
-                float3 pointBodyLs = Mul(Inverse(bodyFromMotion), springData.PointOnBody);
+                var pointBodyLs = Mul(Inverse(bodyFromMotion), springData.PointOnBody);
                 float3 deltaVelocity;
+
                 {
-                    float3 pointDiff = pointBodyWs - pointSpringWs;
-                    float3 relativeVelocityInWorld = velocityComponent.Linear + math.mul(worldFromMotion.Rotation,
+                    var pointDiff = pointBodyWs - pointSpringWs;
+
+                    var relativeVelocityInWorld = velocityComponent.Linear + math.mul(worldFromMotion.Rotation,
                         math.cross(velocityComponent.Angular, pointBodyLs));
 
                     const float elasticity = 0.1f;
                     const float damping = 0.5f;
+
                     deltaVelocity = -pointDiff * (elasticity / SystemAPI.Time.DeltaTime) -
                                     damping * relativeVelocityInWorld;
                 }
@@ -272,8 +293,10 @@ namespace Unity.Physics.Extensions {
                 // TODO how are bodies with inf inertia and finite mass represented
                 // TODO the aggressive damping is hiding something wrong in this code if dragging non-uniform shapes
                 float3x3 effectiveMassMatrix;
+
                 {
-                    float3 arm = pointBodyWs - worldFromMotion.Translation;
+                    var arm = pointBodyWs - worldFromMotion.Translation;
+
                     var skew = new float3x3(
                         new float3(0.0f, arm.z, -arm.y),
                         new float3(-arm.z, 0.0f, arm.x),
@@ -288,7 +311,7 @@ namespace Unity.Physics.Extensions {
                     );
                     invInertiaWs = math.mul(invInertiaWs, math.transpose(worldFromMotion.Rotation));
 
-                    float3x3 invEffMassMatrix = math.mul(math.mul(skew, invInertiaWs), skew);
+                    var invEffMassMatrix = math.mul(math.mul(skew, invInertiaWs), skew);
                     invEffMassMatrix.c0 = new float3(massComponent.InverseMass, 0.0f, 0.0f) - invEffMassMatrix.c0;
                     invEffMassMatrix.c1 = new float3(0.0f, massComponent.InverseMass, 0.0f) - invEffMassMatrix.c1;
                     invEffMassMatrix.c2 = new float3(0.0f, 0.0f, massComponent.InverseMass) - invEffMassMatrix.c2;
@@ -297,19 +320,19 @@ namespace Unity.Physics.Extensions {
                 }
 
                 // Calculate impulse to cause the desired change in velocity
-                float3 impulse = math.mul(effectiveMassMatrix, deltaVelocity);
+                var impulse = math.mul(effectiveMassMatrix, deltaVelocity);
 
                 // Clip the impulse
                 const float maxAcceleration = 250.0f;
-                float maxImpulse = math.rcp(massComponent.InverseMass) * SystemAPI.Time.DeltaTime * maxAcceleration;
-                impulse *= math.min(1.0f, math.sqrt((maxImpulse * maxImpulse) / math.lengthsq(impulse)));
+                var maxImpulse = math.rcp(massComponent.InverseMass) * SystemAPI.Time.DeltaTime * maxAcceleration;
+                impulse *= math.min(1.0f, math.sqrt(maxImpulse * maxImpulse / math.lengthsq(impulse)));
 
                 // Apply the impulse
                 {
                     velocityComponent.Linear += impulse * massComponent.InverseMass;
 
-                    float3 impulseLs = math.mul(math.transpose(worldFromMotion.Rotation), impulse);
-                    float3 angularImpulseLs = math.cross(pointBodyLs, impulseLs);
+                    var impulseLs = math.mul(math.transpose(worldFromMotion.Rotation), impulse);
+                    var angularImpulseLs = math.cross(pointBodyLs, impulseLs);
                     velocityComponent.Angular += angularImpulseLs * massComponent.InverseInertia;
                 }
 
@@ -317,5 +340,7 @@ namespace Unity.Physics.Extensions {
                 Velocities[entity] = velocityComponent;
             }
         }
+
     }
+
 }

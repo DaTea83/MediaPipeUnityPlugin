@@ -1,75 +1,112 @@
 using System;
 
 namespace EugeneC.Utilities {
+
     public class HealthSystem {
-        int _health;
-        int _maxHealth;
 
         public HealthSystem(int hp) {
-            _maxHealth = hp;
-            _health = _maxHealth;
+            MaxHealth = hp;
+            Health = MaxHealth;
         }
 
-        event Action<int> OnHealthChanged;
-        public void SubOnHealthChanged(Action<int> sub) => OnHealthChanged += sub;
-        public void UnsubOnHealthChanged(Action<int> unsub) => OnHealthChanged -= unsub;
+        public int Health { get; private set; }
 
-        event Action<int> OnHealthMaxChanged;
-        public void SubOnHealthMaxChanged(Action<int> sub) => OnHealthMaxChanged += sub;
-        public void UnsubOnHealthMaxChanged(Action<int> unsub) => OnHealthMaxChanged -= unsub;
+        public int MaxHealth { get; private set; }
 
-        event EventHandler OnDamaged;
-        public void SubOnDamaged(EventHandler sub) => OnDamaged += sub;
-        public void UnsubOnDamaged(EventHandler unsub) => OnDamaged -= unsub;
+        public float HealthPercentage => (float)Health / MaxHealth;
 
-        event EventHandler OnHealed;
-        public void SubOnHealed(EventHandler sub) => OnHealed += sub;
-        public void UnsubOnHealed(EventHandler unsub) => OnHealed -= unsub;
+        public bool IsDead => Health <= 0;
 
-        event EventHandler OnDead;
-        public void SubOnDead(EventHandler sub) => OnDead += sub;
-        public void UnsubOnDead(EventHandler unsub) => OnDead -= unsub;
+        private event Action<int> OnHealthChanged;
 
-        public int Health { get => _health; }
+        public void SubOnHealthChanged(Action<int> sub) {
+            OnHealthChanged += sub;
+        }
 
-        public int MaxHealth { get => _maxHealth; }
+        public void UnsubOnHealthChanged(Action<int> unsub) {
+            OnHealthChanged -= unsub;
+        }
 
-        public float HealthPercentage { get => (float)_health / _maxHealth; }
+        private event Action<int> OnHealthMaxChanged;
+
+        public void SubOnHealthMaxChanged(Action<int> sub) {
+            OnHealthMaxChanged += sub;
+        }
+
+        public void UnsubOnHealthMaxChanged(Action<int> unsub) {
+            OnHealthMaxChanged -= unsub;
+        }
+
+        private event EventHandler OnDamaged;
+
+        public void SubOnDamaged(EventHandler sub) {
+            OnDamaged += sub;
+        }
+
+        public void UnsubOnDamaged(EventHandler unsub) {
+            OnDamaged -= unsub;
+        }
+
+        private event EventHandler OnHealed;
+
+        public void SubOnHealed(EventHandler sub) {
+            OnHealed += sub;
+        }
+
+        public void UnsubOnHealed(EventHandler unsub) {
+            OnHealed -= unsub;
+        }
+
+        private event EventHandler OnDead;
+
+        public void SubOnDead(EventHandler sub) {
+            OnDead += sub;
+        }
+
+        public void UnsubOnDead(EventHandler unsub) {
+            OnDead -= unsub;
+        }
 
         public void Damage(int damageNumber) {
-            _health -= damageNumber;
-            if (_health < 0) _health = 0;
+            Health -= damageNumber;
+            if (Health < 0) Health = 0;
 
             OnHealthChanged?.Invoke(-damageNumber);
             OnDamaged?.Invoke(this, EventArgs.Empty);
 
-            if (_health <= 0) Die();
+            if (Health <= 0) Die();
         }
 
-        public void Die() => OnDead?.Invoke(this, EventArgs.Empty);
-
-        public bool IsDead { get => _health <= 0; }
+        public void Die() {
+            OnDead?.Invoke(this, EventArgs.Empty);
+        }
 
         public void Heal(int healAmount) {
-            _health += healAmount;
-            if (_health > _maxHealth) _health = _maxHealth;
+            Health += healAmount;
+            if (Health > MaxHealth) Health = MaxHealth;
             OnHealthChanged?.Invoke(healAmount);
             OnHealed?.Invoke(this, EventArgs.Empty);
         }
 
         public void OnHealthMaxChangedEvent(int hp) {
-            _maxHealth += hp;
-            if (_maxHealth < 0) _maxHealth = 1;
+            MaxHealth += hp;
+            if (MaxHealth < 0) MaxHealth = 1;
             OnHealthMaxChanged?.Invoke(hp);
         }
+
     }
 
     public interface IDamage {
+
         void Damaged(int tagTeam, int dmg);
+
     }
 
     public interface IHeal {
+
         bool CanInteract { get; }
         void Healed(int heal);
+
     }
+
 }

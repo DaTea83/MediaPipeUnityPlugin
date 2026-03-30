@@ -5,7 +5,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace EugeneC.Utilities {
+
     public static partial class UtilityCollection {
+
         public static IEnumerator FadeScreenCoroutine(this Image fadeImage,
             bool isFadein,
             float loadDuration,
@@ -20,6 +22,7 @@ namespace EugeneC.Utilities {
                 time += Time.unscaledDeltaTime;
                 var alpha = Mathf.Lerp(currentAlpha, targetAlpha, time / loadDuration);
                 fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, alpha);
+
                 yield return null;
             }
 
@@ -38,7 +41,7 @@ namespace EugeneC.Utilities {
 
             while (time <= loadDuration) {
                 time += Time.unscaledDeltaTime;
-                Color col = Color.Lerp(currentColor, target, time / loadDuration);
+                var col = Color.Lerp(currentColor, target, time / loadDuration);
                 currentColor = col;
             }
 
@@ -53,13 +56,14 @@ namespace EugeneC.Utilities {
             if (obj is null || targetPos is null) yield break;
 
             float time = 0;
-            Vector3 startPos = obj.transform.position;
-            Vector3 endPos = targetPos.position;
+            var startPos = obj.transform.position;
+            var endPos = targetPos.position;
 
             while (time < moveDuration) {
                 time += Time.unscaledDeltaTime;
                 var pos = Vector3.Lerp(startPos, endPos, time / moveDuration);
                 obj.transform.position = pos;
+
                 yield return null;
             }
 
@@ -74,13 +78,14 @@ namespace EugeneC.Utilities {
             if (obj is null) yield break;
 
             float time = 0;
-            Vector3 startPos = obj.transform.position;
-            Vector3 endPos = targetPos;
+            var startPos = obj.transform.position;
+            var endPos = targetPos;
 
             while (time < moveDuration) {
                 time += Time.unscaledDeltaTime;
-                Vector3 pos = Vector3.Lerp(startPos, endPos, time / moveDuration);
+                var pos = Vector3.Lerp(startPos, endPos, time / moveDuration);
                 obj.transform.position = pos;
+
                 yield return null;
             }
 
@@ -94,13 +99,14 @@ namespace EugeneC.Utilities {
             Action onDone = null) {
             if (obj is null) yield break;
 
-            float time = 0f;
-            Quaternion startRot = obj.transform.rotation;
-            Quaternion endRot = Quaternion.Euler(rotateTo);
+            var time = 0f;
+            var startRot = obj.transform.rotation;
+            var endRot = Quaternion.Euler(rotateTo);
 
             while (time < rotateDuration) {
                 time += Time.unscaledDeltaTime;
                 obj.transform.rotation = Quaternion.Slerp(startRot, endRot, time / rotateDuration);
+
                 yield return null;
             }
 
@@ -113,13 +119,14 @@ namespace EugeneC.Utilities {
             float scalingDuration,
             Action onDone = null) {
             if (obj is null) yield break;
-            float time = 0f;
-            Vector3 startScale = obj.transform.localScale;
-            Vector3 endScale = scaleTo;
+            var time = 0f;
+            var startScale = obj.transform.localScale;
+            var endScale = scaleTo;
 
             while (time < scalingDuration) {
                 time += Time.unscaledDeltaTime;
                 obj.transform.localScale = Vector3.Lerp(startScale, endScale, time / scalingDuration);
+
                 yield return null;
             }
 
@@ -143,7 +150,7 @@ namespace EugeneC.Utilities {
 
                 while (currentDisplaying != textToDisplay) {
                     timer += Time.unscaledDeltaTime;
-                    int length = Mathf.CeilToInt(timer / timePerChar);
+                    var length = Mathf.CeilToInt(timer / timePerChar);
                     length = Mathf.Clamp(length, 0, textToDisplay.Length);
                     currentDisplaying = textToDisplay.Substring(0, length);
                     displayTo(currentDisplaying);
@@ -162,11 +169,12 @@ namespace EugeneC.Utilities {
             float rollspeed,
             Vector3 dir,
             float rollCd = .1f) {
-            Vector3 anchor = ob.position + (Vector3.down + dir) * 0.5f;
-            Vector3 axis = Vector3.Cross(Vector3.up, dir);
+            var anchor = ob.position + (Vector3.down + dir) * 0.5f;
+            var axis = Vector3.Cross(Vector3.up, dir);
 
-            for (var i = 0; i <= (90 / rollspeed); i++) {
+            for (var i = 0; i <= 90 / rollspeed; i++) {
                 ob.RotateAround(anchor, axis, i);
+
                 yield return new WaitForSeconds(rollCd);
             }
         }
@@ -174,18 +182,22 @@ namespace EugeneC.Utilities {
         public static IEnumerator TimeScaleCoroutine(this float targetScale,
             float loadDuration = 2f,
             Action onDone = null) {
-            float currentScale = Time.timeScale;
+            var currentScale = Time.timeScale;
             float unscaledTimer = 0;
+
             yield return new WaitForEndOfFrame();
 
             while (unscaledTimer <= loadDuration) {
                 unscaledTimer += Time.unscaledDeltaTime;
-                float t = Mathf.Lerp(currentScale, targetScale, unscaledTimer / loadDuration);
+                var t = Mathf.Lerp(currentScale, targetScale, unscaledTimer / loadDuration);
                 Time.timeScale = t;
+
                 yield return new WaitForEndOfFrame();
             }
 
             onDone?.Invoke();
         }
+
     }
+
 }

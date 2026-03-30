@@ -2,7 +2,9 @@
 using UnityEngine;
 
 namespace EugeneC.Editor {
+
     internal static class RemoveMissingScriptsEditor {
+
         [MenuItem(EditorUtils.UtilityWindow + "Missing Scripts/Find")]
         internal static void FindMissingScripts() {
 #if UNITY_2023_1_OR_NEWER
@@ -11,12 +13,11 @@ namespace EugeneC.Editor {
 #else
             foreach (var gameObject in GameObject.FindObjectsOfType<GameObject>(true))
 #endif
-            {
-                foreach (var component in gameObject.GetComponentsInChildren<Component>()) {
-                    if (component is not null) continue;
-                    Debug.Log($"GameObject: {gameObject.name} has missing Script", gameObject);
-                    break;
-                }
+            foreach (var component in gameObject.GetComponentsInChildren<Component>()) {
+                if (component is not null) continue;
+                Debug.Log($"GameObject: {gameObject.name} has missing Script", gameObject);
+
+                break;
             }
         }
 
@@ -28,13 +29,13 @@ namespace EugeneC.Editor {
 #else
             foreach (var gameObject in GameObject.FindObjectsOfType<GameObject>(true))
 #endif
-            {
-                foreach (var component in gameObject.GetComponentsInChildren<Component>()) {
-                    if (component is not null) continue;
-                    GameObjectUtility.RemoveMonoBehavioursWithMissingScript(gameObject);
-                    Debug.Log($"Removing {gameObject.name}'s missing Script", gameObject);
-                }
+            foreach (var component in gameObject.GetComponentsInChildren<Component>()) {
+                if (component is not null) continue;
+                GameObjectUtility.RemoveMonoBehavioursWithMissingScript(gameObject);
+                Debug.Log($"Removing {gameObject.name}'s missing Script", gameObject);
             }
         }
+
     }
+
 }

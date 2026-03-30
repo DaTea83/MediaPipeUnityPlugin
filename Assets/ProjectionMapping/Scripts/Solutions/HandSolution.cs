@@ -12,8 +12,10 @@ using RunningMode = Mediapipe.Tasks.Vision.Core.RunningMode;
 using Image = Mediapipe.Image;
 
 namespace ProjectionMapping {
+	
 	[DisallowMultipleComponent]
 	public sealed class HandSolution : MappingSolution<HandLandmarker, HandSolution> {
+		
 		[SerializeField] private BridgeResultAnnotationController bridgeController;
 
 		private readonly HandLandmarkDetectionConfig _config = new();

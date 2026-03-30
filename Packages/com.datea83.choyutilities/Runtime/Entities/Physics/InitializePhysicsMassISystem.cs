@@ -4,10 +4,12 @@ using Unity.Mathematics;
 using Unity.Physics;
 
 namespace EugeneC.ECS {
+
     [BurstCompile]
     [UpdateInGroup(typeof(Eu_InitializationSystemGroup), OrderFirst = true)]
     [UpdateBefore(typeof(InitializeRandomISystem))]
     public partial struct InitializePhysicsMassISystem : ISystem {
+
         [BurstCompile]
         public void OnUpdate(ref SystemState state) {
             var ecb = new EntityCommandBuffer(state.WorldUpdateAllocator);
@@ -24,18 +26,22 @@ namespace EugeneC.ECS {
 
             ecb.Playback(state.EntityManager);
         }
+
     }
 
     public struct InitializePhysicsMassDataITag : IComponentData { }
 
     /// <summary>
-    /// Stores the data because changing to kinematic will set both data to zero
+    ///     Stores the data because changing to kinematic will set both data to zero
     /// </summary>
     /// <remarks>
-    /// The relationship between mass and inverse mass is : IM = 1 / (M * 100)
+    ///     The relationship between mass and inverse mass is : IM = 1 / (M * 100)
     /// </remarks>
     public struct PhysicsMassIData : IComponentData {
+
         public float InverseMass;
         public float3 InverseInertia;
+
     }
+
 }

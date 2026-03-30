@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 
 namespace EugeneC.Utilities {
+
     //TODO
     [RequireComponent(typeof(Camera))]
     public class CustomProjection : MonoBehaviour {
+
         public float left = -0.2F;
         public float right = 0.2F;
         public float top = 0.2F;
@@ -21,14 +23,15 @@ namespace EugeneC.Utilities {
             float top,
             float near,
             float far) {
-            float x = 2.0F * near / (right - left);
-            float y = 2.0F * near / (top - bottom);
-            float a = (right + left) / (right - left);
-            float b = (top + bottom) / (top - bottom);
-            float c = -(far + near) / (far - near);
-            float d = -(2.0F * far * near) / (far - near);
-            float e = -1.0F;
-            Matrix4x4 m = new Matrix4x4 {
+            var x = 2.0F * near / (right - left);
+            var y = 2.0F * near / (top - bottom);
+            var a = (right + left) / (right - left);
+            var b = (top + bottom) / (top - bottom);
+            var c = -(far + near) / (far - near);
+            var d = -(2.0F * far * near) / (far - near);
+            var e = -1.0F;
+
+            var m = new Matrix4x4 {
                 [0, 0] = x,
                 [0, 1] = 0,
                 [0, 2] = a,
@@ -46,7 +49,10 @@ namespace EugeneC.Utilities {
                 [3, 2] = e,
                 [3, 3] = 0
             };
+
             return m;
         }
+
     }
+
 }

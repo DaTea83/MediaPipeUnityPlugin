@@ -3,6 +3,7 @@ using UnityEngine.Localization;
 
 [CreateAssetMenu(fileName = "ParticleAttributes", menuName = "Choy Utilities/ParticleAttributes")]
 public class ParticleAttributes : ScriptableObject {
+
     public LocalizedString particleName;
     public LocalizedString particleDescription;
 
@@ -19,4 +20,5 @@ public class ParticleAttributes : ScriptableObject {
     private void OnValidate() {
         if (topSpeed <= baseSpeed) topSpeed = baseSpeed;
     }
+
 }

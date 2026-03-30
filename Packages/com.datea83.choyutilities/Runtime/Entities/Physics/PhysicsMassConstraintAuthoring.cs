@@ -5,35 +5,44 @@ using Unity.Physics;
 using UnityEngine;
 
 namespace EugeneC.ECS {
+
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(InitializePhysicsMassAuthoring))]
     public class PhysicsMassConstraintAuthoring : MonoBehaviour {
+
         [SerializeField] private bool lockX;
         [SerializeField] private bool lockY;
         [SerializeField] private bool lockZ;
 
         private class PhysicsMassConstraintAuthoringBaker : Baker<PhysicsMassConstraintAuthoring> {
+
             public override void Bake(PhysicsMassConstraintAuthoring authoring) {
                 var e = GetEntity(TransformUsageFlags.Dynamic);
+
                 AddComponent(e, new InitializeLockRotationIData {
                     X = authoring.lockX,
                     Y = authoring.lockY,
                     Z = authoring.lockZ
                 });
             }
+
         }
+
     }
 
     public struct InitializeLockRotationIData : IComponentData {
+
         public bool X;
         public bool Y;
         public bool Z;
+
     }
 
     [UpdateInGroup(typeof(Eu_InitializationSystemGroup))]
     [UpdateAfter(typeof(InitializePhysicsMassISystem))]
     public partial struct InitializeLockRotationISystem : ISystem {
+
         [BurstCompile]
         public void OnUpdate(ref SystemState state) {
             var ecb = new EntityCommandBuffer(state.WorldUpdateAllocator);
@@ -53,5 +62,7 @@ namespace EugeneC.ECS {
 
             ecb.Playback(state.EntityManager);
         }
+
     }
+
 }
