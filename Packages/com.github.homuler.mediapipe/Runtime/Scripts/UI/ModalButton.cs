@@ -17,7 +17,7 @@ namespace Mediapipe.Unity.Sample.UI
 
 		public void Open()
 		{
-			if (_contents != null)
+			if (_contents is not null)
 			{
 				modal.Open(_contents);
 			}
@@ -25,7 +25,7 @@ namespace Mediapipe.Unity.Sample.UI
 
 		public void OpenAndPause()
 		{
-			if (_contents != null)
+			if (_contents is not null)
 			{
 				modal.OpenAndPause(_contents);
 			}
